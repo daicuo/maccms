@@ -1,0 +1,39 @@
+html, body {
+  overflow-x: hidden;
+}
+/*purple*/
+.bg-purple {
+    background-color: #563d7c;
+}
+.badge-purple {
+    color: #fff;
+    background-color: #563d7c;
+}
+.text-purple, .text-purple a { 
+    color: #7952b3; 
+}
+.text-purple:hover, .text-purple a:hover { 
+    color: #6f42c1; 
+}
+.btn-purple{
+    color: #fff;
+    background-color: #563d7c;
+    border-color: #563d7c;
+}
+.btn-purple:hover:hover {
+    color:#fff;
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+.btn-purple:active, .btn-purple:visited {
+    color:#fff;
+}
+.btn-outline-purple {
+    color: #563d7c;
+    border-color: #563d7c;
+}
+.btn-outline-purple:hover:hover {
+    color:#fff;
+    background-color: #563d7c;
+    border-color: #563d7c;
+}

@@ -1,0 +1,35 @@
+html,
+body {
+  height: 100%;
+}
+body{
+	padding-top:0;
+}
+.text-purple, .text-purple a { 
+    color: #7952b3 !important; 
+}
+.text-purple:hover, .text-purple a:hover { 
+    color: #6f42c1 !important; 
+}
+.btn-purple{
+    color: #fff !important;
+    background-color: #7952b3 !important;
+    border-color: #563d7c !important;
+}
+.btn-purple:hover:hover {
+    color:#fff !important;
+    background-color: #6f42c1 !important;
+    border-color: #6f42c1 !important;
+}
+.btn-purple:active, .btn-purple:visited {
+    color:#fff !important;
+}
+.btn-outline-purple {
+    color: #563d7c !important;
+    border-color: #7952b3 !important;
+}
+.btn-outline-purple:hover:hover {
+    color:#fff;
+    background-color: #7952b3 !important;
+    border-color: #563d7c !important;
+}
