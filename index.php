@@ -1,4 +1,6 @@
 <?php
+set_time_limit(600);
+
 // 框架系统目录
 define('THINK_PATH', __DIR__ .'/thinkphp/');
 
