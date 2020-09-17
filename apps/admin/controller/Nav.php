@@ -48,24 +48,6 @@ class Nav extends Admin{
 		if(!$ids[0]){
 			$this->error(lang('mustIn'));
 		}
-        //只更新排序一级导航,查询出需要调序的ID
-        $args = array();
-        $args['cache'] = false;
-        $args['field'] = 'op_id,op_name,op_value';
-        $args['sort'] = 'op_order';
-        $args['order'] = 'desc';
-        $args['where'] = ['op_id'=>['in',$ids]];
-        $parents = array();
-        foreach(\daicuo\Nav::all($args) as $key=>$value){
-            if($value['nav_parent'] == 0){
-                array_push($parents, $value['op_id']);
-            }
-        }
-        //一级导航ID与待排序ID的交集(去除了子导航)
-        $ids_new = array_intersect_key($ids, $parents);
-        if($ids_new){
-            $ids = $ids_new;
-        }
         //批量更新
 		$list = array();
 		foreach($ids as $key=>$value){
@@ -76,7 +58,8 @@ class Nav extends Admin{
 		if( !dbWriteAuto('common/Op', $list) ){
 			$this->error(config('daicuo.error'));
 		}
-		DcCacheTag('nav_item', 'tag', 'clear');
+        //清理缓存
+		DcCacheTag('common/Op/Item', 'tag', 'clear');
 		$this->success(lang('success'));
 	}
     

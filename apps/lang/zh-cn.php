@@ -91,6 +91,8 @@ return [
     'tpl_placeholder'                       => '模板文件名，不带后缀',
     'url'                                   => '网址链接',
     'url_placeholder'                       => 'https(http)开头的网址',
+    'suffix'                                => '后缀',
+    'suffix_placeholder'                    => '网址后缀、留空则不生成 如(.html)',
     'target'                                => '打开方式',
     'target_option_0'                       => '新窗口',
     'target_option_1'                       => '同窗口',
@@ -106,11 +108,19 @@ return [
     'op_autoload'                           => '自动加载',
     'op_autoload_placeholder'               => 'yes/on',
     //导航
+    'nav_text'                              => '导航名称',
+    'nav_text_placeholder'                  => '导航名称必须填写',
     'nav_type'                              => '导航类型',
     'nav_type_option_0'                     => '外部链接',
-    'nav_type_option_1'                     => '内部模块',
+    'nav_type_option_1'                     => '内部应用',
+    'nav_module'                            => '应用模块名',
+    'nav_module_placeholder'                => '插件应用的标识',
+    'nav_controll'                          => '应用控制器',
+    'nav_controll_placeholder'              => '插件应用的控制器',
+    'nav_action'                            => '应用操作名',
+    'nav_action_placeholder'                => '插件应用的操作名',
     //导航验证
-    'nav_text_require'                      => '#nav_text%导航文本必须填写',
+    'nav_text_require'                      => 'nav_text%导航文本必须填写',
     //应用插件
     'apply_home'                            => '作者主页',
     'apply_empty'                           => '还没有安装任何应用插件，请前往应用市场中心下载并安装。',
@@ -139,12 +149,6 @@ return [
     'author'                                => '作者',
     'editor'                                => '编辑',
     'administrator'                         => '管理员',
-    //导航
-    'nav_text'                              => '导航名称',
-    'nav_text_placeholder'                  => '导航名称必须填写',
-    //导航验证
-    'nav_text_require'                      => 'nav_text%导航文本必须填写',
-    'nav_text_require'                      => 'nav_text%导航文本必须填写',
     //用户表
     'user_name'                             => '用户名',
     'user_name_tips'                        => '永久登录名，注册后将不能修改',

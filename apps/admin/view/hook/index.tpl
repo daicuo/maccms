@@ -41,13 +41,18 @@
     //'data-query-params'=>'queryParams',
     'data-sort-name'=>'op_order',
     'data-sort-order'=>'asc',
-    //'data-sort-class'=>'table-active',
+    
     //'data-pagination'=> 'true',
-    //'data-side-pagination'=> 'client',
-    //'data-page-number'=> '1',
-    //'data-page-size'=> '5',
-    //'data-page-list'=>'[10, 25, 50, 100]',
+    //'data-pagination-h-align'=>'left',
+    //'data-pagination-detail-h-align'=>'right',
+    //'data-pagination-v-align'=>'top',
     //'data-show-extended-pagination'=> 'true',
+
+    //'data-page-number'=> $page,
+    //'data-page-size'=> '10',
+    //'data-page-list'=>'[10, 25, 50, 100]',
+    
+    'data-side-pagination'=> 'server',
     //'data-total-field'=>'total',
     //'data-data-field'=>'rows',
     'columns'=>[

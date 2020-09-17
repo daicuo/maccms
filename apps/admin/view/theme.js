@@ -19,12 +19,14 @@ $(function() {
                     $('.dc-modal #nav_controll').parents('.form-group').removeClass('d-none');
                     $('.dc-modal #nav_action').parents('.form-group').removeClass('d-none');
                     $('.dc-modal #nav_params').parents('.form-group').removeClass('d-none');
+                    $('.dc-modal #nav_suffix').parents('.form-group').removeClass('d-none');
                 }else{
                     $('.dc-modal #nav_url').parents('.form-group').removeClass('d-none');
                     $('.dc-modal #nav_module').parents('.form-group').toggleClass('d-none',true);
                     $('.dc-modal #nav_controll').parents('.form-group').toggleClass('d-none',true);
                     $('.dc-modal #nav_action').parents('.form-group').toggleClass('d-none',true);
                     $('.dc-modal #nav_params').parents('.form-group').toggleClass('d-none',true);
+                    $('.dc-modal #nav_suffix').parents('.form-group').toggleClass('d-none',true);
                 }
             }
         },

@@ -8,7 +8,7 @@ class Nav {
 
     /**
      * 批量增加导航
-     * @param array $data 写入数据（二维数组） 
+     * @param array $list 写入数据（二维数组） 
      * @return null|obj 添加成功返回自增ID数据集
      */
     public static function save_all($list){
@@ -291,7 +291,11 @@ class Nav {
 	private static function navLink($op_value)
     {
 		if($op_value['nav_type'] == 'addon'){
-			return DcUrl($op_value['nav_module'].'/'.$op_value['nav_controll'].'/'.$op_value['nav_action'], $op_value['nav_params']);
+			return DcUrl(
+                $op_value['nav_module'].'/'.$op_value['nav_controll'].'/'.$op_value['nav_action'], 
+                $op_value['nav_params'],
+                $op_value['nav_suffix']
+            );
 		}
 		return $op_value['nav_url'];
 	}
