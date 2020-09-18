@@ -1,0 +1,10 @@
+/*插件后台专用CSS*/
+.api-add{
+    font-size: 1.0rem;
+    font-weight: 500;
+    cursor: pointer;
+    color: blueviolet;
+}
+.api-add:hover{
+    color:darkmagenta;
+}

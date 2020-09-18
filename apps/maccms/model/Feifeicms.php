@@ -63,16 +63,23 @@ class Feifeicms extends Api{
         $page['current_page'] = $data['page']['pageindex'];
         $page['last_page'] = $data['page']['pagecount'];
         //拼装分类数据
+        $type = $this->item_data($data);
+        //返回数据
+        return ['page'=>$page, 'type'=>$type, 'item'=>$item];
+    }
+    
+    //分类字典转化xml
+    public function item_data($data){
         $type = array();
         foreach($data['list'] as $key=>$value){
             $type[$key]['type_id'] = $value['list_id'];
             $type[$key]['type_name'] = $value['list_name'];
         }
-        return ['page'=>$page, 'type'=>$type, 'item'=>$item];
+        return $type;
     }
     
     //详情字典转换xml
-    private function detail_data($data){
+    public function detail_data($data){
         if(!$data){
             return null;
         }

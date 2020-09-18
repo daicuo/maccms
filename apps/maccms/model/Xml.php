@@ -109,7 +109,7 @@ class Xml extends Api{
     }
     
     //分类字典转化xml
-    private function item_data($data){
+    public function item_data($data){
         $item = array();
         $key = 0;
         foreach($data->class->ty as $list){
@@ -121,7 +121,7 @@ class Xml extends Api{
     }
     
     //详情字典转换xml
-    private function detail_data($data){
+    public function detail_data($data){
         if(!$data){
             return null;
         }
