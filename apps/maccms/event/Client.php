@@ -3,6 +3,8 @@ namespace app\maccms\event;
 
 use think\Controller;
 
+use think\Error;
+
 class Client extends Controller
 {
     public $cacheName = '';
@@ -43,7 +45,12 @@ class Client extends Controller
         $model = model('maccms/'.$type);
         $list = $model->item($api, $args);
         if($this->cacheName && $list){
+            //缓存列表数据
             cache($this->cacheName, $list, $this->cacheTime);
+            //提前缓存详情页数据
+            foreach($list['item'] as $key=>$value){
+                $this->detail_cache($api, $value['vod_id'], $value);
+            }
         }
         return $list;
 	}
@@ -136,4 +143,26 @@ class Client extends Controller
         $list = model('maccms/'.$type)->item_data($this->apiData);
         return ['type'=>$type, 'api'=>$this->apiUrl, 'list'=>$list];
     }
+    
+    //直接缓存详情页数据 标识IDS
+	private function detail_cache($api, $id=0, $data){
+        if( (config('cache.expire_detail') > 0) || (config('cache.expire_detail')===0) && $data ){
+            //默认参数
+            $args['ids'] = $id;
+            //附带参数
+            parse_str(config('maccms.api_params'), $params);
+            if($params){
+                $args = array_merge($args, $params);
+                unset($params);
+            }
+            //检测是否已经存在缓存数据
+            $cacheName = md5($api.http_build_query($args));
+            //不存在缓存时设置缓存
+            if(!cache($cacheName)){
+                cache($cacheName, $data, config('cache.expire_detail'));
+            }
+            return true;
+        }
+        return false;
+	}
 }

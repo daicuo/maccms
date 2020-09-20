@@ -3,7 +3,12 @@ namespace app\maccms\controller;
 
 use app\common\controller\Front;
 
-class Api extends Front{
+/*
+** MacCms 主资源站
+*/
+
+class Api extends Front
+{
 
     protected $term = '';
 
