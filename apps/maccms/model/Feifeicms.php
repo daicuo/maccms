@@ -125,7 +125,8 @@ class Feifeicms extends Api{
             return [];
         }
 		$old_url   = explode('$$$', $vod_url);
-        $playList = array();
+        $playList = array();//定义播放列表
+        $playFilter = explode(',', config('maccms.filter_play'));//待过滤的播放器组
         foreach($old_url as $key=>$value){
             $playFrom = $vod_play[$key];//定义播放来源
             if(!$playFrom){
@@ -137,6 +138,13 @@ class Feifeicms extends Api{
                     $playFrom = $playFrom.$key;
                 }
             }
+            //过滤播放器组
+            if($playFilter){
+                if( in_array($playFrom,$playFilter) ){
+                    continue;
+                }
+            }
+            //未被过滤的添加至播放列表
             $playList[$playFrom] = $this->play_one($value);
         }
         return $playList;

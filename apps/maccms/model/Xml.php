@@ -95,6 +95,30 @@ class Xml extends Api{
         //远程读取数据
         $xml = DcCurl('auto', 20, urldecode($api.'?'.http_build_query($url)) );
         $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        //播放来源因为是属性所以先获取后才能json转数组
+        $key = 0;
+        foreach($xml->list->video as $value){
+            //视频播放来源解析
+            $from = array();
+            if($count = count($value->dl->dd)){
+				for($i=0; $i<$count; $i++){
+                    $from[$i] = (string)$value->dl->dd[$i]['flag'];
+				}
+			}else{
+                $from = (string)$value->dt;
+			}
+            //其它字段对象转数组后由字典转换获取
+            $xml = json_decode(json_encode($value), true);
+            $item[$key] = $this->detail_data( array_merge($xml, ['from'=>$from]) );
+            $key++;
+        }
+        //只有一个时返回
+        if(count($item) == 1){
+            return $item[0];
+        }
+        return $item;
+        /*
+        //对像转数组
         $xml = json_decode(json_encode($xml), true);
         //多个IDS时返回列表
         if($xml['list']["@attributes"]['recordcount'] > 1){
@@ -105,7 +129,7 @@ class Xml extends Api{
             return $item;
         }else{
             return $this->detail_data($xml['list']['video']);
-        }
+        }*/
     }
     
     //分类字典转化xml
@@ -141,7 +165,7 @@ class Xml extends Api{
             'vod_actor'           => 'actor',
             'vod_director'        => 'director',
             'vod_updatetime'      => 'last',
-            'vod_play'            => 'dt',
+            'vod_play'            => 'from',
             'episode_total'       => 'total',
             'episode_status'      => 'state',
             'episode_title'       => 'note',
@@ -155,13 +179,13 @@ class Xml extends Api{
         $data['vod_language'] = $this->data_explode($data['vod_language']);
         $data['vod_actor']    = $this->data_explode($data['vod_actor']);
         $data['vod_director'] = $this->data_explode($data['vod_director']);
-        $data['play_list']    = $this->play_list($data['play_list']);
+        $data['play_list']    = $this->play_list($data['vod_play'], $data['play_list']);
         $data['play_last']    = $this->play_last($data['type_id'], $data['vod_id'], $data['play_list']);
         return $data;
     }
     
     //播放列表xml
-    private function play_list($xml){
+    private function play_list($from, $xml){
         if( empty($xml) ){
             return '';
         }
@@ -169,10 +193,19 @@ class Xml extends Api{
         if( is_string($xml['dd']) ){
            $xml['dd'] = [$xml['dd']] ;
         }
-        //$playName = explode('#', $xml['dt']);
-        $playList = array();
+        $playList = array();//定义播放列表
+        $playFilter = explode(',', config('maccms.filter_play'));//待过滤的播放器组
         foreach($xml['dd'] as $key=>$value){
-            $playList['play'.$key] = $this->play_one($value);
+            //获取播放来源
+            $playFrom = DcEmpty($from[$key],'play'.$key);
+            //过滤播放器组
+            if($playFilter){
+                if( in_array($playFrom, $playFilter) ){
+                    continue;
+                }
+            }
+            //未被过滤的添加至播放列表
+            $playList[$playFrom] = $this->play_one($value);
         }
         return $playList;
 	}

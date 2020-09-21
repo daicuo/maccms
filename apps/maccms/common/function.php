@@ -119,6 +119,13 @@ function apiType($typeId, $api=''){
  * @return array|false 读取失败时返回false
  */
 function apiItem($args=[], $api=''){
+    //分类过滤
+    if($args['t'] && config('maccms.filter_tid')){
+        if(in_array($args['t'], explode(',', config('maccms.filter_tid')) )){
+            return null;
+        }
+    }
+    //默认参数
     $params = [
         'ac'    => 'list',
         'pg'    => 1,
@@ -145,11 +152,18 @@ function apiItem($args=[], $api=''){
  * @return array|false 读取失败时返回false
  */
 function apiDetail($id, $api=''){
+    //详情ID过滤
+    if($id && config('maccms.filter_ids')){
+        if( in_array($id, explode(',', config('maccms.filter_ids') ) ) ){
+            return null;
+        }
+    }
+    //默认参数
     if(empty($api)){
         $api = config('maccms.api_url');
     }
-    $event = controller('maccms/Client','event');
-    return $event->detail($api, ['ids'=>$id]);
+    //获取数据
+    return controller('maccms/Client','event')->detail($api, ['ids'=>$id]);
 }
 
 /*-------------------MacCms常用函数-------------------------------*/
@@ -167,6 +181,7 @@ function navItem($params=[]){
     $args['order'] = 'asc';
     $args['tree']  = true;
     $args['where']['op_module'] = ['eq', 'maccms'];
+    $args['where']['op_status'] = ['eq', 'normal'];
     //$args['cache'] = false;
     //$args['fetchSql'] = true;
     //$args['limit'] = 0;
@@ -192,6 +207,7 @@ function categoryItem($params=[]){
     $args['with'] = ['termMeta'];
     $args['where']['term_much_type'] = ['eq', 'category'];
     $args['where']['term_module'] = ['eq', 'maccms'];
+    $args['where']['term_status'] = ['eq', 'normal'];
     //$args['cache'] = false;
     //$args['fetchSql'] = true;
     //$args['limit'] = 0;
@@ -379,3 +395,47 @@ function typeId2termId($typeId){
     }
     return $types[0]['term_id'];
 }
+
+/** 
+ * 将对象转换为多维数组 
+ * 
+ **/  
+function objectToArray($d) {  
+    if (is_object($d)) {  
+        // Gets the properties of the given object  
+        // with get_object_vars function  
+        $d = get_object_vars($d);  
+    }  
+  
+    if (is_array($d)) {  
+        /* 
+        * Return array converted to object 
+        * Using __FUNCTION__ (Magic constant) 
+        * for recursive call 
+        */  
+        return array_map(__FUNCTION__, $d);  
+    }  
+    else {  
+        // Return array  
+        return $d;  
+    }  
+}  
+   
+/** 
+ * 将多维数组转换为对象 
+ * 
+ **/  
+function arrayToObject($d) {  
+    if (is_array($d)) {  
+        /* 
+        * Return array converted to object 
+        * Using __FUNCTION__ (Magic constant) 
+        * for recursive call 
+        */  
+        return (object) array_map(__FUNCTION__, $d);  
+    }  
+    else {  
+        // Return object  
+        return $d;  
+    }  
+}  

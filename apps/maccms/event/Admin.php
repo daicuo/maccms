@@ -24,6 +24,11 @@ class Admin extends Controller
         return $this->fetch('maccms@admin/index');
 	}
     
+    //过滤配置
+	public function filter(){
+        return $this->fetch('maccms@admin/filter');
+	}
+    
     //保存配置
     public function update(){
         $status = \daicuo\Op::write(

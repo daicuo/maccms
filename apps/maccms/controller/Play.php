@@ -58,7 +58,7 @@ class Play extends Front{
             }
         }
         //播放器
-        $info['vod_player'] = DcPlayer(['type'=>$info['play_from'],'url'=>$info['play_url']]);
+        $info['vod_player'] = DcPlayer(['type'=>$info['play_from'],'poster'=>$info['vod_cover'],'url'=>$info['play_url']]);
         if($term){
             $info = array_merge($info, $term);
         }

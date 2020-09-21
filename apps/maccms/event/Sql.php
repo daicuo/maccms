@@ -15,6 +15,7 @@ class Sql
             'site_description'=>'青苹果API影视系统提供2020年最新好看的免费电影与电视剧。',
             'theme'           =>'default_pc',
             'theme_wap'       =>'default_wap',
+            'page_size'       =>30,
         ];
         $result = \daicuo\Op::write($op_value, 'maccms', '', '', '0', 'yes');
         if(!$result){
@@ -33,7 +34,7 @@ class Sql
                 'hook_path'=>'app\maccms\behavior\Hook',
                 'hook_overlay'=>'no',
                 'op_module'=>'maccms',
-            ]
+            ],
         ]);
         if(!$result){
             return false;
