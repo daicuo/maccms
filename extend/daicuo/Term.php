@@ -11,7 +11,7 @@ class Term {
         //self::$config = array_merge(self::$config, $config);
     }
     */
- 
+    
      /**
      * 通过termId获取队列信息
      * @param string $value 字段值 
@@ -32,6 +32,24 @@ class Term {
             return array_merge($data, $data_meta);
         }
         return null;
+    }
+    
+    /**
+     * 按termId修改一个队列
+     * @param string $value 字段值
+     * @param array $data 写入数据（一维数组） 
+     * @return obj|null 不为空时返回obj
+     */
+    public static function update_id($value, $data){
+        if ( ! $value ) {
+            return null;
+        }
+        if($value < 1){
+            return null;
+        }
+        $where = array();
+        $where['term_id'] = ['eq', $value];
+        return self::update($where, $data);
     }
     
     /**
@@ -56,21 +74,58 @@ class Term {
     }
     
     /**
-     * 按termId修改一个队列
-     * @param string $value 字段值
-     * @param array $data 写入数据（一维数组） 
-     * @return obj|null 不为空时返回obj
+     * 按模块名删除整个模块的分类
+     * @param array module 模块名
+     * @return array 影响数据
      */
-    public static function update_id($value, $data){
-        if ( ! $value ) {
-            return null;
+    public static function delete_module($module){
+        if($module){
+           return self::delete_all(['term_module'=>['eq',$module]]); 
         }
-        if($value < 1){
-            return null;
+        return 0;
+    }
+    
+    /**
+     * 批量删除分类数据
+     * @param array $where 查询条件
+     * @return array 影响数据的条数
+     */
+    public static function delete_all($where){
+        $status = ['term'=>0,'term_much'=>0,'term_meta'=>0,'term_map'=>0];
+        $term_id = db('term')->where($where)->column('term_id');
+        if($term_id){
+            $term_much_id = db('termMuch')->where(['term_id'=>['in',$term_id]])->column('term_much_id');
+            //定义钩子参数
+            $hookParams = ['term_id'=>$term_id, 'term_much_id'=>$term_much_id];
+            //预留钩子term_delete_all_before
+            \think\Hook::listen('term_delete_all_before', $hookParams);
+            if($term_much_id){
+                $status['term_map'] = db('termMap')->where(['term_much_id'=>['in',$term_much_id]])->delete();
+            }
+            $status['term_meta'] = db('termMeta')->where(['term_id'=>['in',$term_id]])->delete();
+            $status['term_much'] = db('termMuch')->where(['term_id'=>['in',$term_id]])->delete();
+            $status['term'] = db('term')->where(['term_id'=>['in',$term_id]])->delete();
+            //预留钩子term_delete_all_after
+            \think\Hook::listen('term_delete_all_after', $hookParams, $status);
+            //缓存标识清理
+            DcCacheTag('common/Term/Item', 'clear');
         }
-        $where = array();
-        $where['term_id'] = ['eq', $value];
-        return self::update($where, $data);
+        return $status;
+    }
+    
+    /**
+     * 批量增加分类
+     * @param array $list 写入数据（二维数组） 
+     * @return null|obj 添加成功返回自增ID数据集
+     */
+    public static function save_all($list){
+        //关联新增只有循环操作
+        foreach($list as $key=>$data){
+            $status[$key] = self::save($data);
+        }
+        //缓存标识清理
+        DcCacheTag('common/Term/Item', 'clear');
+        return $status;
     }
     
     /**
@@ -82,19 +137,10 @@ class Term {
     public static function save($data, $relation='term_much,term_meta'){
         //必要验证term/termMuch
         if(false === DcCheck($data, 'common/Term', 'save')){
-            //dump(config('daicuo.error'));
-            return 0;
+            return 0;//dump(config('daicuo.error'));
 		}
         //数据整理成关联写入的格式
-        if($data['term_slug']){
-            $data['term_slug'] = DcSlugUnique('term', $data['term_slug']);
-        }else{
-            $data['term_slug'] = '';
-        }
-        //$data = DcDataToOne($data, 'term_much_type,term_much_info,term_much_parent,term_much_count,term_id', 'term_much');
-        //$data = DcDataToMany($data, 'tpl', 'term_meta');
-        $data = DcDataToOne($data, DcConfig('common.custom_fields.term_much'), 'term_much');
-        $data = DcDataToMany($data, DcConfig('common.custom_fields.term_meta'), 'term_meta');
+        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['data'] = $data;
@@ -114,7 +160,7 @@ class Term {
     }
     
     /**
-     * 按条件删除一个队列
+     * 按条件关联删除一个队列
      * @param array $where 删除条件
      * @param string|array $relation 关联表 
      * @return string 返回操作记录数(0|1,1)
@@ -148,19 +194,12 @@ class Term {
     public static function update($where, $data, $relation='term_much,term_meta'){
         //必要字段验证term/termMuch
         if(false === DcCheck($data, 'common/Term', 'update')){
-            //dump(config('daicuo.error'));
             return null;
 		}
         //类型不可修改去掉此字段
         unset($data['term_much_type']);
         //数据整理成关联写入的格式
-        if($data['term_slug']){
-            $data['term_slug'] = DcSlugUnique('term', $data['term_slug'], $data['term_id']);
-        }else{
-            $data['term_slug'] = '';
-        }
-        $data = DcDataToOne($data, DcConfig('common.custom_fields.term_much'), 'term_much');
-        $data = DcDataToMany($data, DcConfig('common.custom_fields.term_meta'), 'term_meta');
+        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -423,6 +462,25 @@ class Term {
             }
         }
         return $children;
+    }
+    
+    /**
+     * 转换post数据
+     * @param array $data 表单数据
+     * @return array 关联写入数据格式
+     */
+    public static function data_post($data){
+        //数据整理成关联写入的格式
+        if($data['term_slug']){
+            $data['term_slug'] = DcSlugUnique('term', $data['term_slug'], intval($data['term_id']));
+        }else{
+            $data['term_slug'] = '';
+        }
+        //$data = DcDataToOne($data, 'term_much_type,term_much_info,term_much_parent,term_much_count,term_id', 'term_much');
+        //$data = DcDataToMany($data, 'term_tpl', 'term_meta');
+        $data = DcDataToOne($data, DcConfig('custom_fields.term_much'), 'term_much');
+        $data = DcDataToMany($data, DcConfig('custom_fields.term_meta'), 'term_meta');
+        return $data;
     }
     
 }

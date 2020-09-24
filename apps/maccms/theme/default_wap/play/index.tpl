@@ -18,9 +18,14 @@
   </a>
 </p>
 <div class="px-1">
-  <h6 class="text-truncate">
-    <span class="text-dark">{$vod_title}</span>
-    <small class="text-muted">{$episode_title}</small>
+  <h6 class="text-truncate d-flex flex-row justify-content-between">
+    <div>
+      <span class="text-dark">{$vod_title}</span>
+      <small class="text-muted">{$episode_title}</small>
+    </div>
+    <a class="small text-muted text-decoration-none mr-1" href="#content">
+      简介<span class="fa fa-angle-double-right"></span>
+    </a>
   </h6>
   <h6 class="text-truncate text-muted small">
     {volist name="vod_year" id="year"}{$year} / {/volist}
@@ -55,7 +60,7 @@
     <fieldset>
       <legend class="h6 px-4">
         <i class="fa fa-flag text-purple"></i>
-        <a class="text-dark text-decoration-none" href="javascript:;">影片简介</a>
+        <a class="text-dark text-decoration-none" name="content">影片简介</a>
       </legend>
     </fieldset>
   </div>

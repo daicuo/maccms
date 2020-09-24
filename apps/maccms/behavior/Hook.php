@@ -7,10 +7,8 @@ class Hook extends Controller
 {
     //后台系统初始化
     public function hookAdminInit(&$params){
-        //自定义表单字段需要保存至数据库
-        $fields = config('common.custom_fields');
-        $fields['term_meta'] = array_merge($fields['term_meta'],['term_api_url','term_api_params','term_api_tid']);
-        config('common.custom_fields', $fields);
+        $fields = array_merge(config('custom_fields.term_meta'),['term_api_url','term_api_params','term_api_tid']);
+        config('custom_fields.term_meta', $fields);
     }
     
     // 表单生成

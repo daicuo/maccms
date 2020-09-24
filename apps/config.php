@@ -51,7 +51,7 @@ return [
         //'max_files'    => 300,
     ],
   
-  // 模板配置
+    // 模板配置
     'template' => [
         // 视图基础目录，配置目录为所有模块的视图起始目录
         //'view_base'    => 'view/',
@@ -134,5 +134,41 @@ return [
         404 => APP_PATH . 'common' . DS . 'view' . DS . 'http_exception_404.tpl',
         // 还可以定义其它的HTTP status
         500 => APP_PATH . 'common' . DS . 'view' . DS . 'http_exception_500.tpl',
+    ],
+    
+    //系统特殊变量
+    'daicuo' => [
+        'error'   =>'fail',
+        'version' =>'1.2.15',
+    ],
+    
+    //系统基础配置
+    'common' => [
+        'site_name'   => 'DaiCuo',
+        'site_status' => 'off',
+        'site_close'  => 'Site closed',
+        'site_secret' => 'abcdefghijklmnopqrst',
+        'site_applys' => [],
+        'site_theme'  => 'default_pc',
+        'wap_theme'   => 'default_wap',
+    ],
+    
+    //自定义字段
+    'custom_fields'  => [
+        'term_much'  => ['term_much_type','term_much_info','term_much_parent','term_much_count'],
+        'term_meta'  => ['term_tpl'],
+        'user_meta'  => ['user_capabilities'],
+    ],
+    
+    //用户权限
+    'user_roles' => [
+        'guest'         => [
+            'admin/index/login',
+            'admin/index/logout',
+            //'index/login/?url=test',
+        ],
+        'administrator' => [
+            '*',
+        ]
     ],
 ];

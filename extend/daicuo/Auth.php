@@ -12,7 +12,7 @@ class Auth
     public static function get_roles()
     {
         $roles = array();
-        foreach(config('common.user_roles') as $role => $value){
+        foreach(config('user_roles') as $role => $value){
             array_push($roles, $role);
         }
         return $roles;
@@ -25,7 +25,7 @@ class Auth
     public static function get_caps()
     {
         $caps = array();
-        foreach(config('common.user_roles') as $key => $value){
+        foreach(config('user_roles') as $key => $value){
             if(is_array($value)){
                 $caps = array_merge($caps, $value);
             }
@@ -46,7 +46,7 @@ class Auth
         }else if(is_string($capabilities)){
             $capabilities = [$capabilities];
         }
-        $user_roles = config('common.user_roles');
+        $user_roles = config('user_roles');
         foreach($capabilities as $role){
             if(isset($user_roles[$role])){
                 array_push($roles, $role);
@@ -69,7 +69,7 @@ class Auth
         }else if(is_string($capabilities)){
             $capabilities = [$capabilities];
         }
-        $user_roles = config('common.user_roles');
+        $user_roles = config('user_roles');
         foreach($capabilities as $role){
             $cap = $user_roles[$role];
             if(isset($cap)){
@@ -98,7 +98,7 @@ class Auth
         //if (!$this->config['auth_on']) {
             //return true;
         //}
-        $roles = config('common.user_roles');
+        $roles = config('user_roles');
         
         $rulelist = self::get_user_caps($capabilities);
         

@@ -15,7 +15,7 @@ class Addon extends Admin
         //定义插件路径
         $this->site['path_addon'] = 'apps/'.Dchtml($this->query['module']).'/';
         //加载插件默认模块配置
-        DcLoadConfig(APP_PATH.$appModule.'/config.php');
+        DcLoadConfig(APP_PATH.Dchtml($this->query['module']).'/config.php');
         //注册插件默认钩子
         
         // 初始化后台钩子

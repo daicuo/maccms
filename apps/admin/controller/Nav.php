@@ -29,6 +29,12 @@ class Nav extends Admin{
             if($this->query['op_module']){
                 $args['where']['op_module'] = ['eq', DcHtml($this->query['op_module'])];
             }
+            if($this->query['op_controll']){
+                $args['where']['op_controll'] = ['eq', DcHtml($this->query['op_controll'])];
+            }
+            if($this->query['op_action']){
+                $args['where']['op_action'] = ['eq', DcHtml($this->query['op_action'])];
+            }
             if($this->query['searchText']){
                 $args['where']['op_value'] = ['like','%'.DcHtml($this->query['searchText']).'%'];
             }

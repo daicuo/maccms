@@ -22,6 +22,7 @@ class Video
         'frontTime'    =>0, //前贴片时长
         'endUrl'       =>'',//后贴片广告
         'endTime'      =>'',//后贴片时长
+        'poster'       =>'',//封面图片
         'advUnit'      =>'',//广告扩展配置
     ];
 

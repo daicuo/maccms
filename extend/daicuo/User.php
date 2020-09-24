@@ -250,7 +250,7 @@ class User {
     public static function save($data, $relation='user_meta'){
         //格式化数据
         //$data = DcDataToMany($data, 'user_capabilities', 'user_meta');
-        $data = DcDataToMany($data, DcConfig('common.custom_fields.user_meta'), 'user_meta');
+        $data = DcDataToMany($data, DcConfig('custom_fields.user_meta'), 'user_meta');
         //钩子传参定义
         $params = array();
         $params['data'] = $data;
@@ -310,7 +310,7 @@ class User {
         }
         //格式化数据
         //$data = DcDataToMany($data, 'user_capabilities', 'user_meta');
-        $data = DcDataToMany($data, DcConfig('common.custom_fields.user_meta'), 'user_meta');
+        $data = DcDataToMany($data, DcConfig('custom_fields.user_meta'), 'user_meta');
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -410,5 +410,53 @@ class User {
      */
     public static function count_users($strategy = 'time'){
     
+    }
+    
+    /**
+     * 批量增加用户
+     * @param array $list 写入数据（二维数组） 
+     * @return null|obj 添加成功返回自增ID数据集
+     */
+    public static function save_all($list){
+        //关联新增只有循环操作
+        foreach($list as $key=>$data){
+            $status[$key] = self::save($data);
+        }
+        //缓存标识清理
+        DcCacheTag('common/User/Item', 'clear');
+        return $status;
+    }
+    
+    /**
+     * 按模块名删除整个模块的用户
+     * @param array module 模块名
+     * @return array 影响数据
+     */
+    public static function delete_module($module){
+        if($module){
+           return self::delete_all(['user_module'=>['eq', $module]]); 
+        }
+        return 0;
+    }
+    
+    /**
+     * 批量删除用户数据
+     * @param array $where 查询条件
+     * @return array 影响数据的条数
+     */
+    public static function delete_all($where){
+        $status = ['user'=>0,'user_meta'=>0];
+        $user_id = db('user')->where($where)->column('user_id');
+        if($user_id){
+            //预留钩子user_delete_all_before
+            \think\Hook::listen('user_delete_all_before', $user_id);
+            $status['user_meta'] = db('userMeta')->where(['user_id'=>['in',$user_id]])->delete();
+            $status['user'] = db('user')->where(['user_id'=>['in',$user_id]])->delete();
+            //预留钩子user_delete_all_after
+            \think\Hook::listen('user_delete_all_after', $user_id, $status);
+            //缓存标识清理
+            DcCacheTag('common/User/Item', 'clear');
+        }
+        return $status;
     }
 }

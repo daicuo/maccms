@@ -52,36 +52,4 @@ class Type extends Controller
         }
         return json($status);
     }
-    
-    public function test(){
-        $types = categoryItem();
-        dump(list_search($types, ['term_api_url'=>'https://cj.okzy.tv/inc/api.php']));
-        dump($types);
-    }
-    
-    public function site_add(){
-        $post = array();
-        $post['api_type'] = input('post.api_type/s');
-        $post['api_url'] = input('post.api_url/s');
-        $result = apiAdd($post['api_url']);
-        foreach($result['list'] as $key=>$value){
-            $category = array();
-            $category['term_name'] = $value['type_name'];
-            $category['term_module'] = 'maccms';
-            $category['term_much_type'] = 'category';
-            $category['term_tpl'] = 'index';
-            $category['term_api_type'] = $result['type'];//xml|json
-            $category['term_api_url'] = $result['api'];//api_url
-            $category['term_api_tid'] = $value['type_id'];//type_id
-            $status = \daicuo\Term::save($category);
-            dump($status);
-        }
-        //$status = \daicuo\Term::save($category);
-        //dump(config('daicuo.error'));
-        //dump($status);
-        dump($category);
-        dump($result);
-        $this->assign('themes', $themes);
-        //return $this->fetch('maccms@admin/site');
-	}
 }

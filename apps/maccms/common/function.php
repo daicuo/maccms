@@ -140,8 +140,7 @@ function apiItem($args=[], $api=''){
     if(empty($api)){
         $api = config('maccms.api_url');
     }
-    $event = controller('maccms/Client', 'event');
-    return $event->item($api, $args);
+    return controller('maccms/Client', 'event')->item($api, $args);
 }
 
 /**

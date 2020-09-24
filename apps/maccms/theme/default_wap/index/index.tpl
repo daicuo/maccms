@@ -15,7 +15,7 @@
   {volist name=":categoryItem()" id="maccms" mod="5" offset="0" length="100"}
   <div class="col px-1">
     <a class="text-dark text-decoration-none" href="{:categoryUrl($maccms['term_id'],$maccms['term_slug'])}">
-      {assign name="color" value=":colorRand(rand(0,7))" /}
+      {assign name="color" value=":colorRand(7)" /}
       <span class="fa-stack fa-lg text-{$color}">
         <i class="fa fa-circle-thin fa-stack-2x"></i>
         <i class="fa-fw fa-stack-1x {:faIcoRand()} text-{$color}"></i>

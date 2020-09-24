@@ -6,11 +6,8 @@ use think\Controller;
 class Hook extends Controller
 {
     //系统初始化
-    public function hookAdminInit(&$params){
-        //自定义表单字段需要保存至数据库
-        $fields = config('common.custom_fields');
-        $fields['term_meta'] = array_merge($fields['term_meta'],['term_hook']);
-        config('common.custom_fields', $fields);
+    public function hookBaseInit(&$params){
+        config('custom_fields.term_meta', array_merge(config('custom_fields.term_meta'), ['term_hook']) );
     }
     
     // 表单生成

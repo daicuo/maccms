@@ -15,10 +15,7 @@ use think\Response;
 use think\Session;
 use think\Url;
 use think\View;
-//关闭错误报告
 error_reporting(E_ERROR);
-//报告 runtime 错误
-//error_reporting(E_ERROR | E_WARNING | E_PARSE);
 /**************************************************分类组件***************************************************/
 /**
  * 获取导航列表简单数组格式
@@ -29,6 +26,7 @@ function DcCategoryOption($args){
     if($args){
         $args = array_merge(['cache'=>false], $args);
     }else{
+        $args['module'] = DcHtml(input('op_module/s',''));
         $args['cache'] = false;
     }
     return \daicuo\Term::option($args);
@@ -48,6 +46,10 @@ function DcNavAll($args){
  * @return mixed null|array;
  */
 function DcNavOption($args){
+    if(!$args){
+        $args['where'] = DcWhereByQuery(['op_module','op_controll','op_action']);
+        $args['cache'] = false;
+    }
     return \daicuo\Nav::option($args);
 }
 /**************************************************权限组件***************************************************/
@@ -206,7 +208,7 @@ function DcBool($value, $default=''){
     return DcDefault($value, 'true', $default);
 }
 //将参数组装为数组
-function DcParseArgs($args,$defaults = ''){
+function DcParseArgs($args, $defaults = ''){
 	if ( is_array( $args ) ){
         //如果是数组则不转换
 		$r =& $args;
@@ -499,6 +501,28 @@ function DcWith($with){
     }
     return $with;
 }
+/**
+ * 根据query参数生成查询条件
+ * @param array $fields 白名单字段
+ * @return array;
+ */
+function DcWhereByQuery($fields=[]){
+    //空值过滤
+    $query = array_filter(request()->param(), function($value){
+        if($value || $value=='0'){
+            return true;
+        }
+        return false;
+    });
+    //字段过滤
+    $where = array();
+    foreach($query as $key=>$value){
+        if( in_array($key, $fields) ){
+            $where[$key] = ['eq', DcHtml($value)];
+        }
+    }
+    return $where;
+}
 /****************************************************ThinkPhp配置***************************************************/
 //获取系统配置.支持多级层次
 function DcConfig($config_name){
@@ -594,10 +618,10 @@ function DcCacheTag($tag, $key, $value='', $time=0){
         return false;
     }
     if($key == 'clear' && $value == ''){
-        return Cache::clear($tag);
+        return Cache::clear($tag);//DcCacheTag('tag','clear');
     }
     if($value === false || $value == 'clear'){
-        return Cache::clear($tag);//DcCacheTag('tag','clear');
+        return Cache::clear($tag);//DcCacheTag('tag','clear','clear');
     }
     if($value){
         return Cache::tag($tag)->set($key, $value, $time);//DcCacheTag('tag','key','value',60);
@@ -653,10 +677,10 @@ function DcUrlAddon($vars = '', $suffix = true){
 }
 //模板存放路径
 function DcViewPath($module, $isMobile){
-    return 'apps/'.$module.'/theme/'.DcTheme($module,$isMobile).'/';
+    return 'apps/'.$module.'/theme/'.DcTheme($module, $isMobile).'/';
 }
 //模板主题目录
-function DcTheme($module='home', $isMobile=false){
+function DcTheme($module='index', $isMobile=false){
     if($isMobile){
         return DcEmpty(config($module.'.theme_wap'),config('common.wap_theme'));
     }

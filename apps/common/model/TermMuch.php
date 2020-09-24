@@ -15,4 +15,8 @@ class TermMuch extends Model{
 		return $this->belongsTo('TermMeta','term_id');
 	}
     
+    public function termMap(){
+		return $this->hasMany('TermMap','term_much_id');
+	}
+    
 }
