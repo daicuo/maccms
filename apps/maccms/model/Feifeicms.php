@@ -37,6 +37,20 @@ class Feifeicms extends Api{
         $url['p']      = $args['pg'];//pg 分页
         $url['wd']     = '';//wd search
         $url['play']   = $args['rid'];//rid 播放器名称
+        //feifeicms增加
+        $url['area']      = $args['area'];
+        $url['year']      = $args['year'];
+        $url['language']  = $args['language'];
+        $url['actor']     = $args['actor'];
+        $url['director']  = $args['director'];
+        $url['wirter']    = $args['wirter'];
+        $url['name']      = $args['name'];
+        $url['ename']     = $args['ename'];
+        $url['state']     = $args['state'];
+        $url['letter']    = $args['letter'];
+        $url['order']     = $args['order'];
+        $url['sort']      = $args['sort'];
+        //参数合并
         if(is_array($args)){
             $url = array_merge($url, $args);
         }

@@ -27,23 +27,48 @@ function apiTermSlug($slug, $page=1){
 }
 
 /**
+ * 按系统分类ID获取API数据列表最新N条(参数由后台分类设置)
+ * @param int $id 分类ID
+ * @param int $limit 数量
+ * @return array 数据列表不带分页
+ */
+function apiTermIdLimit($id, $limit=10){
+    $term = apiTerm(categoryId($id), ['limit'=>$limit]);
+    return $term['item'];
+}
+
+/**
+ * 按系统分类ID获取API数据列表(参数不固定)
+ * @param int $id 分类ID
+ * @param int $args 自定义参数
+ * @return array 数据列表不带分页
+ */
+function apiTermIdArgs($id, $params){
+    $term = apiTerm(categoryId($id), $params);
+    return $term['item'];
+}
+
+/**
  * 按系统分类信息获取API数据列表
  * @param array $term 分类信息
- * @param int $page 页码
- * @return array 数据列表
+ * @param int $params 自定义参数
+ * @return array 数据列表带分页
  */
-function apiTerm($term, $page=1){
+function apiTerm($term, $params){
     //检查分类信息
     if( !$term['term_api_tid'] ){
         return null;
     }
     $arg = array();
     $arg['t'] = $term['term_api_tid'];
-    $arg['pg'] = DcEmpty($term['term_api_pg'],1);
-    $arg['limit'] = intval(config('maccms.page_size'));//分页统一后台设置
+    $arg['pg'] = DcEmpty($term['term_api_pg'], 1);
+    //分页统一后台设置
+    $arg['limit'] = intval(config('maccms.page_size'));
+    //关键字限制
     if($term['term_api_wd']){
         $arg['wd'] = $term['term_api_wd'];
     }
+    //更新时间限制
     if($term['term_api_h']){
         $arg['h'] = $term['term_api_h'];
     }
@@ -52,6 +77,11 @@ function apiTerm($term, $page=1){
         $api_params = config('maccms.api_params');
         config('maccms.api_params', $term['term_api_params']);
     }
+    //自定义参数
+    if($params){
+        $arg = array_merge($arg, $params);
+    }
+    //读取远程数据
     $list = apiItem($arg, $term['term_api_url']);
     //还原默认附加参数
     if($api_params){
@@ -95,7 +125,7 @@ function apiHour($hour=24, $api=''){
  * @return array|false 读取失败时返回false
  */
 function apiNew($limit=20, $api=''){
-    $list = apiItem(['pg'=>1,'limit'=>DcEmpty($limit, 20)]);
+    $item = apiItem(['pg'=>1,'limit'=>DcEmpty($limit, 20)]);
     return $item['item'];
 }
 
@@ -109,6 +139,43 @@ function apiNew($limit=20, $api=''){
 function apiType($typeId, $api=''){
     $item = apiItem(['t'=>$typeId], $api);
     return $item['item'];
+}
+
+/**
+ * 按字段直接调用远程API数据(需要API接口支持)
+ * @param string field 字段名称
+ * @param string value 字段值
+ * @param array params 其它参数
+ * @param string $api API入口地址 不带参数
+ * @return array|false 读取失败时返回false
+ */
+function apiField($field='wd', $value='', $params=[], $api=''){
+    if( !$value ){
+        return null;
+    }
+    if( !in_array($field,['wd','actor','director','writer','area','year','language','state','name','ename','letter']) ){
+        return null;
+    }
+    $args = array();
+    $args['t'] = '';//分类
+    $args['h'] = 0;//时间限制
+    $args['pg'] = 1;//页码
+    $args['limit'] = 10;//数量
+    $args['order'] = '';//排序字段
+    $args['sort'] = '';//排序方式
+    $args[$field] = $value;//字段:如主演actor
+    $args['return'] = 'item';//page时返回分页信息
+    if($params){
+        $args = array_merge($args, $params);
+    }
+    $item = apiItem($args, $api);
+    //返回方式
+    $returnType = $args['return'];
+    unset($args['return']);
+    if($returnType == 'item'){
+        return $item['item'];
+    }
+    return $item;
 }
 
 /**
@@ -133,6 +200,20 @@ function apiItem($args=[], $api=''){
         't'     => '',
         'wd'    => '',
         'limit' => 20,
+        /*以下个性参数需要CMSAPI接口支持
+        'area'       => '',
+        'year'       => '',
+        'language'   => '',
+        'actor'      => '',
+        'director'   => '',
+        'writer'     => '',
+        'name'       => '',
+        'ename'      => '',
+        'letter'     => '',
+        'state'      => '',
+        'order'      => '',
+        'sort'       => '',
+        */
     ];
     if($args){
         $args = array_merge($params, $args);
