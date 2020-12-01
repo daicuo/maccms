@@ -9,10 +9,48 @@
 {block name="header"}{include file="block/header" /}{/block}
 <!-- -->
 {block name="main"}
+<div id="dcSlide" class="carousel slide" data-ride="carousel">
+  <ol class="carousel-indicators">
+    {volist name=":config('slide')" id="dc" offset="0" length="8"}
+    <li data-target="#dcSlide" data-slide-to="{$key}" {eq name="key" value="0"}class="active"{/eq}></li>
+    {/volist}
+  </ol>
+  <div class="carousel-inner">
+    {volist name=":config('slide')" id="dc" offset="0" length="8"}
+    <div class="carousel-item {eq name="key" value="0"}active{/eq}">
+     <a href="{$dc.url}">
+     <img src="{$dc.image}" class="d-block w-100 img-slide" alt="{$dc.title}">
+     </a>
+    </div>
+    {/volist}
+  </div>
+  <a class="carousel-control-prev" href="#dcSlide" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#dcSlide" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
 <div class="container">
 <!-- -->
 <div class="row px-0 pt-4 pb-1 text-center">
-  {volist name=":categoryItem()" id="maccms" mod="5" offset="0" length="100"}
+  {volist name=":navItem(['limit'=>10])" id="maccms" mod="5" offset="0" length="10"}
+  <div class="col px-1">
+    <a class="text-dark text-decoration-none" href="{$maccms.nav_link}">
+      {assign name="color" value=":colorRand(7)" /}
+      <span class="fa-stack fa-lg text-{$color}">
+        <i class="fa fa-circle-thin fa-stack-2x"></i>
+        <i class="fa-fw fa-stack-1x text-{$color} {$maccms.nav_ico}"></i>
+      </span>
+      <p class="small mb-0 mt-1">{$maccms.nav_text|DcSubstr=0,5,false}</p>
+    </a>
+  </div>
+  {eq name="mod" value="4"}<div class="w-100 mt-3"></div>{/eq}
+  {/volist}
+  
+  {volist name=":categoryItem()" id="maccms" mod="5" offset="0" length="10"}
   <div class="col px-1">
     <a class="text-dark text-decoration-none" href="{:categoryUrl($maccms['term_id'],$maccms['term_slug'])}">
       {assign name="color" value=":colorRand(7)" /}
@@ -20,10 +58,10 @@
         <i class="fa fa-circle-thin fa-stack-2x"></i>
         <i class="fa-fw fa-stack-1x {:faIcoRand()} text-{$color}"></i>
       </span>
-      <p class="small mb-0 mt-1">{$maccms.term_name|DcSubstr=0,5,false}</p>
+      <p class="small mb-0 mt-1">{$maccms.term_name|DcSubstr=0,4,false}</p>
     </a>
   </div>
-  {eq name="mod" value="4"}<div class="w-100 mb-2"></div>{/eq}
+  {eq name="mod" value="4"}<div class="w-100 mt-3"></div>{/eq}
 {/volist}
 </div>
 <!-- -->

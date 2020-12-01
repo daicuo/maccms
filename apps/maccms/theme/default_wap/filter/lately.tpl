@@ -14,7 +14,7 @@
 <div class="row px-0">
   <div class="col-12 px-1 mt-3 mb-2">
     <fieldset>
-      <legend class="h5 px-4">
+      <legend class="h6 px-4">
         <i class="fa fa-line-chart text-purple"></i>
         <a class="text-dark text-decoration-none" href="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">最近更新</a>
       </legend>

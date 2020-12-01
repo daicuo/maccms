@@ -10,14 +10,14 @@
 <!-- -->
 {block name="main"}
 <div class="jumbotron jumbotron-fluid pt-0 pb-0 mb-2">
-    {$vod_player}
+  {$vod_player}
 </div>
 <p class="px-1">
-  <a class="btn btn-block btn-purple text-light" href="http://cdn.youdu.com/jialin/02.png" target="_blank">
+  <a class="btn btn-block btn-purple text-light" href="http://cdn.youdu.com/images/gzh/jlxjc_02.png" target="_blank">
   <small>微信关注（回复片名 / 免费观看）永不迷路</small>
   </a>
 </p>
-<div class="px-1">
+<div class="px-1 mb-3">
   <h6 class="text-truncate d-flex flex-row justify-content-between">
     <div>
       <span class="text-dark">{$vod_title}</span>
@@ -36,17 +36,15 @@
 <div class="container">
 {assign name="n" value="1" /}
 {foreach name="play_list" item="playOne" key="playFrom"}
-<div class="row px-0">
-  <div class="col-12 px-1 mt-3 mb-2">
-    <fieldset>
-      <legend class="h6 px-4">
-        <i class="fa fa-play-circle-o text-purple"></i>
-        <a class="text-dark text-decoration-none" href="javascript:;">播放地址{$n++}</a>
-      </legend>
-    </fieldset>
-  </div>
+<div class="row px-0 mb-2">
+<div class="col-12 px-1">
+<fieldset>
+  <legend class="h6 px-4">
+    <i class="fa fa-play-circle-o text-purple"></i>
+    <a class="text-dark text-decoration-none" href="javascript:;">播放地址{$n++}</a>
+  </legend>
+</fieldset>
 </div>
-<div class="row px-0">
 {volist name="playOne" id="play"}
 <div class="col-3 mb-2 px-1">
   <a class="text-truncate btn btn-sm btn-block btn-{:DcDefault($playFrom.$play_index, $play_from.$i, 'dark', 'secondary')}" href="{:playUrl(['tid'=>$type_id,'id'=>$vod_id,'ep'=>$i,'from'=>$playFrom])}"><small>{$play.play_title}</small></a>
@@ -55,8 +53,8 @@
 </div>
 {/foreach}
 <!---->
-<div class="row px-0">
-  <div class="col-12 px-1 mt-3">
+<div class="row px-0 mb-2">
+  <div class="col-12 px-1">
     <fieldset>
       <legend class="h6 px-4">
         <i class="fa fa-flag text-purple"></i>
@@ -65,7 +63,7 @@
     </fieldset>
   </div>
   <div class="col-12 px-1">
-    <p class="lead mb-1 pt-1">
+    <p class="lead mb-1">
       <small>{$vod_content|strip_tags|DcHtml}</small>
     </p>
     <p class="d-flex flex-row flex-wrap justify-content-between">
@@ -78,8 +76,8 @@
   </div>
 </div>
 <!-- -->
-<div class="row px-0">
-  <div class="col-12 px-1 mt-3 mb-2">
+<div class="row px-0 mb-2">
+  <div class="col-12 px-1">
     <fieldset>
       <legend class="h6 px-4">
         <i class="fa fa-fire text-purple"></i>
@@ -88,12 +86,12 @@
     </fieldset>
   </div>
 </div>
-<div class="row px-0" data-api="filter" data-url="{:DcUrl('maccms/category/index',['id'=>$term_id,'length'=>9,'page'=>1],'')}">
+<div class="row px-0 mb-2" data-api="filter" data-url="{:DcUrl('maccms/category/index',['id'=>$term_id,'length'=>9,'page'=>1],'')}">
   <p class="mx-auto"><span class="fa fa-spinner fa-spin"></span> loading...</p>
 </div>
 <!-- -->
-<div class="row px-0">
-  <div class="col-12 px-1 mt-3 mb-2">
+<div class="row px-0 mb-2">
+  <div class="col-12 px-1">
     <fieldset>
       <legend class="h6 px-4">
         <i class="fa fa-line-chart text-purple"></i>
