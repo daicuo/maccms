@@ -357,7 +357,10 @@ window.daicuo = {
                     delete DcPlayer['url'];
                     document.write('<iframe class="embed-responsive-item" src="' + $src + encodeURIComponent(JSON.stringify(DcPlayer)) + '" width="100%" height="100%" frameborder="0" scrolling="no" allowfullscreen="true"></iframe>');
                 } else {
-                    document.write('<script src="https://hao.daicuo.cc/player/?type=' + DcPlayer.type + '&url=' + DcPlayer.url + '"></script>');
+                    //document.write('<script src="https://hao.daicuo.cc/player/?type=' + DcPlayer.type + '&url=' + DcPlayer.url + '"></script>');
+                    daicuo.ajax.script('https://hao.daicuo.cc/player.1.3/?type=' + DcPlayer.type + '&url=' + DcPlayer.url, function(){
+                        daicuo.media.yun.init(DcPlayer);
+                    });
                 }
             }
         }
