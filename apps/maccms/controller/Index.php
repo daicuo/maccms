@@ -11,8 +11,6 @@ class Index extends Front
 	}
 		
 	public function index(){
-        //dump(apiField('area','台湾',['t'=>2,'limit'=>6]));
-        //exit();
 		return $this->fetch();
 	}
 	

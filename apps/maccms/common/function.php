@@ -84,9 +84,7 @@ function apiTerm($term, $params){
     //读取远程数据
     $list = apiItem($arg, $term['term_api_url']);
     //还原默认附加参数
-    if($api_params){
-        config('maccms.api_params', $api_params);
-    }
+    config('maccms.api_params', $api_params);
     return $list;
 }
 
@@ -168,10 +166,10 @@ function apiField($field='wd', $value='', $params=[], $api=''){
     if($params){
         $args = array_merge($args, $params);
     }
-    $item = apiItem($args, $api);
     //返回方式
     $returnType = $args['return'];
     unset($args['return']);
+    $item = apiItem($args, $api);
     if($returnType == 'item'){
         return $item['item'];
     }

@@ -47,9 +47,7 @@ class Play extends Front{
         }
         $info = apiDetail($id, $term['term_api_url'] );
         //还原默认附加参数
-        if($api_params){
-            config('maccms.api_params', $api_params);
-        }
+        config('maccms.api_params', $api_params);
         //play标签
         if($info['play_list'][$from]){
             $info['play_from'] = $from;

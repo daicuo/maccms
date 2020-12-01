@@ -43,7 +43,7 @@
 <!--page start -->
 <div class="row px-0 mt-2">
     <div class="col-12 px-1">
-        <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/lately',['page'=>''],'')}" data-page="1" data-target="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
+      <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/lately',['page'=>''],'')}" data-page="1" data-target="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
     </div>
 </div>
 <!-- -->

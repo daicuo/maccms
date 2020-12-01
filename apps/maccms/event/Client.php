@@ -21,7 +21,7 @@ class Client extends Controller
     
     //列表采集入口(缓存)
     public function item($api, $args){
-        //附带参数
+        //附加参数
         parse_str(config('maccms.api_params'), $params);
         if($params){
             $args = array_merge($args, $params);
@@ -30,8 +30,6 @@ class Client extends Controller
         //缓存获取
         if( (config('cache.expire_item') > 0) || (config('cache.expire_item')===0) ){
             $this->cacheTime = config('cache.expire_item');
-        }
-        if($this->cacheTime){
             $this->cacheName = md5($api.http_build_query($args));
             if($list = cache($this->cacheName)){
                 return $list;
@@ -66,8 +64,6 @@ class Client extends Controller
         //缓存获取
         if( (config('cache.expire_detail') > 0) || (config('cache.expire_detail')===0) ){
             $this->cacheTime = config('cache.expire_detail');
-        }
-        if($this->cacheTime){
             $this->cacheName = md5($api.http_build_query($args));
             if($data = cache($this->cacheName)){
                 return $data;

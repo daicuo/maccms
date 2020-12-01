@@ -13,17 +13,20 @@ class Feifeicms extends Api{
     ];
     
     //列表页接口
-	public function item($api, $args){
+	public function item($api, $args)
+    {
         return $this->apis($api, $args, 'item');
     }
     
     //详情页接口
-    public function detail($api, $args){
+    public function detail($api, $args)
+    {
         return $this->apis($api, $args, 'detail');
     }
     
     //通用采集接口
-    private function apis($api, $args, $action='detail'){
+    private function apis($api, $args, $action='detail')
+    {
         //API参数
         $url = array();
         $url['g']      = 'plus';
@@ -56,7 +59,7 @@ class Feifeicms extends Api{
         }
         //return urldecode($api.'?'.http_build_query($url));
         //远程读取数据
-        $data = DcCurl('auto', 20, urldecode($api.'?'.http_build_query($url)) );
+        $data = DcCurl('auto', 20, $api.'?'.http_build_query($url));
         $data = json_decode($data, true);
         //数据字典转换
         $item = array();

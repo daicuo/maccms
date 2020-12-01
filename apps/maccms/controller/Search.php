@@ -20,6 +20,8 @@ class Search extends Front{
         if($this->request->isAjax()){
             return $this->fetch('ajax');
         }
+        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
+			DcUrl('maccms/search/index',['wd'=>DcHtml($this->query['wd']), 'page'=>'[PAGE]'],'')));
         return $this->fetch('index');
 	}
     

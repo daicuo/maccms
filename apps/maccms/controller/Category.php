@@ -28,6 +28,8 @@ class Category extends Front
         if($this->request->isAjax()){
             return $this->fetch('ajax');
         }
+        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
+			DcUrl('maccms/category/index',['id'=>$term['term_id'], 'page'=>'[PAGE]'],'')));
         return $this->fetch();
     }
     
@@ -43,6 +45,8 @@ class Category extends Front
         if($this->request->isAjax()){
             return $this->fetch('ajax');
         }
+        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
+			DcUrl('maccms/category/'.$name,['page'=>'[PAGE]'],'')));
         return $this->fetch('index');
 	}
 }
