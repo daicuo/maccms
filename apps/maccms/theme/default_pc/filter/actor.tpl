@@ -1,9 +1,7 @@
 {extend name="./public/static/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{$term_name}第{$current_page|default='1'}页-{:config('common.site_name')}</title>
-<meta name="keywords" content="{$term_slug},{$term_name}" />
-<meta name="description" content="{$term_much_info|default='好看免费无广告'}"  />
+<title>{$id|DcHtml}主演的所有电影与电视剧第{$current_page|default='1'}页-{:config('common.site_name')}</title>
 {/block}
 <!-- -->
 {block name="header"}{include file="block/header" /}{/block}
@@ -23,15 +21,15 @@
     {include file='block/itemRow' /}
   {/volist}
 </div>
-<!--page start -->
-<div class="row d-md-none">
-  <div class="col-12 px-2 px-md-3">
-    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/category/'.$action,['id'=>$term_id,'limit'=>intval($term_api_limit)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
-  </div>
-</div>
 <!-- -->
 <div class="d-none d-md-block">
   <div class="d-flex justify-content-center">{$pages}</div>
+</div>
+<!--page start -->
+<div class="row d-md-none">
+  <div class="col-12 px-2 px-md-3">
+    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/actor',['id'=>DcHtml($id)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+  </div>
 </div>
 <!-- -->
 </div> <!-- /container -->

@@ -1,7 +1,7 @@
 {extend name="./public/static/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:date('Y',time())}年最新好看的电影与电视剧-{:config('common.site_name')}</title>
+<title>说{$id|DcHtml}的最新好看电影与电视剧-{:config('common.site_name')}</title>
 {/block}
 <!-- -->
 {block name="header"}{include file="block/header" /}{/block}
@@ -14,7 +14,7 @@
     <fieldset class="mt-4 mb-3">
       <legend class="h6 px-4">
         <i class="fa fa-line-chart text-purple"></i>
-        <a class="text-dark text-decoration-none" href="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">最近更新</a>
+        <span class="text-dark">{$id|DcHtml}对白的影片</span>
       </legend>
     </fieldset>
   </div>
@@ -27,7 +27,7 @@
 <!--page start -->
 <div class="row px-0 mt-2">
   <div class="col-12 px-1">
-    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/lately','','')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/language',['id'=>DcHtml($id)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
   </div>
 </div>
 <!-- -->

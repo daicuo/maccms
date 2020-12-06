@@ -49,7 +49,7 @@
 </div>
 </div>
 <!-- -->
-{volist name=":categoryItem()" id="term" mod="5" offset="0" length="6"}
+{volist name=":categoryItem()" id="term" offset="0" length="10"}
 {if $item = apiTermIdLimit($term['term_id'], 6)}
 <div class="row mb-2">
   <div class="col-12 px-2 px-md-3 mb-2">
@@ -57,7 +57,7 @@
     <a class="text-light text-decoration-none" href="{:categoryUrl($term['term_id'],$term['term_slug'])}">2020最新{$term.term_name|DcSubstr=0,5,false}</a>
   </div>
   {volist name="$item" id="dc" offset="0" length="6"}
-    {include file='block/itemRow' /}
+    {include file='block/itemRow'/}
   {/volist}
 </div>
 {/if}

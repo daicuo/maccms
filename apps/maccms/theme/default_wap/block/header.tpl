@@ -12,7 +12,7 @@
 <div class="collapse" id="search">
     <form class="bg-secondary px-3 py-3" action="{:DcUrl('maccms/search/index','','')}" method="get">
         <div class="input-group input-group-sm">
-            <input class="form-control" name="wd" type="text" placeholder="片名">
+            <input class="form-control" name="wd" type="text" placeholder="片名或主演">
             <div class="input-group-append">
                 <button class="btn btn-outline-light" type="submit"><i class="fa fa-search fa-lg"></i></button>
             </div>

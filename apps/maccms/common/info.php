@@ -6,7 +6,7 @@ return [
     'module'=>'maccms',//插件唯一标识
     'name'=>'青苹果API影视系统',
     'info'=>'青苹果API影视系统于20200903开始开发，主要是用于测试DaiCuo1.2.6的BUG与功能。',
-    'version'=>'1.1.0',
+    'version'=>'1.2.0',
     //后台菜单
     'ico'=>'fa-home',
     'subico'=>'fa-gear',

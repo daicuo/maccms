@@ -7,6 +7,8 @@ use app\common\controller\Front;
 
 class Play extends Front{
 
+    private $term = [];
+
     //继承
     public function _initialize(){
         parent::_initialize();
@@ -14,40 +16,47 @@ class Play extends Front{
     
     //按本地分类获取数据入口
     public function index(){
-        return $this->get(input('tid/d',0));
+        if($tid = input('tid/d',0)){
+            return $this->get( categoryId($tid) );
+        }else{
+            $this->error(lang('mustIn'));
+        }
     }
     
-    //按远程分类获取数据入口
+    //按远程分类获取数据入口 
+    //如果有多个资源站,可能存在多个资源站tid相同的情况
     public function type(){
-        return $this->get(typeId2termId(input('tid/d',0)));
+        if($tid = input('tid/d',0)){
+            return $this->get( categoryMeta('term_api_tid', $tid) );
+        }else{
+            $this->error(lang('mustIn'));
+        }
     }
     
     //空操作
     public function _empty($name){
-    
+        $term = categorySlug(DcHtml($name));
+        if($term){
+           return $this->get($term);
+        }
+        $this->error(lang('mustIn'));
     }
     
     //按本地分类ID获取远程数据
-    private function get($tid = 0){
-        $term  = array();
-        //$tid   = input('tid/d',0);   //分类ID
-        $id    = input('id/d',51930);//视频ID
-        $ep    = input('ep/d',51930)-1;//视频集数
+    private function get($term = []){
+        $id    = input('id/d',88);//视频ID
+        $ep    = input('ep/d',88)-1;//视频集数
         $from  = input('from/s','play0');//播放器组
-        //查询已绑定的apiTid
-        if($tid){
-            $term = categoryId($tid);
-        }else{
-            $term['term_id'] = 0;
-        }
         //指定分类附加参数
         if($term['term_api_params']){
             $api_params = config('maccms.api_params');
             config('maccms.api_params', $term['term_api_params']);
         }
-        $info = apiDetail($id, $term['term_api_url'] );
+        $info = apiDetail($id, $term['term_api_url'], $term['term_api_type'] );
         //还原默认附加参数
-        config('maccms.api_params', $api_params);
+        if($term['term_api_params']){
+            config('maccms.api_params', $api_params);
+        }
         //play标签
         if($info['play_list'][$from]){
             $info['play_from'] = $from;
@@ -63,5 +72,4 @@ class Play extends Front{
         $this->assign($info);
         return $this->fetch('index');
     }
-  
 }

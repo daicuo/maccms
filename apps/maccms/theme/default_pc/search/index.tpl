@@ -27,9 +27,9 @@
   <div class="d-flex justify-content-center">{$pages}</div>
 </div>
 <!--page sm -->
-<div class="row d-md-none-">
+<div class="row d-md-none">
   <div class="col-12 px-2">
-    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-url="{:DcUrl('maccms/search/index',['wd'=>DcHtml($wd),'page'=>''],'')}" data-page="{$current_page}" data-target="#row">更多结果<i class="fa fa-lg fa-angle-down mx-1"></i></a>
+    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-url="{:DcUrl('maccms/search/index',['wd'=>DcHtml($wd)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果<i class="fa fa-lg fa-angle-down mx-1"></i></a>
   </div>
 </div>
 <!-- /container -->

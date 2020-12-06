@@ -7,7 +7,7 @@ class Hook extends Controller
 {
     //后台系统初始化
     public function hookAdminInit(&$params){
-        $fields = array_merge(config('custom_fields.term_meta'),['term_api_url','term_api_params','term_api_tid']);
+        $fields = array_merge(config('custom_fields.term_meta'),['term_api_url','term_api_params','term_api_tid','term_api_type']);
         config('custom_fields.term_meta', $fields);
     }
     
@@ -67,6 +67,25 @@ class Hook extends Controller
                     'autocomplete'=>'on',
                     'maxlength'=>'20',
                     //'rows'=>4,
+                    'class'=>'row form-group',
+                    'class_left'=>'col-12',
+                    'class_right'=>'col-12',
+                    'class_right_control'=>'',
+                    'class_right_tips'=>'',
+                ],
+                [
+                    'type'=>'text',
+                    'name'=>'term_api_type',
+                    'id'=>'term_api_type',
+                    'title'=>lang('term_api_type'),
+                    'placeholder'=>lang('term_api_type_placeholder'),
+                    'tips'=>'',
+                    'value'=>$params['data']['term_api_type'],
+                    'readonly'=>false,
+                    'disabled'=>false,
+                    'required'=>false,
+                    'autocomplete'=>'on',
+                    'maxlength'=>'60',
                     'class'=>'row form-group',
                     'class_left'=>'col-12',
                     'class_right'=>'col-12',

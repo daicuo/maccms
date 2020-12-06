@@ -30,7 +30,7 @@
   <h6 class="text-truncate text-muted small">
     {volist name="vod_year" id="year"}{$year} / {/volist}
     {volist name="vod_area" id="area"}{$area} / {/volist}
-    <a class="text-muted" href="{:categoryUrl($term_id, $term_slug)}">{$type_name}</a>
+    <a class="text-muted" href="{:categoryUrl($term_id, $term_slug)}">{$term_name}</a>
   </h6>
 </div>
 <div class="container">
@@ -68,10 +68,10 @@
     </p>
     <p class="d-flex flex-row flex-wrap justify-content-between">
       <a class="mt-2 mr-2 badge badge-{:colorRand(7)} flex-fill" href="{:categoryUrl($term_id, $term_slug)}"><span class="fa fa-tag mr-1"></span>{$type_name}</a>
-      {volist name="vod_year" id="year"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/search/year',['wd'=>$year,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$year}</a>{/volist}
-      {volist name="vod_language" id="language" mod="2"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/search/language',['wd'=>$language,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$language}</a>{/volist}
-      {volist name="vod_director" id="director"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/search/director',['wd'=>$director,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$director}</a>{/volist}
-      {volist name="vod_actor" id="actor"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/search/actor',['wd'=>$actor,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$actor}</a>{/volist}
+      {volist name="vod_year" id="year"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/year',['id'=>$year,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$year}</a>{/volist}
+      {volist name="vod_language" id="language" mod="2"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/language',['id'=>$language,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$language}</a>{/volist}
+      {volist name="vod_director" id="director"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/director',['id'=>$director,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$director}</a>{/volist}
+      {volist name="vod_actor" id="actor"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/actor',['id'=>$actor,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$actor}</a>{/volist}
     </p>
   </div>
 </div>

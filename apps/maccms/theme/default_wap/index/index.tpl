@@ -35,11 +35,11 @@
 </div>
 <div class="container">
 <!-- -->
-<div class="row px-0 pt-4 pb-1 text-center">
+<div class="row px-0 text-center">
   {volist name=":navItem(['limit'=>10])" id="maccms" mod="5" offset="0" length="10"}
-  <div class="col px-1">
+  <div class="col px-1 mt-3">
     <a class="text-dark text-decoration-none" href="{$maccms.nav_link}">
-      {assign name="color" value=":colorRand(7)" /}
+      {assign name="color" value=":colorRand($key)" /}
       <span class="fa-stack fa-lg text-{$color}">
         <i class="fa fa-circle-thin fa-stack-2x"></i>
         <i class="fa-fw fa-stack-1x text-{$color} {$maccms.nav_ico}"></i>
@@ -47,22 +47,8 @@
       <p class="small mb-0 mt-1">{$maccms.nav_text|DcSubstr=0,5,false}</p>
     </a>
   </div>
-  {eq name="mod" value="4"}<div class="w-100 mt-3"></div>{/eq}
+  {eq name="mod" value="4"}<div class="w-100"></div>{/eq}
   {/volist}
-  
-  {volist name=":categoryItem()" id="maccms" mod="5" offset="0" length="10"}
-  <div class="col px-1">
-    <a class="text-dark text-decoration-none" href="{:categoryUrl($maccms['term_id'],$maccms['term_slug'])}">
-      {assign name="color" value=":colorRand(7)" /}
-      <span class="fa-stack fa-lg text-{$color}">
-        <i class="fa fa-circle-thin fa-stack-2x"></i>
-        <i class="fa-fw fa-stack-1x {:faIcoRand()} text-{$color}"></i>
-      </span>
-      <p class="small mb-0 mt-1">{$maccms.term_name|DcSubstr=0,4,false}</p>
-    </a>
-  </div>
-  {eq name="mod" value="4"}<div class="w-100 mt-3"></div>{/eq}
-{/volist}
 </div>
 <!-- -->
 <div class="row px-0">

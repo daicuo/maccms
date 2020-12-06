@@ -22,7 +22,7 @@
 <!--page start -->
 <div class="row px-0 mt-2">
     <div class="col-12 px-1">
-        <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/category/'.$action,['id'=>$term_id,'limit'=>intval($term_api_limit),'page'=>''],'')}" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+        <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/category/'.$action,['id'=>$term_id,'limit'=>intval($term_api_limit)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
     </div>
 </div>
 <!-- -->

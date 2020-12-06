@@ -43,6 +43,7 @@ class Type extends Controller
             $data['term_much_type'] = 'category';
             $data['term_tpl'] = 'index';
             $data['term_api_url'] = $post['api'];//api_url
+            $data['term_api_type'] = $post['type'];//api_type
             $data['term_api_tid'] = $type_id;//type_id
             //不同资源站相同分类名称时增加随机后缀
             if( list_search($types, ['term_name'=>$data['term_name']]) ){

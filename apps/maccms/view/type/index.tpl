@@ -2,9 +2,10 @@
   <div class="modal-body">
     <form class="bg-white px-2 py-2 form-bind" action="../addon/index/?module=maccms&controll=type&action=update" method="post" data-toggle="form" data-callback="callAjax" target="_blank">
       <input name="api" type="hidden" value="{$api}">
+      <input name="type" type="hidden" value="{$type}">
       <div class="row form-group">
         {volist name="list" id="maccms"}
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-3 mt-2">
             <div class="form-check">
               <input name="type_name[{$maccms.type_id}]" type="hidden" value="{$maccms.type_name}">
               <input class="form-check-input" name="type_id[{$maccms.type_id}]" type="checkbox" value="{$maccms.type_id}" checked>

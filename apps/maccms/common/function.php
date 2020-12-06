@@ -82,7 +82,7 @@ function apiTerm($term, $params){
         $arg = array_merge($arg, $params);
     }
     //读取远程数据
-    $list = apiItem($arg, $term['term_api_url']);
+    $list = apiItem($arg, $term['term_api_url'], $term['term_api_type']);
     //还原默认附加参数
     config('maccms.api_params', $api_params);
     return $list;
@@ -180,10 +180,10 @@ function apiField($field='wd', $value='', $params=[], $api=''){
  * 调用API远程多个详情数据
  * @param array $args APIURL参数
  * @param string $api API入品地址 不带参数
- * @param string $result API返回类型 可选json|xml
+ * @param string $apiType API类型 可选json|xml|feifeicms
  * @return array|false 读取失败时返回false
  */
-function apiItem($args=[], $api=''){
+function apiItem($args=[], $api='', $apiType=''){
     //分类过滤
     if($args['t'] && config('maccms.filter_tid')){
         if(in_array($args['t'], explode(',', config('maccms.filter_tid')) )){
@@ -219,17 +219,17 @@ function apiItem($args=[], $api=''){
     if(empty($api)){
         $api = config('maccms.api_url');
     }
-    return controller('maccms/Client', 'event')->item($api, $args);
+    return controller('maccms/Client', 'event')->item($args, $api, $apiType);
 }
 
 /**
  * 调用API远程单个数据
  * @param int id 视频id
  * @param string $api API入口地址 不带参数
- * @param string $result API返回类型 可选json|xml
+ * @param string $apiType API类型 可选json|xml|feifeicms
  * @return array|false 读取失败时返回false
  */
-function apiDetail($id, $api=''){
+function apiDetail($id, $api='', $apiType=''){
     //详情ID过滤
     if($id && config('maccms.filter_ids')){
         if( in_array($id, explode(',', config('maccms.filter_ids') ) ) ){
@@ -241,7 +241,7 @@ function apiDetail($id, $api=''){
         $api = config('maccms.api_url');
     }
     //获取数据
-    return controller('maccms/Client','event')->detail($api, ['ids'=>$id]);
+    return controller('maccms/Client', 'event')->detail(['ids'=>$id], $api, $apiType);
 }
 
 /*-------------------MacCms常用函数-------------------------------*/
@@ -338,22 +338,27 @@ function categorySlug($slug){
  * 通过meta条件查询单条
  * @param $metaKey key值
  * @param $metaValue value值
+ * @param $operation 运算规则
  * @return obj|null
  */
- function categoryMeta($metaKey, $metaValue){
+ function categoryMeta($metaKey, $metaValue, $operation='eq'){
     $where = array();
     //$where['term_much_type'] = ['eq','category'];
-    $where['term_meta_key'] = ['eq',$metaKey];
-    $where['term_meta_value'] = ['eq',$metaValue];
+    $where['term_meta_key'] = [$operation, $metaKey];
+    $where['term_meta_value'] = [$operation, $metaValue];
     $join = array();
     $join[0] = ['term','*'];
     $join[1] = ['term_much','*','term_much.term_id=term.term_id'];
     $join[2] = ['term_meta','term_meta_id','term_meta.term_id=term.term_id'];
     //return \daicuo\Term::get($where, 'termMeta', true, $join);
     $data = DcDbFind('common/Term', [
-        'where'=>$where,
-        'view'=>$join,
-        'with'=>'termMeta',
+        'cache' => false,
+        'where' => $where,
+        'view'  => $join,
+        'with'  => 'termMeta',
+        'sort'  => 'term_order desc,term_id',
+        'order' => 'desc',
+        //'fetchSql' => true,
     ]);
     if(!is_null($data)){
         $data = $data->toArray();
@@ -362,6 +367,26 @@ function categorySlug($slug){
         return array_merge($data, $data_meta);
     }
     return $data;
+}
+
+/**
+ * 通过远程分类ID查询绑定的本地分类信息
+ * @param $id 分类ID值
+ * @return obj|null
+ */
+function categoryTypeId($typeId){
+    $terms = categoryItem();
+    $types = list_search($terms,['term_api_tid'=>$typeId]);
+    if( count($types)== 0 ){
+        return null;
+    }
+    if( count($types)> 1 ){
+        $typesUrl = list_search($types, ['term_api_url'=>config('maccms.api_url')]);
+        if($typesUrl){
+            return $typesUrl[0];
+        }
+    }
+    return $types[0];
 }
 
 /**
@@ -383,12 +408,27 @@ function categoryUrl($termId=0, $termSlug=''){
  * @param int $termId 系统分类ID
  * @return string 网址链接
  */
-function playUrl($args, $termId=0){
-    if($termId){
-        $args = array_merge($args, ['tid'=>$termId]);
-        return DcUrl('maccms/play/index', $args);
+function playUrl($args, $term=[]){
+    $jump = [];
+    $jump['from'] = $args['from'];
+    $jump['tid'] = $args['tid'];//远程分类ID
+    $jump['id'] = $args['id'];
+    $jump['ep'] = $args['ep'];
+    //本地分类参数
+    if($term['term_slug']){
+        unset($jump['tid']);
+        return DcUrl('maccms/play/'.$term['term_slug'], $jump, '');
     }
-    return DcUrl('maccms/play/type', $args);
+    if($term['term_id']){
+        return DcUrl('maccms/play/index', array_merge($jump, ['tid'=>$term['term_id']]), '');
+    }
+    //将远程分类ID转为本地分类别名
+    if($term_slug = typeId2termSlug($args['tid'])){
+        unset($jump['tid']);
+        return DcUrl('maccms/play/'.$term_slug, $jump, '');
+    }
+    //按远程分类加载播放页
+    return DcUrl('maccms/play/type', $jump, '');
 }
 
 /**
@@ -409,18 +449,20 @@ function imageUrl($image_url){
  * @return string 颜色伪类
  */
 function colorRand($rand=6){
-    /*if(!in_array($rand,[0,1,2,3,4,5,6])){
-        $rand = rand(0, 6);
-    }*/
-    $rand = rand(0, $rand);
+    if(!in_array($rand,[0,1,2,3,4,5,6,7,8,9])){
+        $rand = rand(0, 9);
+    }
+    //$rand = rand(0, $rand);
     $text[0] = 'purple';
-    $text[1] = 'secondary';
-    $text[2] = 'dark';
+    $text[1] = 'primary';
+    $text[2] = 'danger';
     $text[3] = 'info';
-    $text[4] = 'primary';
+    $text[4] = 'success';
     $text[5] = 'danger';
     $text[6] = 'warning';
     $text[7] = 'success';
+    $text[8] = 'info';
+    $text[9] = 'primary';
     return $text[$rand];
 }
 
@@ -455,23 +497,27 @@ function faIcoRand($rand=19){
 }
 
 /**
- * 将远程APIID转为本地分类ID
+ * 将远程APIID转为本地绑定的分类ID
  * @param int $typeId 远程分类ID
  * @return int 本地对应ID,无对应时返回0
  */
 function typeId2termId($typeId){
-    $terms = categoryItem();
-    $types = list_search($terms,['term_api_tid'=>$typeId]);
-    if( count($types)== 0 ){
-        return 0;
+    if( $term = categoryTypeId($typeId) ){
+        return $term['term_id'];
     }
-    if( count($types)> 1 ){
-        $typesUrl = list_search($types, ['term_api_url'=>config('maccms.api_url')]);
-        if($typesUrl){
-            return $typesUrl[0]['term_id'];
-        }
+    return 0;
+}
+
+/**
+ * 将远程APIID转为本地绑定的分类别名
+ * @param int $typeId 远程分类ID
+ * @return int 本地对应ID,无对应时返回0
+ */
+function typeId2termSlug($typeId){
+    if( $term = categoryTypeId($typeId) ){
+        return $term['term_slug'];
     }
-    return $types[0]['term_id'];
+    return '';
 }
 
 /** 
@@ -516,4 +562,37 @@ function arrayToObject($d) {
         // Return object  
         return $d;  
     }  
-}  
+}
+
+/**
+ * 检测一个UTF-8字符串里是否包含繁体中文
+ * @param string $str
+ * @return bool
+ */
+function maccmsIsBig($str) {
+    return iconv('UTF-8', 'GB2312', $str) === false ? true : false;
+}
+
+//简转繁
+function maccmss2t($str){
+	$url = 'http://api.k780.com/?app=code.hanzi_fanjian&typeid=1&wd='.urlencode($str).'&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json';
+	$json = json_decode(DcCurl('windows',10,$url),true);
+	return $json['result']['text'];
+}
+
+//繁转简
+function maccmst2s($str){
+	$url = 'http://api.k780.com/?app=code.hanzi_fanjian&typeid=2&wd='.urlencode($str).'&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json';
+	$json = json_decode(DcCurl('windows',10,$url),true);
+	return $json['result']['text'];
+}
+
+//将繁体字转为简体后搜索
+function maccmsSearch($str){
+	if(maccmsIsBig($str)){//存在繁体字就转为简体
+		if( $strt2s = maccmst2s($str) ){
+			return $strt2s;
+		}
+	}
+	return $str;
+}

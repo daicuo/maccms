@@ -20,7 +20,7 @@ class Client extends Controller
 	}
     
     //列表采集入口(缓存)
-    public function item($api, $args){
+    public function item($args, $api, $apiType){
         //附加参数
         parse_str(config('maccms.api_params'), $params);
         if($params){
@@ -36,11 +36,16 @@ class Client extends Controller
             }
         }
         //检测资源站接口类型
-        $type = $this->check($api);
+        if($apiType){
+            $type = $apiType;//主动定义资源站类型
+        }else{
+            $type = $this->check($api);//自动检测资源站类型
+        }
         if($type == false){
             return null;
         }
-        $model = model('maccms/'.$type);
+        //加载API引擎
+        $model = model('maccms/'.ucfirst($type));
         $list = $model->item($api, $args);
         if($this->cacheName && $list){
             //缓存列表数据
@@ -54,7 +59,7 @@ class Client extends Controller
 	}
     
     //详情采集入口(缓存)
-	public function detail($api, $args){
+	public function detail($args, $api, $apiType){
         //附带参数
         parse_str(config('maccms.api_params'), $params);
         if($params){
@@ -70,11 +75,16 @@ class Client extends Controller
             }
         }
         //检测资源站接口类型
-        $type = $this->check($api);
+        if($apiType){
+            $type = $apiType;//主动定义资源站类型
+        }else{
+            $type = $this->check($api);//自动检测资源站类型
+        }
         if($type == false){
             return null;
         }
-        $model = model('maccms/'.$type);
+        //加载API引擎
+        $model = model('maccms/'.ucfirst($type));
         $data = $model->detail($api, $args);
         if($this->cacheName && $data){
             cache($this->cacheName, $data, $this->cacheTime);

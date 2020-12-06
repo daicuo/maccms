@@ -9,7 +9,7 @@
       <li class="nav-item {:DcDefault($controll.$action, 'indexindex', 'active', '')}">
         <a class="nav-link" href="{:DcUrl('maccms/index/index','','')}">首页 <span class="sr-only">(current)</span></a>
       </li>
-      {volist name=":navItem(['limit'=>6])" id="maccms" offset="0" length="6"}
+      {volist name=":navItem(['limit'=>10])" id="maccms" offset="0" length="10"}
       <li class="nav-item {:DcDefault($controll.$action, $maccms['nav_active'], 'active', '')}">
         <a class="nav-link" href="{$maccms.nav_link}">{$maccms.nav_text|DcSubstr=0,5,false}</a>
       </li>

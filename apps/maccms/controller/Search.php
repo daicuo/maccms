@@ -12,7 +12,13 @@ class Search extends Front{
     
     //空操作
 	public function _empty($name){
-        $list = apiItem(['wd'=>$this->query['wd'],'pg'=>$this->query['page']]);
+        $wd = maccmsSearch(urldecode($this->query['wd']));
+        
+        $list = apiItem(['wd'=>$wd,'pg'=>$this->query['page']]);
+        
+        if($this->query['page'] > $list['page']['last_page']){
+          return '';
+        }
         $this->assign($this->query);
         $this->assign($list['page']);
         $this->assign('type', $list['type']);
