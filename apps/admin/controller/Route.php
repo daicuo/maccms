@@ -6,9 +6,65 @@ use app\common\controller\Admin;
 /**
  * 路由管理
  */
-class Route extends Admin{
+class Route extends Admin
+{
 	
-	//路由管理
+    //新加一条规则到数据库
+	public function save()
+    {
+        config('common.validate_name', 'common/Route');
+        $op_id = \daicuo\Route::save(input('post.'));
+		if($op_id < 1){
+			$this->error(\daicuo\Route::getError());
+		}
+		$this->success(lang('success'));
+	}
+    
+    //删除路由规则
+	public function delete()
+    {
+        $ids = input('id/a');
+		if(!$ids){
+			$this->error(lang('mustIn'));
+		}
+        foreach($ids as $id){
+            \daicuo\Route::delete_id($id);
+        }
+        $this->success(lang('success'));
+	}
+    
+    //修改
+	public function edit()
+    {
+        $id = input('id/d',0);
+		if(!$id){
+			$this->error(lang('mustIn'));
+		}
+		//查询数据
+        $data = \daicuo\Route::get_id($id, false);
+        if( is_null($data) ){
+            $this->error(lang('empty'));
+        }
+		$this->assign('data', $data);
+		return $this->fetch();
+	}
+	
+	//修改一条规则到数据库
+	public function update()
+    {
+        $data = input('post.');
+        if(!$data['op_id']){
+			$this->error(lang('mustIn'));
+		}
+        config('common.validate_name', 'common/Route');
+        $info = \daicuo\Route::update_id($data['op_id'], $data);
+        if(is_null($info)){
+            $this->error(\daicuo\Route::getError());
+        }
+        $this->success(lang('success'));
+	}
+    
+    //路由管理
 	public function index()
     {
         if($this->request->isAjax()){
@@ -35,55 +91,6 @@ class Route extends Admin{
 		}
 		$this->assign('query', $this->query);
 		return $this->fetch();
-	}
-	
-	//修改
-	public function edit(){
-        $id = input('id/d',0);
-		if(!$id){
-			$this->error(lang('mustIn'));
-		}
-		//查询数据
-        $data = \daicuo\Route::get_id($id, false);
-        if( is_null($data) ){
-            $this->error(lang('empty'));
-        }
-		$this->assign('data', $data);
-		return $this->fetch();
-	}
-	
-	//修改一条规则到数据库
-	public function update(){
-        $data = input('post.');
-        if(!$data['op_id']){
-			$this->error(lang('mustIn'));
-		}
-        $info = \daicuo\Route::update_id($data['op_id'], $data);
-        if(is_null($info)){
-            $this->error(lang('fail'));
-        }
-        $this->success(lang('success'));
-	}
-		
-	//删除路由规则
-	public function delete(){
-        $ids = input('id/a');
-		if(!$ids){
-			$this->error(lang('mustIn'));
-		}
-        foreach($ids as $id){
-            \daicuo\Route::delete_id($id);
-        }
-        $this->success(lang('success'));
-	}
-	
-	//新加一条规则到数据库
-	public function save(){
-        $op_id = \daicuo\Route::save(input('post.'));
-		if($op_id < 1){
-			$this->error(config('daicuo.error'));
-		}
-		$this->success(lang('success'));
 	}
     
     //首页快捷设置

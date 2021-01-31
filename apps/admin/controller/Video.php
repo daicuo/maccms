@@ -3,16 +3,12 @@ namespace app\admin\controller;
 
 use app\common\controller\Admin;
 
-/**
- * 视频组件控制器
- * @package app\admin\controller
- */
 class Video extends Admin
 {
     /**
-    * 批量更新与新增配置
-    * @return array
-    */	
+     * 批量更新与新增配置
+     * @return array
+     */	
     public function update()
     {
         $data = input('post.');

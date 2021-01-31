@@ -6,12 +6,12 @@ use think\Controller;
 class Table extends Controller
 {
 
-    public function build($config)
+    public function build($args)
     {
         $table = array();
         //$table['columns'] = [];
         $table['data-toggle'] = 'bootstrap-table';
-		$table['data-locale'] = 'zh-cn';
+		$table['data-locale'] = str_replace(['zh-cn','zh-tw'], ['zh-CN','zh-TW'], config('default_lang'));
         $table['data-classes'] = 'table table-bordered table-hover table-striped';//table-dark table-sm table-borderless
         $table['data-thead-classes'] = '';//thead-light thead-dark
         $table['data-data'] = '';
@@ -32,6 +32,8 @@ class Table extends Controller
         $table['data-toolbar-align'] = 'left';//left right
         //$table['data-buttons-toolbar'] = '';//自定义按钮工具栏 .buttons-toolbar
         //$table['data-buttons-align'] = 'right';//如何对齐工具栏按钮 left,right
+        //$table['data-buttons-prefix'] = 'btn';//表格按钮的前缀
+        //$table['data-buttons-class'] = 'secondary';//'btn-'表格按钮的类（在后面添加）
         $table['data-show-header'] = 'true';//设置false 为隐藏表格标题
         $table['data-show-footer'] = 'false';//设置true 为显示摘要页脚行
         //$table['data-footer-style'] = 'footerStyle';//(function)页脚样式格式化程序函数
@@ -61,11 +63,9 @@ class Table extends Controller
         $table['data-detail-view-by-click'] = 'false';//设置true单击以设置切换细节视图
         //$table['data-detail-formatter'] = 'function';//(function)当格式化您的详细信息视图detailView 设置为 true时函数处理
         //$table['data-detail-filter'] = 'function';//(function)当启用每行扩展detailView 设置到 true做函数处理
-        //$table['data-buttons-prefix'] = 'btn';//定义表格按钮的前缀
-        //$table['data-buttons-class'] = 'secondary';//定义'btn-'表格按钮的类（在后面添加）
         //$table['data-icons'] = "{paginationSwitchDown: 'fa-caret-down',paginationSwitchUp: 'fa-caret-up',refresh: 'fa-refresh',toggleOff: 'fa-toggle-off',toggleOn: 'fa-toggle-on',columns: 'fa-th-list',fullscreen: 'fa-arrows-alt',detailOpen: 'fa-plus',detailClose: 'fa-minus'}";
-        //$table['data-icon-size'] = '';//lg sm
-        //$table['data-icons-prefix'] = 'fa';//图标前缀
+        //$table['data-icon-size'] = 'sm';//lg sm
+        $table['data-icons-prefix'] = 'fa';//图标前缀
         //
         $table['data-search'] = 'false';
         $table['data-search-on-enter-key'] = 'false';
@@ -109,7 +109,14 @@ class Table extends Controller
         $table['data-pagination-next-text'] = '›';
         $table['data-pagination-successively-size'] = '5';//最大连续页数
         $table['data-pagination-pages-by-side'] = '1';//当前页面每侧（右侧，左侧）的页数
-        $this->assign('table', array_merge($table, $config));
-        return $this->fetch(APP_PATH.'common'.DS.'view'.DS.'daicuo_table.tpl'); 
+        //预留钩子
+        \think\Hook::listen('table_build', $args);
+        //合并参数并赋值模板变量
+        $this->assign('table', array_merge($table, $args));
+        //释放内存
+        unset($table);unset($args);
+        //模板渲染
+        return $this->fetch('common@table/index');
+        //return $this->fetch(APP_PATH.'common'.DS.'view'.DS.'daicuo_table.tpl'); 
     }	
 }

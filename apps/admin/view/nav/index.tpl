@@ -1,33 +1,35 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("navIndex")}－{:lang('appName')}</title>
+<title>{:lang("nav_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("navIndex")}
+  {:lang("nav_index")}
 </h6>
 <!-- -->
 <form action="{:DcUrl('admin/nav/delete','','')}" method="post" data-toggle="form">
 <input type="hidden" name="_method" value="delete">
 <div id="toolbar" class="toolbar mb-2">
-    <a class="btn btn-sm btn-light border" href="javascript:;" data-toggle="reload">
-        <i class="fa fa-refresh fa-fw"></i> {:lang('refresh')}
-    </a>
-    <a class="btn btn-sm btn-outline-purple" href="{:DcUrl('admin/nav/create',$query,'')}" data-toggle="create" data-modal-lg="true" data-formatter="callAjax">
-        <i class="fa fa-plus fa-fw"></i> {:lang('create')}
-    </a>
-    <button class="btn btn-sm btn-outline-danger" type="submit" data-toggle="delete">
-        <i class="fa fa-trash"></i> {:lang('delete')}
-    </button>
+  <a class="btn btn-sm btn-light border" href="javascript:;" data-toggle="reload">
+    <i class="fa fa-refresh fa-fw"></i>
+    {:lang('refresh')}
+  </a>
+  <a class="btn btn-sm btn-outline-purple" href="{:DcUrl('admin/nav/create',$query,'')}" data-toggle="create" data-modal-lg="true" data-callback="callAjax">
+    <i class="fa fa-plus fa-fw"></i>
+    {:lang('create')}
+  </a>
+  <button class="btn btn-sm btn-outline-danger" type="submit" data-toggle="delete">
+    <i class="fa fa-trash"></i>
+    {:lang('delete')}
+  </button>
 </div>
 {:DcBuildTable([
     'data-toolbar'=>'.toolbar',
     'data-toolbar-align'=>'none float-md-left',
     'data-search-align'=>'none float-md-right',
     'data-toggle'=>'bootstrap-table',
-    'data-locale'=>config('default_lang'),
     'data-url' => DcUrl('admin/nav/index', $query, ''),
     'data-buttons-class'=>'purple',
     'data-icon-size'=>'sm',
@@ -85,7 +87,7 @@
             'data-width-unit'=>'%',
             'data-align'=>'center',
             'data-halign'=>'center',
-            'data-formatter'=>'daicuo.bootstrap.table.sort',
+            'data-formatter'=>'daicuo.table.sort',
         ],
         [
             'data-field'=>'nav_text',
@@ -159,7 +161,8 @@
 <script>
 //回调操作
 callAjax = function($data, $status, $xhr) {
-    daicuo.admin.nav.typeChange($('.dc-modal #nav_type').val());
+    daicuo.bootstrap.dialogForm($data);
+    daicuo.admin.navType($('.dc-modal #nav_type').val());
 }
 callNavIco = function(value, row, index, field){
     return '<i class="fa-lg text-muted '+value+'"></i>';
@@ -180,11 +183,11 @@ callOperate = function(value, row, index, field){
     var $url_preview = row.nav_link;
     var $url_edit = daicuo.config.file + '/' + daicuo.config.controll + '/edit?id='+row.op_id;
     var $url_delete = daicuo.config.file + '/' + daicuo.config.controll + '/delete?id='+row.op_id;
-    return '<div class="btn-group btn-group-sm"><a class="btn btn-outline-secondary" href="'+$url_preview+'" target="_blank"><i class="fa fa-fw fa-link"></i></a><a class="btn btn-outline-secondary bg-light" href="'+$url_edit+'" data-toggle="edit" data-modal-lg="true" data-formatter="callAjax"><i class="fa fa-fw fa-pencil"></i></a><a class="btn btn-outline-secondary" href="'+$url_delete+'" data-toggle="delete"><i class="fa fa-fw fa-trash-o"></i></a></div>';
+    return '<div class="btn-group btn-group-sm"><a class="btn btn-outline-secondary" href="'+$url_preview+'" target="_blank"><i class="fa fa-fw fa-link"></i></a><a class="btn btn-outline-secondary bg-light" href="'+$url_edit+'" data-toggle="edit" data-modal-lg="true" data-callback="callAjax"><i class="fa fa-fw fa-pencil"></i></a><a class="btn btn-outline-secondary" href="'+$url_delete+'" data-toggle="delete"><i class="fa fa-fw fa-trash-o"></i></a></div>';
 }
 //事件定义
 $(document).on("change", '#nav_type', function(){
-	daicuo.admin.nav.typeChange($(this).val());
+	daicuo.admin.navType($(this).val());
 });
 </script>
 {/block}

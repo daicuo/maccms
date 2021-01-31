@@ -12,17 +12,10 @@ class Sql
         //批量添加钩子
         $result = \daicuo\Hook::save_all([
             [
-                'hook_name'=>'hook_build_form',
+                'hook_name'=>'form_build',
                 'hook_path'=>'app\index\behavior\Hook',
                 'hook_overlay'=>'no',
-                'hook_info'=>'首页模块自定义表单字段',
-                'op_module'=>'index',
-            ],
-            [
-                'hook_name'=>'hook_base_init',
-                'hook_path'=>'app\index\behavior\Hook',
-                'hook_overlay'=>'no',
-                'hook_info'=>'首页模块初始化扩展表单字段列表',
+                'hook_info'=>'首页模块自定义表单字段演示',
                 'op_module'=>'index',
             ]
         ]);
@@ -33,8 +26,8 @@ class Sql
         
         //批量写入插件配置
         $result = \daicuo\Op::write([
-            'site_title'      =>'大错开发框架',
-            'site_keywords'   =>'欢迎使用大错（DaiCuo）开发您的项目',
+            'site_title'      =>'呆错开发框架',
+            'site_keywords'   =>'欢迎使用呆错（DaiCuo）开发您的项目',
             'site_description'=>'基于ThinkPHP、Bootstrap、Jquery的极速后台开发框架',
             'theme'           =>'default_pc',
             'theme_wap'       =>'default_wap',

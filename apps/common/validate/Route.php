@@ -6,9 +6,9 @@ class Route extends Validate
 {
 	
 	protected $rule = [
-		'rule'  =>  'require|checkRule',
+		'rule'      => 'require|checkRule',
 		'address'   => 'require|checkAddress',
-        'option'   => 'checkJson',
+        'option'    => 'checkJson',
         'pattern'   => 'checkJson',
 	];
 	

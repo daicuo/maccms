@@ -1,5 +1,4 @@
 <?php
-//系统基础配置
 namespace app\admin\controller;
 
 use app\common\controller\Admin;
@@ -48,4 +47,5 @@ class Cache extends Admin
 		write_arr2file('./datas/config/cache.php',['cache'=>$config]);
 		$this->success(lang('success'));
 	}
+    
 }

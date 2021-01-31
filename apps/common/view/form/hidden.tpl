@@ -1,0 +1,1 @@
+<input type="hidden" name="{$form.name}" id="{:DcEmpty($form['id'],$form['name'])}" value="{$form.value|DcHtml}">

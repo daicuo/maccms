@@ -1,4 +1,4 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{:lang("indexAdmin")}－{:lang('appName')}</title>
@@ -38,7 +38,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -55,7 +55,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'textarea',
@@ -72,7 +72,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'select.custom',

@@ -1,12 +1,12 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("tagIndex")}－{:lang('appName')}</title>
+<title>{:lang("tag_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("tagIndex")}
+	{:lang("tag_index")}
 </h6>
 <!-- -->
 <form action="{:DcUrl('admin/tag/delete','','')}" method="post" data-toggle="form">
@@ -26,7 +26,6 @@
     'data-toolbar-align'=>'none float-md-left',
     'data-search-align'=>'none float-md-right',
     'data-toggle'=>'bootstrap-table',
-    'data-locale'=>config('default_lang'),
     'data-url' => DcUrl('admin/tag/index', $query, ''),
     'data-buttons-class'=>'purple',
     'data-icon-size'=>'sm',

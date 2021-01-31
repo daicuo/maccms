@@ -6,7 +6,8 @@ use think\Validate;
 /*
 **用于未格式化前的表单数据验证
 */
-class Term extends Validate{
+class Term extends Validate
+{
 	
 	protected $rule = [
 		'term_name'        => 'require|length:1,60|unique_type',

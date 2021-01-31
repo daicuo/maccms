@@ -2,8 +2,9 @@
 namespace app\common\validate;
 use think\Validate;
 
-class Op extends Validate{
-	
+class Op extends Validate
+{
+
 	protected $rule = [
 		'op_name'  =>  'require',
 	];

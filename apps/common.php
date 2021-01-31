@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ERROR);
 use think\Cache;
 use think\Config;
 use think\Cookie;
@@ -15,7 +16,6 @@ use think\Response;
 use think\Session;
 use think\Url;
 use think\View;
-error_reporting(E_ERROR);
 /**************************************************分类组件***************************************************/
 /**
  * 获取导航列表简单数组格式
@@ -122,6 +122,16 @@ function DcPageSimple($pageIndex, $totalPage=1, $path=''){//&raquo;
     }
     return sprintf('<ul class="pagination pagination-lg">%s %s</ul>', $prev, $next);
 }
+/**************************************************模板组件***************************************************/
+/**
+ * 生成模板调用配置标签
+ * @param string $module 模块
+ * @param string $field 字段
+ * @return string;
+ */
+function DcTplLabelOp($module, $field){
+    return DcHtml('{:config("'.$module.'.'.$field.'")}');
+}
 /**************************************************系统常用函数***************************************************/
 /**
  * 加载配置文件（PHP格式）
@@ -149,16 +159,16 @@ function DcLoadLang($file, $range = ''){
  * @param array $params 表单元素参数
  * @return string 返回渲染后的表单HTML代码
  */
-function DcBuildForm($params=[]){
-    return widget('common/Form/build', ['params' =>$params]);
+function DcBuildForm($args=[]){
+    return widget('common/Form/build', ['args'=>$args]);
 }
 /**
  * 生成表格数据
  * @param array $config格据参数
  * @return string 返回渲染后的表单HTML代码
  */
-function DcBuildTable($config=[]){
-    return widget('common/Table/build', ['config' =>$config]);
+function DcBuildTable($args=[]){
+    return widget('common/Table/build', ['args'=>$args]);
 }
 /**
  * 判断是否为数组(一维)
@@ -189,8 +199,19 @@ function DcSubstr($str, $start=0, $length, $suffix=true, $charset="UTF-8"){
     return @substr($str, $start, $length);
 }
 //字符串安全输出
+function DcStrip($string, $allow='<p>'){
+    $string = preg_replace('/([\x00-\x08,\x0b-\x0c,\x0e-\x19])/', '', $string);
+    $string = strip_tags(htmlspecialchars_decode(trim($string)), $allow);
+    //$string = str_replace(array('"', "'"), '', $string);
+    return stripslashes($string);
+}
+//字符串安全输出
 function DcHtml($string){
     return htmlspecialchars(trim($string), ENT_QUOTES);
+}
+//过滤目录名称不让跳转到上级目录
+function DcDirPath($string){
+    return str_replace('.','', trim($string));
 }
 //字符串作比较输出
 function DcDefault($value, $default, $string_active='active', $string_empty=''){
@@ -204,8 +225,27 @@ function DcEmpty($value, $default=''){
     return !empty($value) ? $value : $default;
 }
 //BOOL输出
-function DcBool($value, $default=''){
-    return DcDefault($value, 'true', $default);
+function DcBool($value, $default=true){
+    $array = ['1', 'true', 'on', 'yes'];
+    if(in_array(strtolower($value), $array)){
+        return $default;
+    }
+    return false;
+}
+//OnOff输出
+function DcSwitch($value){
+    if( DcBool($value) ){
+        return 'on';
+    }
+    return 'off';
+}
+//错误输出
+function DcError($value){
+    $value_array = explode('%', $value);
+    if(count($value_array) > 1){
+        return $value_array[1];
+    }
+    return $value;
 }
 //将参数组装为数组
 function DcParseArgs($args, $defaults = ''){
@@ -317,9 +357,7 @@ function DcCurl($useragent='auto', $timeout=10, $url, $post_data='', $referer=''
     curl_setopt ($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
     curl_setopt ($ch, CURLOPT_FOLLOWLOCATION, 1);//301 302
     curl_setopt ($ch, CURLOPT_ENCODING, "");//乱码是因为返回的数据被压缩过了，在curl中加上一项参数即可
-    //useragent 
-    //https://blog.csdn.net/u012175089/article/details/61199238
-    //https://blog.csdn.net/learningITwell/article/details/78842439
+    //useragent
     if($useragent == 'windows'){
         curl_setopt ($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows;U;WindowsNT6.1;en-us)AppleWebKit/534.50(KHTML,likeGecko)Version/5.1Safari/534.50');
     }elseif($useragent == 'linux'){
@@ -387,6 +425,30 @@ function DcPregMatch($rule,$html){
     }
 }
 /**************************************************数据转化***************************************************/
+/**
+ * 普通数据转多对多关系
+ * @param array $data 待转化的数据,通常为post提交的一维数组数据
+ * @param string $fields 需要转化的字段,多个用逗号分隔或传入数组
+ * @param string $prefix 关联表名
+ * @return array 转化后的数据
+ */
+function DcDataToMuch($data, $fields='', $prefix='term_map'){
+    if(empty($data) || empty($fields)){
+        return $data;
+    }
+    if( is_string($fields) ){
+        $fields = explode(',', $fields);
+    }
+    foreach($fields as $key=>$field){
+        if( isset($data[$field]) ){
+            foreach($data[$field] as $key2=>$value2){
+                $data[$prefix][$key2][$field] = $value2;
+            }
+        }
+        unset($data[$field]);
+    }
+    return $data;
+}
 /**
  * 普通数据转一对多关系
  * @param array $data 待转化的数据,通常为post提交的一维数组数据
@@ -467,17 +529,22 @@ function DcOneToData($data, $prefix='term_much'){
     return array_merge($data, $data_one);
 }
 /**
- * 别名唯一值验证
+ * 别名唯一值处理
  * @param string $table 待验证的表名
- * @param string $value 待验证别名
+ * @param string $value 待验证别名值
  * @param string $id 主键ID
  * @return string 不是唯一值时自动添加-**
  */
 function DcSlugUnique($table, $value, $id=0){
+    //空值是唯一
     if( empty($value) ){
         return uniqid();
     }
-    $count = db($table)->where([$table.'_id'=>['neq',$id]])->where($table.'_slug',[['eq',$value],['like',$value.'-%'],'or'])->fetchSql(false)->count();
+    //查询是否存在
+    $count = db($table)->where(config('common.where_slug_unique'))->where([$table.'_id'=>['neq',$id]])->where($table.'_slug',[['eq',$value],['like',$value.'-%'],'or'])->fetchSql(false)->count();
+    //还原为空
+    config('common.where_slug_unique',[]);
+    //已存在
     if($count){
         $value = $value.'-'.($count+1);
     }
@@ -504,9 +571,10 @@ function DcWith($with){
 /**
  * 根据query参数生成查询条件
  * @param array $fields 白名单字段
+ * @param string $condition 关系,eq|neq|gt|lt|in (default:eq)
  * @return array;
  */
-function DcWhereByQuery($fields=[]){
+function DcWhereByQuery($fields=[], $condition='eq'){
     //空值过滤
     $query = array_filter(request()->param(), function($value){
         if($value || $value=='0'){
@@ -518,16 +586,20 @@ function DcWhereByQuery($fields=[]){
     $where = array();
     foreach($query as $key=>$value){
         if( in_array($key, $fields) ){
-            $where[$key] = ['eq', DcHtml($value)];
+            $where[$key] = [$condition, DcHtml($value)];
         }
     }
     return $where;
 }
 /****************************************************ThinkPhp配置***************************************************/
-//获取系统配置.支持多级层次
-function DcConfig($config_name){
+/**
+* 获取系统配置.支持多级层次
+* @param string $name 配置名称
+* @return mixed
+*/
+function DcConfig($name){
     $data = config();
-    foreach (explode('.', $config_name) as $key => $val) {
+    foreach (explode('.', $name) as $key => $val) {
         if (isset($data[$val])) {
             $data = $data[$val];
         } else {
@@ -536,20 +608,41 @@ function DcConfig($config_name){
         }
     }
     return $data;
-    /*$count = count($arrKey);
-    $config[0] = config($arrKey[0]);
-    if($count == 1){
-        return $config[0];
+}
+/**
+* 合并系统配置
+* @param string $config_name 配置名称
+* @param string $config_value 新配置值
+* @return mixed
+*/
+function DcConfigMerge($config_name, $config_value){
+    if( !is_array($config_value) ){
+        return false;
     }
-    for($i=1;$i<$count;$i++){
-        $config[$i] = $config[$i-1][$arrKey[$i]];
+    //旧配置
+    $config_name = trim($config_name);
+    $config_value_old = config($config_name);
+    if( is_string($config_value_old) ){
+        $config_value_old = [$config_value_old];
+    }elseif( is_null($config_value_old) ){
+        $config_value_old = [];
     }
-    return $config[($count-1)];*/
+    if( !is_array($config_value_old) ){
+        return false;
+    }
+    return config($config_name, array_merge($config_value_old, $config_value));
 }
 /**************************************************ThinkPhp验证器***************************************************/
-//验证器独立验证
-function DcCheck($data = [], $controll='Term', $scene='', $layer='validate'){
-    $validate = validate($controll, $layer);
+/**
+* 验证器独立验证
+* @param array $data 待验证数据
+* @param string $name 验证器名称
+* @param string $scene 验证场景,多个用逗号分隔
+* @param string $layer 业务层名称
+* @return bool \think\Validate
+*/
+function DcCheck($data = [], $name, $scene='', $layer='validate'){
+    $validate = validate($name, $layer);
     if(!$validate->scene($scene)->check($data)){
         config('daicuo.error', $validate->getError());
         return false;
@@ -559,7 +652,6 @@ function DcCheck($data = [], $controll='Term', $scene='', $layer='validate'){
 /**************************************************ThinkPhp钩子***************************************************/
 /**
 * 动态添加行为扩展到某个标签
-* @access public
 * @param  string $tag      标签名称
 * @param  mixed  $behavior 行为名称
 * @param  bool   $first    是否放到开头执行
@@ -570,7 +662,6 @@ function DcHookAdd($tag, $behavior, $first = false){
 }
 /**
  * 监听标签的行为
- * @access public
  * @param  string $tag    标签名称
  * @param  mixed  $params 传入参数
  * @param  mixed  $extra  额外参数
@@ -582,7 +673,6 @@ function DcHookListen($tag, &$params = null, $extra = null, $once = false){
 }
 /**
  * 执行某个行为
- * @access public
  * @param  mixed  $class  要执行的行为
  * @param  string $tag    方法名（标签名）
  * @param  mixed  $params 传入的参数
@@ -593,7 +683,13 @@ function DcHookExec($class, $tag = '', &$params = null, $extra = null){
     \think\Hook::exec($class, $tag, $params, $extra);
 }
 /**************************************************ThinkPhp缓存***************************************************/
-// 缓存标识函数、支持清空缓存(value=false)
+/**
+ * 缓存标识函数、支持清空缓存(value=false)
+ * @param string $key 缓存KEY
+ * @param string|array $value 缓存名格式化 (default:空)
+ * @param intval $time 缓存时间 (default:0)
+ * @return mixed
+ */
 function DcCache($key, $value='', $time=0){
     if(!$key){
         return false;
@@ -609,7 +705,14 @@ function DcCache($key, $value='', $time=0){
     }
     return Cache::get($key);
 }
-// 缓存标签函数、支持清空缓存(value=false)
+/**
+ * 缓存标签函数、支持清空缓存(value=false)
+ * @param string $tag 缓存标签名
+ * @param string $key 缓存KEY
+ * @param string|array $value 缓存名格式化 (default:空)
+ * @param intval $time 缓存时间 (default:0)
+ * @return mixed
+ */
 function DcCacheTag($tag, $key, $value='', $time=0){
     if(!$tag){
         return false;
@@ -657,12 +760,21 @@ function DcCacheKey($value){
     return md5($value);
 }
 /**************************************************ThinkPhp模板、路径***************************************************/
-//系统根目录
+/**
+ * 系统根目录
+ * @return string 根目录路径
+ */
 function DcRoot(){
     $base = Request::instance()->root();
     return ltrim(dirname($base), DS).'/';
 }
-//生成站内链接
+/**
+ * 生成站内链接
+ * @param string $url 调用地址
+ * @param string|array $vars 调用参数 支持字符串和数组
+ * @param bool $suffix 是否添加类名后缀 (default:true)
+ * @return mixed
+ */
 function DcUrl($url = '', $vars = '', $suffix = true){
     if(config('common.app_domain') == 'on'){
         return strip_tags(url($url, $vars, $suffix, true));
@@ -670,16 +782,78 @@ function DcUrl($url = '', $vars = '', $suffix = true){
         return strip_tags(url($url, $vars, $suffix, false));
     }
 }
-//插件管理路径
-function DcUrlAddon($vars = '', $suffix = true){
-    return '../addon/index?'.http_build_query($vars);
-    //return DcUrl('admin/addon/index', $vars, $suffix);
+/**
+ * 后台生成前台路径
+ * @param string $url 调用地址
+ * @param string|array $vars 调用参数 支持字符串和数组
+ * @param bool $suffix 是否添加类名后缀 (default:true)
+ * @return mixed
+ */
+function DcUrlAdmin($url = '', $vars = '', $suffix = true){
+	$baseFile = request()->baseFile();
+	return str_replace($baseFile, '', DcUrl($url, $vars, $suffix));
 }
-//模板存放路径
+/**
+ * 后台插件管理路径
+ * @param array $vars 地址栏参数
+ * @return string 后台插件访问地址
+ */
+function DcUrlAddon($vars = '', $suffix = true){
+    return DcUrl('addon/index', $vars, '');
+    //return '../addon/index?'.http_build_query($vars);
+}
+/**
+ * 附件读取路径
+ * @param string $file 文件保存路径
+ * @param int $key key值
+ * @return string 附件访问地址
+ */
+function DcUrlAttachment($file, $key=0){
+    //必要参数
+    if(!$file){
+        return '';
+    }
+    //多图分割
+    $file = explode(',',$file);
+    //当前第几个
+    $file = $file[$key];
+    //判断本地附件还是远程附件
+    $array = parse_url($file);
+    //远程附件处理
+	if(in_array($array['scheme'], array('http','https','ftp'))){
+        //第三方防盗链附盗链开关
+		if( config('common.upload_referer') ){
+			return config('common.upload_referer').urlencode($file);
+		}
+        //直接返回绝对地址
+		return $file;
+	}
+    //本地附件URL接口开关
+    if(config('common.upload_host')){
+        return config('common.upload_host').urlencode($file);
+    }
+    //本地附件CDN加速开关
+    if(config('common.upload_cdn')){
+        return trim(config('common.upload_cdn')).DcRoot().trim(config('common.upload_path')).'/'.$file;
+    }
+    //相对路径直接返回真实路径
+    return DcRoot().trim(config('common.upload_path')).'/'.$file;
+}
+/**
+ * 模板存放路径
+ * @param string $module 模块名称 (default:index)
+ * @param bool $isMobile 是否移动端 (default:false)
+ * @return string 模板主题路径
+ */
 function DcViewPath($module, $isMobile){
     return 'apps/'.$module.'/theme/'.DcTheme($module, $isMobile).'/';
 }
-//模板主题目录
+/**
+ * 模板主题目录
+ * @param string $module 模块名称 (default:index)
+ * @param bool $isMobile 是否移动端 (default:false)
+ * @return string 模板主题目录名称
+ */
 function DcTheme($module='index', $isMobile=false){
     if($isMobile){
         return DcEmpty(config($module.'.theme_wap'),config('common.wap_theme'));
@@ -787,9 +961,10 @@ function DcDbDelete($name, $where=[], $relationTables=''){
  * @param array $where 更新条件
  * @param array $data 待写入数据(关联写入则包含二维数组)
  * @param array $relationTables 关联表/多个用,分隔/不需要表前缀/user_meta
+ * @param array $relationWhere 二维数组/一对多关联更新时附加的删除条件['info_meta'=>['_pk'=>'info_id'],'term_map'=>['_pk'=>'detail_id']]
  * @return obj|null 不为空时返回修改后的obj
  */
-function DcDbUpdate($name, $where=[], $data=[], $relationTables=''){
+function DcDbUpdate($name, $where=[], $data=[], $relationTables='', $relationWhere=[]){
     $model = model($name);
     $modelPk = $model->getPk();//获取模型主键
     unset($data[$modelPk]);//数据主键过滤
@@ -816,8 +991,8 @@ function DcDbUpdate($name, $where=[], $data=[], $relationTables=''){
             $relationTable = camelize($tableName);
             //采用哪种关联模式(由data关联表的数据决定,二维数组则是一对多)
             if( DcIsArray($data[$tableName], true) ){
-                //一对一关联
-                if(is_null($info->$relationTable)){
+                //一对一关联 is_null($info->$relationTable)
+                if( is_null($info->$relationTable) ){
                     //无关联数据时新增
                     $info->$relationTable()->save($data[$tableName]);
                 }else{
@@ -826,8 +1001,27 @@ function DcDbUpdate($name, $where=[], $data=[], $relationTables=''){
                 }
             }else{
                 //一对多关联
-                $info->$relationTable()->delete();
-                $info->$relationTable()->saveAll($data[$tableName]);
+                if( !$info->$relationTable->isEmpty() ){
+                    //按关联表主键+附加条件删除
+                    $relationPk = DcEmpty($relationWhere[$tableName]['_pk'], $modelPk);//主键字段
+                    $relationFileds = DcEmpty($relationWhere[$tableName]['_fields'], [$tableName.'_key']);//需要删除的附加字段
+                    //遍历需要修改的数据
+                    foreach($data[$tableName] as $keyOne=>$valueOne){
+                        //动态生成删除条件
+                        $where = array();
+                        $where[$relationPk] = ['eq', $info->$modelPk];//关联表主键值
+                        foreach($valueOne as $keyField=>$valueFiled){
+                            if( in_array($keyField, $relationFileds) ){
+                                $where[$keyField] = ['eq', $valueFiled];
+                            }
+                        }
+                        //删除关联表符件条件的数据
+                        $info->$relationTable()->where($where)->delete();
+                        //model($relationTable)->where($where)->delete();
+                    }
+                }
+                //$info->$relationTable()->delete();//一次性删除所有旧的关联数据
+                $info->$relationTable()->saveAll($data[$tableName]);//批量增加关联数据
             }
         }
     }
@@ -920,6 +1114,7 @@ function DcDbFind($name, $params){
     //
     $args['fetchSql'] = false;
     $args['cache'] = true;
+    $args['cacheKey'] = '';
     //合并参数
     if($params){
         $args = array_merge($args, $params);
@@ -969,8 +1164,15 @@ function DcDbFind($name, $params){
     if($args['bind']){
         $model->bind($args['bind']);
     }
-    if($args['sort'] && $args['order'] ){
-        $model->order($args['sort'].' '.$args['order']);
+    if($args['orderRaw']){
+        $model->orderRaw($args['orderRaw']);
+    }
+    if( is_array($args['order']) ){
+        $model->order($args['order']);
+    }else{
+        if($args['sort'] && $args['order'] ){
+            $model->order($args['sort'].' '.$args['order']);
+        }
     }
     //查询数据库
     $info = $model->find();
@@ -1094,8 +1296,15 @@ function DcDbSelect($name, $params){
     if($args['page']){
         $model->page($args['page']);
     }
-    if($args['sort'] && $args['order'] ){
-        $model->order($args['sort'].' '.$args['order']);
+    if($args['orderRaw']){
+        $model->orderRaw($args['orderRaw']);
+    }
+    if( is_array($args['order']) ){
+        $model->order($args['order']);
+    }else{
+        if($args['sort'] && $args['order'] ){
+            $model->order($args['sort'].' '.$args['order']);
+        }
     }
     if($args['force']){
         $model->force($args['force']);
@@ -1310,6 +1519,14 @@ function is_username($str) {
     return preg_match("/^[\x80-\xffA-Za-z]{1,1}[\x80-\xff_A-Za-z0-9]{2,19}+$/", $str);
 }
 /**
+ * 判断数据不是JSON格式
+ * @param string $str 要验证的字符串
+ * @return bool
+ */
+function is_not_json($str){  
+    return is_null(json_decode($str));
+}
+/**
  * 读取文件
  * @param string $path 完整文件路径名
  * @return bool
@@ -1453,18 +1670,11 @@ function tree_to_list($tree, $child = '_child', $order='id', &$list = array()){
     return $list;
 }
 /**
- +----------------------------------------------------------
  * 对查询结果集进行排序
- +----------------------------------------------------------
- * @access public
- +----------------------------------------------------------
  * @param array $list 查询结果
  * @param string $field 排序的字段名
- * @param array $sortby 排序类型
- * asc正向排序 desc逆向排序 nat自然排序
- +----------------------------------------------------------
+ * @param array $sortby 排序类型 (asc正向排序 desc逆向排序 nat自然排序)
  * @return array
- +----------------------------------------------------------
  */
 function list_sort_by($list,$field, $sortby='asc') {
    if(is_array($list)){

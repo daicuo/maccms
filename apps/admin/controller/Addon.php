@@ -5,6 +5,7 @@ use app\common\controller\Admin;
 
 class Addon extends Admin
 {
+
 	//插件管理入口
     public function index()
     {
@@ -14,20 +15,17 @@ class Addon extends Admin
         }
         //定义插件路径
         $this->site['path_addon'] = 'apps/'.Dchtml($this->query['module']).'/';
-        //加载插件默认模块配置
-        DcLoadConfig(APP_PATH.Dchtml($this->query['module']).'/config.php');
-        //注册插件默认钩子
-        
-        // 初始化后台钩子
+        //初始化插件钩子
         \think\Hook::listen('hook_admin_init', $this->site);
-        // 后台插件模板变量
+        //后台插件模板变量
         $this->assign('path_addon', $this->site['path_addon']);
         //调用插件模块、控制器、操作
         return action(Dchtml($this->query['module']).'/'.ucfirst(Dchtml($this->query['controll'])).'/'.Dchtml($this->query['action']), '', 'event');
 	}
     
     //空操作
-	public function _empty(){
+	public function _empty($name)
+    {
         return $this->index();
 	}
 	

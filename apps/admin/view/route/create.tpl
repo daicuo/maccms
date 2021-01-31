@@ -1,17 +1,18 @@
 <div class="modal-content">
     <div class="modal-body">
     {:DcBuildForm([
+        'name'     => 'route_create',
         'class'    => 'bg-white px-2 py-2 form-create',
         'action'   => DcUrl('admin/route/save', '', ''),
         'method'   => 'post',
-        'ajax'     => true,
         'submit'   => lang('submit'),
         'reset'    => lang('reset'),
         'close'    => lang('close'),
         'disabled' => false,
+        'ajax'     => true,
         'callback' => '',
         'data'     => '',
-        'items'=>[
+        'items'    => [
             [
                 'type'=>'hidden',
                 'name'=>'op_module',
@@ -32,7 +33,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -49,7 +50,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'select',
@@ -68,7 +69,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'select',
@@ -87,7 +88,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'json',
@@ -105,7 +106,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'json',
@@ -123,7 +124,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
         ]
     ])}

@@ -1,9 +1,11 @@
 <?php
 namespace app\common\validate;
+
 use think\Validate;
 
-class Hook extends Validate{
-	
+class Hook extends Validate
+{
+
 	protected $rule = [
 		'hook_name'     =>  'require|checkNumber',
         'hook_path'     =>  'require|checkPath',
@@ -16,7 +18,7 @@ class Hook extends Validate{
 	];
 	
 	protected $scene = [
-    
+        
 	];
     
     protected function checkNumber($value, $rule, $data)

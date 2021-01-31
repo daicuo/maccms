@@ -5,17 +5,27 @@ body {
 }
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
 }
+/*背景*/
 .bg-muted{
     background-color: #6c757d !important;
 }
+/*模态框*/
 .modal-scrollbar-measure {
     display: none;
 }
+/*导航栏*/
 .navbar{
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.05), inset 0 -1px 0 rgba(0,0,0,.1);
 }
 .navbar-brand{
     font-size:1.15rem;
+}
+/*Tab效果*/
+.nav-tabs .nav-item a.nav-link{
+    color:#333;
+}
+.nav-tabs .nav-item a.nav-link.active{
+    color:#7952b3;
 }
 /*表格设宽*/
 .table-width{
@@ -126,4 +136,11 @@ body {
 .dc-handle {
     cursor: move;
     cursor: -webkit-grabbing;
+}
+/*bootstrap-table*/
+.loading-text{
+    font-size: 14px !important;
+}
+.fa-sync:before {
+    content: "\f021";
 }

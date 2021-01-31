@@ -1,16 +1,16 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("applyInfo")}－{:lang('appName')}</title>
+<title>{:lang("apply_create")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("applyInfo")}
+	{:lang("apply_create")}
 </h6>
 {:DcBuildForm([
-    'class'=>'bg-white px-2 py-2',
-    'action'=>DcUrl('admin/apply/update', '', ''),
+    'class'=>'bg-white px-0 py-2',
+    'action'=>DcUrl('admin/apply/save', '', ''),
     'method'=>'post',
     'ajax'=>true,
     'disabled'=>false,
@@ -34,7 +34,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -51,7 +51,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -68,7 +68,24 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
+        ],
+        [
+            'type'=>'text',
+            'name'=>'apply_rely',
+            'id'=>'apply_rely',
+            'title'=>lang('apply_rely'),
+            'placeholder'=>lang('apply_rely_placeholder'),
+            'tips'=>'',
+            'value'=>config('common.apply_rely'),
+            'readonly'=>false,
+            'disabled'=>false,
+            'required'=>false,
+            'class'=>'row form-group',
+            'class_left'=>'col-md-2',
+            'class_right'=>'col-md-6',
+            'class_right_control'=>'',
+            'class_tips'=>'',
         ],
     ]
 ])}

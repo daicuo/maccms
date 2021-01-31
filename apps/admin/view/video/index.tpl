@@ -1,24 +1,25 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("videoIndex")}－{:lang('appName')}</title>
+<title>{:lang("video_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-    {:lang("videoIndex")}
+  {:lang("video_index")}
 </h6>
 {:DcBuildForm([
-    'class'=>'bg-white px-2 py-2',
-    'action'=>DcUrl('admin/video/update', 'module=common', ''),
-    'method'=>'post',
-    'ajax'=>true,
-    'submit'=>lang('submit'),
-    //'close'=>lang('close'),
-    'reset'=>lang('reset'),
-    'disabled'=>false,
-    //'callback'=>'daicuo.form.test',
-    'items'=>[
+    'name'       => 'video_index',
+    'class'      => 'bg-white px-2 py-2',
+    'action'     => DcUrl('admin/video/update', 'module=common', ''),
+    'method'     => 'post',
+    'submit'     => lang('submit'),
+    //'close'    => lang('close'),
+    'reset'      => lang('reset'),
+    'disabled'   => false,
+    'ajax'       => true,
+    //'callback' => 'daicuo.form.test',
+    'items'      => [
         [
             'type'=>'switch',
             'name'=>'video_in',
@@ -33,7 +34,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-auto',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'select.custom',
@@ -51,7 +52,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-auto',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],		    
         [
             'type'=>'text',
@@ -68,7 +69,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -85,7 +86,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -102,7 +103,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -119,7 +120,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],		
         [
             'type'=>'text',
@@ -136,7 +137,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -153,7 +154,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -170,10 +171,10 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
-            'type'=>'text',
+            'type'=>'hidden',
             'name'=>'video_advUnit',
             'id'=>'video_advUnit',
             'title'=>lang('video_advUnit'),
@@ -187,7 +188,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
     ]
 ])}

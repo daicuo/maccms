@@ -6,17 +6,31 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitb03179045ce40b6ff19c4f72537c1cb2
 {
+    public static $files = array (
+        '1cfd2761b63b0a29ed23657ea394cb2d' => __DIR__ . '/..' . '/topthink/think-captcha/src/helper.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        't' => 
         array (
-            'PHPMailer\\PHPMailer\\' => 20,
+            'think\\composer\\' => 15,
+            'think\\captcha\\' => 14,
+            'think\\' => 6,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'PHPMailer\\PHPMailer\\' => 
+        'think\\composer\\' => 
         array (
-            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+            0 => __DIR__ . '/..' . '/topthink/think-installer/src',
+        ),
+        'think\\captcha\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/topthink/think-captcha/src',
+        ),
+        'think\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/topthink/framework/library/think',
         ),
     );
 

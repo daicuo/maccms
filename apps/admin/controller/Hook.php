@@ -8,6 +8,61 @@ use app\common\controller\Admin;
  */
 class Hook extends Admin
 {
+	//添加数据保存至数据库
+    public function save()
+    {
+        config('common.validate_name', 'common/Hook');
+        $op_id = \daicuo\Hook::save(input('post.'));
+		if($op_id < 1){
+			$this->error(\daicuo\Hook::getError());
+		}
+		$this->success(lang('success'));
+    }
+    
+    //删除（数据库）
+	public function delete()
+    {
+	    $ids = input('id/a');
+		if(!$ids){
+			$this->error(lang('mustIn'));
+		}
+        foreach($ids as $id){
+            \daicuo\Hook::delete_id($id);
+        }
+        $this->success(lang('success'));
+	}
+    
+    //修改（表单）
+	public function edit()
+    {
+		$id = input('id/d',0);
+		if(!$id){
+			$this->error(lang('mustIn'));
+		}
+		//查询数据
+        $data = \daicuo\Hook::get_id($id, false);
+        if( is_null($data) ){
+            $this->error(lang('empty'));
+        }
+		$this->assign('data', $data);
+		return $this->fetch();
+	}
+	
+	//修改（数据库）
+	public function update()
+    {
+		$data = input('post.');
+        if(!$data['op_id']){
+			$this->error(lang('mustIn'));
+		}
+        config('common.validate_name', 'common/Hook');
+        $info = \daicuo\Hook::update_id($data['op_id'], $data);
+        if(is_null($info)){
+            $this->error(\daicuo\Hook::getError());
+        }
+        $this->success(lang('success'));
+	}
+    
     //管理
     public function index()
     {
@@ -32,8 +87,8 @@ class Hook extends Admin
         $this->assign('query', $this->query);
         return $this->fetch();
     }
-	
-	//排序（拖拽ajax）
+    
+    //排序（拖拽ajax）
     public function sort()
     {
         $ids = explode(',',input('get.id'));
@@ -48,57 +103,5 @@ class Hook extends Admin
         DcCacheTag('common/Hook/Item', 'tag', 'clear');
         $this->success(lang('success'));
 	}
-	
-	//修改（表单）
-	public function edit()
-    {
-		$id = input('id/d',0);
-		if(!$id){
-			$this->error(lang('mustIn'));
-		}
-		//查询数据
-        $data = \daicuo\Hook::get_id($id, false);
-        if( is_null($data) ){
-            $this->error(lang('empty'));
-        }
-		$this->assign('data', $data);
-		return $this->fetch();
-	}
-	
-	//修改（数据库）
-	public function update()
-    {
-		$data = input('post.');
-        if(!$data['op_id']){
-			$this->error(lang('mustIn'));
-		}
-        $info = \daicuo\Hook::update_id($data['op_id'], $data);
-        if(is_null($info)){
-            $this->error(lang('fail'));
-        }
-        $this->success(lang('success'));
-	}		
-	
-	//删除（数据库）
-	public function delete()
-    {
-	    $ids = input('id/a');
-		if(!$ids){
-			$this->error(lang('mustIn'));
-		}
-        foreach($ids as $id){
-            \daicuo\Hook::delete_id($id);
-        }
-        $this->success(lang('success'));
-	}
-	
-	//添加数据保存至数据库
-    public function save()
-    {
-        $op_id = \daicuo\Hook::save(input('post.'));
-		if($op_id < 1){
-			$this->error(config('daicuo.error'));
-		}
-		$this->success(lang('success'));
-    }	
+    
 }

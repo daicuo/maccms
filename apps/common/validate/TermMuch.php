@@ -3,7 +3,8 @@ namespace app\common\validate;
 
 use think\Validate;
 
-class TermMuch extends Validate{
+class TermMuch extends Validate
+{
 	
 	protected $rule = [
 		'term_much_type'   => 'require|in:category,tag',

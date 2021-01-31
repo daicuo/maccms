@@ -3,8 +3,9 @@ namespace app\common\validate;
 
 use think\Validate;
 
-class Nav extends Validate{
-	
+class Nav extends Validate
+{
+
 	protected $rule = [
 		'nav_text'  =>  'require',
 	];

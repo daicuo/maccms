@@ -1,34 +1,34 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("routeIndex")}－{:lang('appName')}</title>
+<title>{:lang("route_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <form action="{:DcUrl('admin/route/delete','','')}" method="post" data-toggle="form">
 <input type="hidden" name="_method" value="delete">
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("routeIndex")}
+	{:lang("route_index")}
 </h6>
 <div id="toolbar" class="toolbar mb-2">
-    <a class="btn btn-sm btn-light border" href="javascript:;" data-toggle="reload">
-        <i class="fa fa-refresh"></i>
-        {:lang('refresh')}
-    </a>
-    <a class="btn btn-sm btn-light border" href="{:DcUrl('admin/route/create',['op_module'=>$op_module],'')}" data-toggle="create">
-        <i class="fa fa-plus"></i>
-        {:lang('create')}
-    </a>
-    <button class="btn btn-sm btn-outline-danger" type="submit" data-toggle="delete">
-        <i class="fa fa-trash"></i> {:lang('delete')}
-    </button>
+  <a class="btn btn-sm btn-light border" href="javascript:;" data-toggle="reload">
+    <i class="fa fa-refresh"></i>
+    {:lang('refresh')}
+  </a>
+  <a class="btn btn-sm btn-light border" href="{:DcUrl('admin/route/create',['op_module'=>$op_module],'')}" data-toggle="create">
+    <i class="fa fa-plus"></i>
+    {:lang('create')}
+  </a>
+  <button class="btn btn-sm btn-outline-danger" type="submit" data-toggle="delete">
+    <i class="fa fa-trash"></i>
+    {:lang('delete')}
+  </button>
 </div>
 {:DcBuildTable([
     'data-toolbar'=>'.toolbar',
     'data-toolbar-align'=>'none float-md-left',
     'data-search-align'=>'none float-md-right',
     'data-toggle'=>'bootstrap-table',
-    'data-locale'=>config('default_lang'),
     'data-url' => DcUrl('admin/route/index', $query, ''),
     'data-buttons-class'=>'purple',
     'data-icon-size'=>'sm',
@@ -102,6 +102,8 @@
         [
           'data-field'=>'operate',
           'data-title'=>lang('operate'),
+          'data-width'=>'120',
+          'data-width-unit'=>'px',
           'data-align'=>'center',
           'data-halign'=>'center',
           'data-formatter'=>'callOperate',
@@ -115,6 +117,7 @@
 <script>
 callAjax = function($data, $status, $xhr) {
     //$('.form-edit input[name="rule"]').attr('readonly',true);
+    daicuo.bootstrap.dialogForm($data);
     daicuo.json.beauty();
 }
 callModule = function(value, row, index, field){
@@ -122,10 +125,9 @@ callModule = function(value, row, index, field){
     return '<a class="text-purple" href="'+$url+'">'+value+'</a>';
 }
 callOperate = function(value, row, index, field){
-    var $url_preview = daicuo.config.root +row.rule;
     var $url_edit = daicuo.config.file + '/' + daicuo.config.controll + '/edit?id='+row.op_id;
     var $url_delete = daicuo.config.file + '/' + daicuo.config.controll + '/delete?id='+row.op_id;
-    return '<div class="btn-group btn-group-sm"><a class="btn btn-outline-secondary" href="'+$url_preview+'" target="_blank"><i class="fa fa-fw fa-link"></i></a><a class="btn btn-outline-secondary bg-light" href="'+$url_edit+'" data-toggle="edit" data-formatter="callAjax"><i class="fa fa-fw fa-pencil"></i></a><a class="btn btn-outline-secondary" href="'+$url_delete+'" data-toggle="delete"><i class="fa fa-fw fa-trash-o"></i></a></div>';
+    return '<div class="btn-group btn-group-sm"><a class="btn btn-outline-secondary bg-light" href="'+$url_edit+'" data-toggle="edit" data-callback="callAjax"><i class="fa fa-fw fa-pencil"></i></a><a class="btn btn-outline-secondary" href="'+$url_delete+'" data-toggle="delete"><i class="fa fa-fw fa-trash-o"></i></a></div>';
 }
 </script>
 {/block}

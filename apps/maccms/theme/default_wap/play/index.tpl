@@ -13,8 +13,8 @@
   {$vod_player}
 </div>
 <p class="px-1">
-  <a class="btn btn-block btn-purple text-light" href="http://cdn.youdu.com/images/gzh/jlxjc_02.png" target="_blank">
-  <small>微信关注（回复片名 / 免费观看）永不迷路</small>
+  <a class="btn btn-block btn-purple text-light" href="https://kan.qxwk.net/weixin.html" target="_blank">
+  小小影视微信版开通了（方便又好用）
   </a>
 </p>
 <div class="px-1 mb-3">
@@ -67,7 +67,7 @@
       <small>{$vod_content|strip_tags|DcHtml}</small>
     </p>
     <p class="d-flex flex-row flex-wrap justify-content-between">
-      <a class="mt-2 mr-2 badge badge-{:colorRand(7)} flex-fill" href="{:categoryUrl($term_id, $term_slug)}"><span class="fa fa-tag mr-1"></span>{$type_name}</a>
+      <a class="mt-2 mr-2 badge badge-{:colorRand(7)} flex-fill" href="{:categoryUrl($term_id, $term_slug)}"><span class="fa fa-tag mr-1"></span>{$term_name}</a>
       {volist name="vod_year" id="year"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/year',['id'=>$year,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$year}</a>{/volist}
       {volist name="vod_language" id="language" mod="2"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/language',['id'=>$language,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$language}</a>{/volist}
       {volist name="vod_director" id="director"}<a class="mt-2 mr-2 badge badge-{:colorRand(3)} flex-fill" href="{:DcUrl('maccms/filter/director',['id'=>$director,'page'=>1],'')}"><span class="fa fa-tag mr-1"></span>{$director}</a>{/volist}

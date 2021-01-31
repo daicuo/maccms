@@ -1,9 +1,6 @@
 <?php
 namespace app\common\event;
 
-/**
- * 控制器分层.钩子
- */
 class Hook
 {
     /**
@@ -27,10 +24,14 @@ class Hook
         }
         //\think\Hook::add('hook_base_init','app\\home\\hook\\Common');
         foreach($hooks as $key=>$value){
-            if($value['hook_overlay']=='yes'){
-                \think\Hook::add($value['hook_name'], [$value['hook_path'], '_overlay'=>true]);
-            }else{
-                \think\Hook::add($value['hook_name'], $value['hook_path']);
+            //验证钩子路径
+            if( class_exists( trim($value['hook_path'])) ){
+                //注册钩子
+                if($value['hook_overlay']=='yes'){
+                    \think\Hook::add($value['hook_name'], [$value['hook_path'], '_overlay'=>true]);
+                }else{
+                    \think\Hook::add($value['hook_name'], $value['hook_path']);
+                }
             }
         }
         return $hooks;

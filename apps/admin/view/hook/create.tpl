@@ -1,6 +1,7 @@
 <div class="modal-content">
     <div class="modal-body"> 
     {:DcBuildForm([
+        'name'     => 'hook_create',
         'class'    => 'bg-white px-2 py-2 form-create',
         'action'   => DcUrl('admin/hook/save', '', ''),
         'method'   => 'post',
@@ -11,7 +12,7 @@
         'disabled' => false,
         'callback' => '',
         'data'     => '',
-        'items'=>[
+        'items'    => [
             [
                 'type'=>'text',
                 'name'=>'hook_name',
@@ -27,7 +28,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -44,7 +45,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'select',
@@ -62,7 +63,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'select',
@@ -81,7 +82,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'textarea',
@@ -99,7 +100,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
         ]
     ])}

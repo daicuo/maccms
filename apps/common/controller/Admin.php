@@ -19,37 +19,31 @@ use app\common\controller\Base;
  */
 class Admin extends Base
 {
+    // 系统权限属性
+    protected $auth = [
+        'check'       => true,
+        'rule'        => '',
+        'none_login'  => ['admin/index/login','admin/index/logout'],
+        'none_right'  => [],
+        'error_login' => 'admin/index/login',
+        'error_right' => '',
+    ];
+    
     /**
     * 继承初始化方法
     */
     public function _initialize()
 	{
-        // 父级初始化
+        // 继承上级
         parent::_initialize();
-        // 当前用户
-        $this->site['user'] = \daicuo\User::get_current_user();
         // 权限验证
-        if(false == \daicuo\Auth::check(
-            $this->site['module'].'/'.$this->site['controll'].'/'.$this->site['action'], 
-            $this->site['user']['user_capabilities'])){
-            $this->error(lang('You have no permission'),'index/login');
-        }
+        $this->_authCheck();
         // 模板路径
         $this->site['path_view'] = 'apps/admin/view/';
         // 后台钩子
         \think\Hook::listen('hook_admin_init', $this->site);
         // 模板标签
         $this->assign($this->site);
-    }
-	
-    /**
-    * 默认操作
-    * @return mixed
-    */
-    public function index()
-    {
-        $this->assign('query', $this->query);
-        return $this->fetch();
     }
     
     /**
@@ -58,6 +52,7 @@ class Admin extends Base
     */
     public function create()
     {
+        //config('common.validate_token', true);
         $this->assign('query', $this->query);
         return $this->fetch();
     }
@@ -67,6 +62,16 @@ class Admin extends Base
     * @return mixed
     */
     public function edit()
+    {
+        $this->assign('query', $this->query);
+        return $this->fetch();
+    }
+    
+    /**
+    * 默认操作
+    * @return mixed
+    */
+    public function index()
     {
         $this->assign('query', $this->query);
         return $this->fetch();

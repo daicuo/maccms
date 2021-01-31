@@ -20,9 +20,9 @@ class Term extends Model{
     {
         if( empty($value) ){
             $value = \daicuo\Pinyin::get(trim($data['term_name']));
-            $value = DcSlugUnique('term', $value);
         }
-        return $value;
+        //别名唯一值处理
+        return DcSlugUnique('term', $value, intval($data['term_id']));
     }
     
     //获取器增加不存在的字段

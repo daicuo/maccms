@@ -1,28 +1,38 @@
 <?php
 namespace app\common\event;
 
-/**
- * 控制器分层.应用
- */
-class Apply{
+class Apply
+{
+    private $error = '';
     
     /**
+     * 模块初始化
      * 加载框架所有应用信息/函数/语言
      */
-    public function appBegin(){
-        //加载所有己安装应用的全局信息
+    public function moduleInit($module)
+    {
+        //加载所有己安装插件应用的全局信息
         foreach(config('common.site_applys') as $key=>$value){
             //加载插件动态配置
             action('common/Op/config', $key, 'event');
-            //加载插件全局语言包
-            \think\Lang::load(APP_PATH.$key.'/common/'.config('default_lang').'.php');
-            //加载插件全局函数
-            include(APP_PATH.$key.'/common/function.php');//\think\Loader::import('function', APP_PATH.'home/common/', EXT);
+            //加载插件初始信息等 当前模块会自动加载 防止二次加载
+            if($key != $module){
+                \think\Lang::load(APP_PATH.$key.'/lang/'.config('default_lang').'.php');//插件语言包
+                \think\Config::load(APP_PATH.$key.'/config.php');//插件初始配置
+                \think\Loader::import('common', APP_PATH.$key, EXT);//插件公用函数
+                /*注册插件初始钩子,全局钩子请使用钩子模块添加到数据库中
+                \think\Config::load(APP_PATH.$key.'/tags.php', 'applys_tags');
+                foreach(config('applys_tags') as $key=>$value){
+                    \think\Hook::add($key, $value[0], $value['_overlay']);
+                }
+                config('applys_tags', NULL);*/
+            }
         }
     }
     
     //获取系统所有应用列表包含安装状态
-    public function appsInfo(){
+    public function appsInfo()
+    {
         $applys = config('common.site_applys');
         if(is_null($applys)){
            $applys = array(); 
@@ -30,7 +40,7 @@ class Apply{
 		//以本地模块为应用信息
 		$dirs = DcAdminApply();
 		foreach($dirs as $module){
-            $apply = DcLoadConfig(APP_PATH.$module.'/common/info.php', 'apply');
+            $apply = DcLoadConfig(APP_PATH.$module.'/info.php', 'apply');
             if($applys[$module]){
                 $applys[$module]['install'] = true;
             }else{
@@ -42,50 +52,107 @@ class Apply{
     }
     
     /**
-    * 卸载插件/先加载插件自身卸载脚本再删除安装记录
+    * 禁用/启用插件
+    * @param string $module 应用模块名称
+    * @param string $status 应用状态disable|enable
     * @return bool
     */
-    public function uninstall($module=''){
-        if($module){
-            //执行插件自卸载脚本
-            $status = action($module.'/Sql/'.unInstall,'','event');
-            if(!$status){
-                config('daicuo.error', lang('apply_fail_sql'));
+    public function updateStatus($module='', $status='enable')
+    {
+        if(!$module){
+            $this->error = 'mustIn';
+            return false;
+        }
+        //导入待安装的插件信息
+        DcLoadConfig(APP_PATH.$module.'/info.php', 'apply');
+        if( config('apply') ){
+            //是否禁用
+            if($status == 'disable'){
+                config('apply.disable',true);
+            }
+            //更新插件列表
+            $result = $this->write( config('apply') );
+            if(!$result){
+                $this->error = 'apply_fail_op';
                 return false;
             }
-            //删除插件安装记录
-            $where = array();
-            $where['op_name'] = array('eq', 'site_applys');
-            $where['op_module'] = array('eq', 'common');
-            $status = \daicuo\Op::delete_value_key($where, $module);
-            if(!$status){
-                config('daicuo.error', lang('apply_fail'));
-                return false;
-            }
-            //删除全局缓存
+            //删除全局缓存并返回结果
             DcCache('route_all', null);
             DcCache('hook_all', null);
-            DcCache('config_'.$module, null);
             DcCache('config_common', null);
-            //\think\Cache::clear();
-            return true;
+            return $result;
         }
         return false;
     }
     
-    //安装插件 自动写入应用的相关信息至config.applys
-    public function install($module){
+    /**
+    * 卸载插件/先加载插件自身卸载脚本再删除安装记录
+    * @param string $module 应用模块名称
+    * @param string $isDel 是否删除应用文件
+    * @return bool
+    */
+    public function uninstall($module, $isDel = false)
+    {
         if(!$module){
+            $this->error = 'mustIn';
+            return false;
+        }
+        //依赖插件禁止卸载
+        if(config('common.apply_rely')){
+            if( in_array($module, explode(',',config('common.apply_rely'))) ){
+                $this->error = 'apply_fail_rely';//依赖插件禁止卸载
+                return false;
+            }
+        }
+        //执行插件自卸载脚本
+        if( !$this->executeSql($module, 'uninstall') ){
+            $this->error = 'apply_fail_sql';
+            return false;
+        }
+        //删除插件安装记录
+        $where = array();
+        $where['op_name'] = array('eq', 'site_applys');
+        $where['op_module'] = array('eq', 'common');
+        $status = \daicuo\Op::delete_value_key($where, $module);
+        if(!$status){
+            $this->error = 'apply_fail_op';//更新插件列表出错
+            return false;
+        }
+        //删除全局缓存
+        DcCache('route_all', null);
+        DcCache('hook_all', null);
+        DcCache('config_'.$module, null);
+        DcCache('config_common', null);
+        //\think\Cache::clear();
+        //删除目录包括下面的文件
+        if(!in_array($module,['admin','api','common','index']) && $isDel){
+            $module = DcDirPath($module);
+            \files\Dir::delDir('./apps/'.$module);
+        }
+        return true;
+    }
+    
+    /**
+    * 安装与升级插件
+    * @param string $module 应用模块名称
+    * @param string $$method 脚本方法（install|upgrade）
+    * @return bool
+    */
+    public function install($module, $method = 'install')
+    {
+        //必要参数
+        if(!$module){
+            $this->error = 'mustIn';
             return false;
         }
         //导入待安装的插件信息
-        DcLoadConfig(APP_PATH.$module.'/common/info.php', 'apply');
+        DcLoadConfig(APP_PATH.$module.'/info.php', 'apply');
         //读取已安装的插件列表
         $applys = config('common.site_applys');
         //数据库依赖验证
         if( config('apply.datatype') ){
             if( !in_array(config('database.type'), config('apply.datatype')) ){
-                config('daicuo.error', lang('apply_daicuo_datatype'));
+                $this->error = 'apply_fail_datatype%database';//数据库不匹配
                 return false;
             }
         }
@@ -94,31 +161,29 @@ class Apply{
         foreach(config('apply.rely') as $key=>$value){
             if($key == 'daicuo'){
                 if( !$version->check(config('daicuo.version'), $value) ){
-                    config('daicuo.error', lang('apply_daicuo'));
+                    $this->error = 'apply_fail_update%daicuo%index/index#update';//请升级框架
                     return false;
                 }
             }else{
-                if(is_null($applys[$key])){
-                    config('daicuo.error', DcHtml($key).lang('apply_uninstall'));
-                    return false; 
+                if( is_null($applys[$key]) ){
+                    $this->error = 'apply_fail_uninstall%'.$key;//未安装依赖插件
+                    return false;
                 }else{
                     if( !$version->check($applys[$key]['version'], $value) ){
-                        config('daicuo.error', lang('apply_daicuo'));
+                        $this->error = 'apply_fail_update%'.$key;//依赖插件版本过低
                         return false;
                     }
                 }
             }
         }
-        //执行插件自安装脚本
-        $status = action($module.'/Sql/'.install,'','event');
-        if(!$status){
-            config('daicuo.error', lang('apply_fail_sql'));
+        //执行安装或升级脚本
+        if( !$this->executeSql($module, $method) ){
             return false;
         }
-        //安装应用信息至数据库
+        //应用信息写入数据库
         $status = $this->write( config('apply') );
         if(!$status){
-            config('daicuo.error', lang('apply_fail'));
+            $this->error = 'apply_fail_op';//更新插件列表出错
             return false;
         }
         //删除全局缓存并返回结果
@@ -127,13 +192,127 @@ class Apply{
         DcCache('config_common', null);
         return $status;
     }
+    
+    /**
+    * 在线安装应用
+    * @param array $args 参数['name'=>'demo','version'=>'1.0.2']
+    * @return bool
+    */
+    public function installOnline($args)
+    {
+        //必要参数
+        if(!$args['module']){
+            $this->error = 'mustIn';
+            return false;
+        }
+        //在线安装参数标识
+        $args['event'] = 'install';
+        //待安装应用名
+        $module = DcDirPath($args['module']);
+        //应用目录
+        $moduleDir = './apps/'.$module;
+        //实例化文件类
+        $file = new \files\File();
+        //是否已存在相同应用
+        if( $file->d_has($moduleDir) ){
+            $this->error = 'apply_name_unique';
+            return false;
+        }
+        //是否有权限创建应用目录
+        if(!$file->d_create($moduleDir)){
+            $this->error = 'apply_dir_access';
+            return false;
+        }
+        //下载应用到临时目录
+        $service = new \daicuo\Service();
+        if(!$saveFile = $service->applyDownLoad($args)){
+            $file->d_delete($moduleDir);
+            $this->error = $service->getError();
+            return false;
+        }
+        //在线解压到应用目录
+        $zip = new \files\Zip();
+        if(!$zip->unzip($saveFile, $moduleDir)){
+            $file->d_delete($moduleDir);
+            $file->f_delete($saveFile);
+            $this->error = 'apply_unzip_failed';
+            return false;
+        }
+        //执行安装脚本
+        if(!$this->install($module, 'install')){
+            $file->d_delete($moduleDir);
+            $file->f_delete($saveFile);
+            return false;
+        }
+        //默认返回
+        return true;
+    }
+    
+    /**
+    * 在线升级应用（一个一个版本递增升级）
+    * @param array $args 参数['name'=>'demo','version'=>'1.0.2']
+    * @return bool
+    */
+    public function upgradeOnline($module)
+    {
+        //必要参数
+        if(!$module){
+            $this->error = 'mustIn';
+            return false;
+        }
+        //已安装应用列表
+        $applys = $this->appsInfo();
+        //待升级应用名称
+        $module = DcDirPath($module);
+        //验证是否已安装
+        if(!$applys[$module]){
+            $this->error = 'apply_module_uninstall';
+            return false;
+        }
+        //待升级应用旧版本
+        $version = $applys[$module]['version'];
+        //待升级应用目录
+        $moduleDir = './apps/'.$module;
+        //获取升级信息
+        $service = new \daicuo\Service();
+        $upJson = $service->apiUpgrade(['module'=>$module,'version'=>$version]);
+        if(!$upJson['code']){
+            $this->error = 'apply_update_server_error';
+            return false;
+        }
+        if($upJson['version'] == $version){
+            $this->error = 'apply_version_isnew';
+            return false;
+        }
+        //下载应用到临时目录
+        $service = new \daicuo\Service();
+        if(!$saveFile = $service->applyDownLoad(['event'=>'update','module'=>$module,'version'=>$version])){
+            $this->error = $service->getError();
+            return false;
+        }
+        //在线解压到应用目录
+        $zip = new \files\Zip();
+        if(!$zip->unzip($saveFile, $moduleDir)){
+            $file->f_delete($saveFile);
+            $this->error = 'apply_unzip_failed';
+            return false;
+        }
+        //执行升级脚本
+        if(!$this->install($module, 'upgrade')){
+            $file->f_delete($saveFile);
+            return false;
+        }
+        //默认返回
+        return true;
+    }
 
     /**
     * 自动处理新增与修改
     * @param array $data 数据
     * @return array 数据集
     */
-	public function write($data=[]){
+	public function write($data=[])
+    {
         //必要字段验证
         if(false === DcCheck($data, 'common/Apply')){
 			return false;
@@ -157,5 +336,41 @@ class Apply{
         $info['op_value'] = array_merge($info['op_value'], [$data['module']=>$data]);
 		return \daicuo\Op::update_id($info['op_id'], $info);
 	}
-
+    
+    /**
+    * 获取错误信息
+    * @return string
+    */
+    public function getError()
+    {
+        return $this->error;
+    }
+    
+    /**
+    * 执行应用脚本方法
+    * @param string $module 应用模块名称
+    * @param string $method 方法名 install|upgrade|uninstall
+    * @return bool
+    */
+    private function executeSql($module, $method){
+        //必要参数
+        if(!$module || !$method){
+            return true;
+        }
+        //无脚本文件
+        if ( !class_exists($class = '\\app\\'.$module.'\\event\\Sql') ){
+            return true;
+        }
+        //实例化脚本类
+        $Sql = new $class();
+        //执行方法前方法是否已经定义 
+        if( method_exists($Sql, $method) ){
+            //action($module.'/Sql/install','','event');
+            if(!$Sql->$method()){
+                $this->error = 'apply_fail_sql%'.$module;//执行SQL语句出错
+                return false;
+            }
+        }
+        return true;
+    }
 }

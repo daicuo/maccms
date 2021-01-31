@@ -13,25 +13,32 @@ return [
     'module_init'  => [
         'app\\common\\behavior\\Common',
     ],
-    // 操作开始执行
-    'action_begin' => [
+    // 表单验证
+    'form_validate'  => [
+        'app\\common\\behavior\\Common',
     ],
-    // 视图内容过滤
-    'view_filter'  => [            
+    // 配置数据验证
+    'op_data_validate'  => [
+        'app\\common\\behavior\\Common',
     ],
-    // 应用结束
-    'app_end'      => [
+    // 钩子数据验证
+    'hook_data_validate'  => [
+        'app\\common\\behavior\\Common',
     ],
-    // 日志写入
-    'log_write'    => [        
-    ],    
-    // 日志写入完成
-    'log_write_done'    => [        
-    ],    
-    // 响应发送
-    'response_send'    => [
-    ],    
-    // 输出结束
-    'response_end'    => [        
+    // 路由数据验证
+    'route_data_validate'  => [
+        'app\\common\\behavior\\Common',
+    ],
+    // 导航数据验证
+    'nav_data_validate'  => [
+        'app\\common\\behavior\\Common',
+    ],
+    // 队列数据验证
+    'term_data_validate'  => [
+        'app\\common\\behavior\\Common',
+    ],
+    // 内容数据验证
+    'info_data_validate'  => [
+        'app\\common\\behavior\\Common',
     ],
 ];

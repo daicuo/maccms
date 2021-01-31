@@ -1,17 +1,18 @@
 <div class="modal-content">
     <div class="modal-body"> 
     {:DcBuildForm([
+        'name'     => 'category_create',
         'class'    => 'bg-white px-2 py-2 form-create',
         'action'   => DcUrl('admin/category/save', '', ''),
         'method'   => 'post',
-        'ajax'     => true,
         'submit'   => lang('submit'),
         'reset'    => lang('reset'),
         'close'    => lang('close'),
+        'ajax'     => true,
         'disabled' => false,
         'callback' => '',
         'data'     => '',
-        'items'=>[
+        'items'    => [
             [
                 'type'=>'hidden',
                 'name'=>'term_much_type',
@@ -34,7 +35,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -53,7 +54,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'select',
@@ -72,7 +73,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -91,7 +92,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -110,7 +111,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'number',
@@ -129,7 +130,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
             [
                 'type'=>'text',
@@ -148,7 +149,7 @@
                 'class_left'=>'col-12',
                 'class_right'=>'col-12',
                 'class_right_control'=>'',
-                'class_right_tips'=>'',
+                'class_tips'=>'',
             ],
         ]
     ])}

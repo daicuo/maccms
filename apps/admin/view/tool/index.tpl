@@ -1,12 +1,12 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("toolIndex")}－{:lang('appName')}</title>
+<title>{:lang("tool_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-    {:lang("toolIndex")}
+    {:lang("tool_index")}
 </h6>
 <div class="table-responsive-sm">
 <table class="table table-bordered bg-white mb-0">

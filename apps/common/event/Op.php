@@ -1,16 +1,14 @@
 <?php
 namespace app\common\event;
 
-/**
- * 控制器分层.配置
- */
 class Op
 {
 
     /**
      * 加载框架默认动态配置
      */
-    public function appBegin(){
+    public function appBegin()
+    {
         $this->config('common');
     }
     

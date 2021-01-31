@@ -1,25 +1,26 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("cacheIndex")}－{:lang('appName')}</title>
+<title>{:lang("cache_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("cacheIndex")}
-    <small class="text-muted">{:lang("cacheTips")}</small>
+	{:lang("cache_index")}
+    <small class="text-muted">{:lang("cache_tips")}</small>
 </h6>
 {:DcBuildForm([
-    'class'=>'bg-white px-2 py-2',
-    'action'=>DcUrl('admin/cache/update', '', ''),
-    'method'=>'post',
-    'ajax'=>true,
-    'disabled'=>false,
-    'submit'=>lang('submit'),
-    'reset'=>lang('reset'),
-    'close'=>false,
-    'callback'=>'',
-    'items'=>[
+    'name'     => 'cache_index',
+    'class'    => 'bg-white py-2 px-2',
+    'action'   => DcUrl('admin/cache/update', '', ''),
+    'method'   => 'post',
+    'disabled' => false,
+    'submit'   => lang('submit'),
+    'reset'    => lang('reset'),
+    'close'    => false,
+    'ajax'     => true,
+    'callback' => '',
+    'items'    => [
         [
             'type'=>'radio',
             'name'=>'cache_type',
@@ -35,7 +36,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-auto',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -52,7 +53,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -69,7 +70,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -86,7 +87,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -103,7 +104,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],		
         [
             'type'=>'text',
@@ -120,7 +121,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -137,7 +138,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -154,7 +155,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
         [
             'type'=>'text',
@@ -171,7 +172,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
     ]
 ])}

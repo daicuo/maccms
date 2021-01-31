@@ -3,7 +3,8 @@ namespace app\common\validate;
 
 use think\Validate;
 
-class User extends Validate{
+class User extends Validate
+{
 	
 	protected $rule = [
 		'user_name'       =>  'require|unique:user',
@@ -29,8 +30,10 @@ class User extends Validate{
 	];
 	
 	protected $scene = [
-		'admin_save'  =>  ['user_name','user_pass','user_email','user_mobile'],
-		'admin_update'  =>  ['user_email','user_mobile','user_id'],
+		'save'      =>  ['user_name','user_pass','user_email','user_mobile'],
+		'update'    =>  ['user_email','user_mobile','user_id'],
+        'register'  =>  ['user_name','user_pass','user_pass_re','user_email','user_mobile'],
+        'auto'      =>  ['user_name','user_pass'],
 	];
     
     protected function mobile($value, $rule, $data, $field)

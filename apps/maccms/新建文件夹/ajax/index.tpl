@@ -1,0 +1,1 @@
+ajax/index.tpl

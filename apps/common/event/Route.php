@@ -1,9 +1,6 @@
 <?php
 namespace app\common\event;
 
-/**
- * 控制器分层.路由
- */
 class Route{
 	
     /**

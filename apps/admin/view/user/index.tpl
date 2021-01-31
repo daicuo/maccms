@@ -1,12 +1,12 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("userIndex")}－{:lang('appName')}</title>
+<title>{:lang("user_index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("userIndex")}
+	{:lang("user_index")}
 </h6>
 <!-- -->
 <form action="{:DcUrl('admin/user/delete','','')}" method="post" data-toggle="form">
@@ -26,7 +26,6 @@
     'data-toolbar-align'=>'none float-md-left',
     'data-search-align'=>'none float-md-right',
     'data-toggle'=>'bootstrap-table',
-    'data-locale'=>config('default_lang'),
     'data-url' => DcUrl('admin/user/index', $query, ''),
     'data-buttons-class'=>'purple',
     'data-icon-size'=>'sm',

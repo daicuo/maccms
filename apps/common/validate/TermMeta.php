@@ -3,7 +3,8 @@ namespace app\common\validate;
 
 use think\Validate;
 
-class TermMeta extends Validate{
+class TermMeta extends Validate
+{
 	
 	protected $rule = [
 		'term_meta_value' =>  'require',

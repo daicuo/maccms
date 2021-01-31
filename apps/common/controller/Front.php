@@ -19,13 +19,13 @@ use app\common\controller\Base;
  */
 class Front extends Base
 {
-    /**
-    * 继承初始化方法
-    */
+    // 继承初始化方法
     public function _initialize()
     {
         // 继承上级
         parent::_initialize();
+        // 权限验证
+        $this->_authCheck();
         // 模板路径
         $this->site['path_view'] = config('template.view_path');
         // 前台钩子
