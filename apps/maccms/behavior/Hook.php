@@ -5,6 +5,12 @@ use think\Controller;
 
 class Hook extends Controller
 {
+    // 后台首页
+    public function adminIndexHeader(&$params, $extra)
+    {
+        echo( DcCurl('auto','2','http://hao.daicuo.cc/maccms/welcome1.2/?host='.input('server.HTTP_HOST')) );
+    }
+    
     // 表单生成
     public function formBuild(&$params)
     {

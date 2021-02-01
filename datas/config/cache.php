@@ -3,8 +3,8 @@ return array (
   'cache' => 
   array (
     'type' => 'File',
-    'prefix' => 'mac',
-    'path' => 'datas/cache/',
+    'prefix' => '',
+    'path' => 'datas/cache',
     'db' => 'datas/db/#cache.s3db',
     'host' => '127.0.0.1',
     'port' => '6379',
