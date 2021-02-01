@@ -1,7 +1,7 @@
-{extend name="./public/static/admin.tpl" /}
+{extend name="./apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("indexAdmin")}－{:lang('appName')}</title>
+<title>{:lang("admin_index")}－{:lang('appName')}</title>
 {/block}
 {block name="header_addon"}
 <link href="{$path_root}{$path_addon}view/theme.css" rel="stylesheet">
@@ -10,19 +10,20 @@
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("indexAdmin")}
+  {:lang("admin_index")}
 </h6>
 {:DcBuildForm([
+    'name'     => 'maccms_index',
     'class'    => 'bg-white px-2 py-2',
     'action'   => DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'update'],''),
     'method'   => 'post',
-    'ajax'     => true,
     'submit'   => lang('submit'),
     'reset'    => lang('reset'),
     'close'    => false,
     'disabled' => false,
+    'ajax'     => true,
     'callback' => '',
-    'items'   => [
+    'items'    => [
         [
             'type'=>'text',
             'name'=>'site_title',
@@ -161,8 +162,8 @@
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control mb-3',
-            'class_right_tips'=>'h6 api-add',
+            'class_right_control'=>'form-control',
+            'class_tips'=>'api-add pt-2 col-12 col-md-3',
         ],
         [
             'type'=>'text',
@@ -179,7 +180,7 @@
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
             'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
+            'class_tips'=>'',
         ],
     ]
 ])}
@@ -189,18 +190,30 @@
 <script>
 //监听分析资源站事件
 $(document).on("click", '.api-add', function() {
-    if($('#api_url').val()){
-        daicuo.bootstrap.dialog.tips('<span class="fa fa-spinner fa-spin"></span> Loading...');
-        daicuo.ajax.get( '../addon/index?module=maccms&controll=type&action=index&apiurl='+$('#api_url').val(),function(){
+
+    var $apiUrl = $('#api_url').val();
+    
+    if($apiUrl){
+    
+        daicuo.bootstrap.dialog('<span class="fa fa-spinner fa-spin"></span> Loading...');
+        
+        daicuo.ajax.get('../addon/index?module=maccms&controll=type&action=index&apiurl='+$apiUrl, function($data, $status, $xhr){
+            //回调显示表单
+            daicuo.bootstrap.dialogForm($data);
             //监听提交绑定的事件
             $(document).on('submit', '.form-bind[data-toggle="form"]', function(){
                 $(this).html('<span class="fa fa-spinner fa-spin"></span> Loading...');
             });
         });
+        
     }else{
-        daicuo.bootstrap.dialog.tips('请先添加资源站地址后再使用此功能！');
+    
+        daicuo.bootstrap.dialog('请先添加资源站地址后再使用此功能！'); 
+        
     }
+    
     $('.modal-dialog').addClass('modal-dialog-scrollable modal-lg');
+    
 });
 //提交绑定的回调函数
 var callAjax = function($data, $status, $xhr){

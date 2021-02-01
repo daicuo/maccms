@@ -1,10 +1,20 @@
 <?php
 namespace daicuo;
 
-/**
-* 钩子
-*/
-class Hook {
+class Hook 
+{
+
+    // 错误信息
+    protected static $error = 'error';
+    
+    /**
+     * 获取错误信息
+     * @return mixed
+     */
+    public static function getError()
+    {
+        return self::$error;
+    }
 
     /**
      * 批量增加钩子
@@ -16,6 +26,7 @@ class Hook {
             if(false === DcCheck($value, 'common/Hook')){
                 return 0;
             }
+            config('common.validate_name', false);
             $list[$key] = self::data_post($value);
         }
         return \daicuo\Op::save_all($list);
@@ -39,7 +50,7 @@ class Hook {
      * @return array|null 不为空时返回array
      */
     public static function update_id($value, $data){
-        if ( ! $value ) {
+        if ( ! $data ) {
             return null;
         }
         if($value < 1){
@@ -51,7 +62,7 @@ class Hook {
     }
     
     /**
-     * 通过ID获取钩子
+     * 通过ID获取一个钩子
      * @param int $value 字段值 
      * @param bool $cache 是否开启缓存功能 由后台统一配置
      * @return array|null 不为空时返回修改后的数据
@@ -71,12 +82,10 @@ class Hook {
      * @return int 添加成功返回自增ID
      */
     public static function save($data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Hook')){
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
             return 0;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['data'] = $data;
@@ -86,10 +95,17 @@ class Hook {
         \think\Hook::listen('hook_save_before', $params);
         //添加数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', 'common/Op');
+            //数据库操作
             $params['result'] = \daicuo\Op::save($params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCache('hook_all', null);
+            }
         }
-        //清理全局缓存
-        DcCache('hook_all', null);
         //预埋钩子
         \think\Hook::listen('hook_save_after', $params);
         //返回结果
@@ -111,10 +127,13 @@ class Hook {
         \think\Hook::listen('hook_delete_before', $params);
         //删除数据
         if( 0 == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库操作
             $params['result'] = \daicuo\Op::delete($params['where']);
+            //清理全局缓存
+            DcCache('hook_all', null);
         }
-        //清理全局缓存
-        DcCache('hook_all', null);
         //预埋钩子
         \think\Hook::listen('hook_delete_after', $params);
         //返回结果
@@ -128,12 +147,10 @@ class Hook {
      * @return int 添加成功返回自增ID
      */
     public static function update($where, $data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Hook')){
-            return 0;
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
+            return null;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -144,10 +161,17 @@ class Hook {
         \think\Hook::listen('hook_update_before', $params);
         //修改数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库操作
             $params['result'] = \daicuo\Op::update($params['where'], $params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCache('hook_all', null);
+            }
         }
-        //清理全局缓存
-        DcCache('hook_all', null);
         //预埋钩子
         \think\Hook::listen('hook_update_after', $params);
         //返回结果
@@ -172,12 +196,12 @@ class Hook {
         //数据查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
             $params['result'] = \daicuo\Op::get($params['where'], $params['cache']);
-        }
-        //获取器
-        if( !is_null($params['result']) ){
-            $data = $params['result']->toArray();
-            $params['result'] = array_merge($data, $data['op_value']);
-            unset($params['result']['op_value']);
+            //获取器
+            if( !is_null($params['result']) ){
+                $data = $params['result']->toArray();
+                $params['result'] = array_merge($data, $data['op_value']);
+                unset($data);unset($params['result']['op_value']);
+            }
         }
         //预埋钩子
         \think\Hook::listen('hook_get_after', $params);
@@ -202,7 +226,7 @@ class Hook {
             'cache'     => true,
             'fetchSql'  => false,
             'tree'      => false,
-            'field'     => 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order',
+            'field'     => 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order,op_status',
             'sort'      => 'op_order',
             'order'     => 'desc',
             'where'     => [],
@@ -217,21 +241,22 @@ class Hook {
         \think\Hook::listen('hook_all_before', $params);
         //数据库查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
+            //查询数据库
             $params['result'] = \daicuo\Op::all($params['args']);
-        }
-        //获取器转化
-        if( !is_null($params['result']) ){
-            $datas = array();
-            foreach($params['result']->toArray() as $key=>$value){
-                if($value['op_value']){
-                    $datas[$key] = array_merge($value, $value['op_value']);
-                }else{
-                    $datas[$key] = $value;
+            //获取器转化
+            if( !is_null($params['result']) ){
+                $datas = array();
+                foreach($params['result']->toArray() as $key=>$value){
+                    if($value['op_value']){
+                        $datas[$key] = array_merge($value, $value['op_value']);
+                    }else{
+                        $datas[$key] = $value;
+                    }
+                    unset($datas[$key]['op_value']);
                 }
-                unset($datas[$key]['op_value']);
+                $params['result'] = $datas;
+                unset($datas);
             }
-            $params['result'] = $datas;
-            unset($datas);
         }
         //预埋钩子
         \think\Hook::listen('hook_all_after', $params);
@@ -242,17 +267,31 @@ class Hook {
     /**
      * 转换post数据写入OP配置表
      * @param array $post 表单数据
-     * @return array 二维数组
+     * @return array|null 二维数组
      */
     public static function data_post($post){
+        //表单验证
+        $validate = [];
+        $validate['data'] = $post;
+        $validate['error'] = '';
+        $validate['result'] = true;
+        //定义钩子参数
+        \think\Hook::listen('form_validate', $validate);
+        if($validate['result'] == false){
+            self::$error = $validate['error'];
+            return null;
+        }
+        unset($validate);
+        //数据整理
         $op = array();
 		$op['op_name'] = 'site_hook';
 		$op['op_value'] = self::data_value_set($post);
-		$op['op_module'] = DcEmpty($post['op_module'],'common');
-		$op['op_controll'] = DcEmpty($post['op_controll'],'hook');
+		$op['op_module'] = DcEmpty($post['op_module'], 'common');
+		$op['op_controll'] = DcEmpty($post['op_controll'], 'hook');
 		$op['op_action'] = $post['op_action'];
 		$op['op_order'] = 0;
         $op['op_autoload'] = 'no';
+        $op['op_status'] = DcEmpty($post['op_status'], 'normal');
         return $op;
     }
     
@@ -269,7 +308,7 @@ class Hook {
         $hook['hook_name'] = trim($post['hook_name']);
         $hook['hook_path'] = trim($post['hook_path']);
         $hook['hook_info'] = trim($post['hook_info']);
-        $hook['hook_overlay'] = DcEmpty($post['hook_overlay'], false);
+        $hook['hook_overlay'] = DcEmpty($post['hook_overlay'], 'no');
 		return $hook;
     }
     

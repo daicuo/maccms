@@ -5,17 +5,11 @@ use think\Controller;
 
 class Hook extends Controller
 {
-    //后台系统初始化
-    public function hookAdminInit(&$params){
-        $fields = array_merge(config('custom_fields.term_meta'),['term_api_url','term_api_params','term_api_tid','term_api_type']);
-        config('custom_fields.term_meta', $fields);
-    }
-    
     // 表单生成
-    public function hookBuildForm(&$params)
+    public function formBuild(&$params)
     {
         //追加表单字段
-        if( strpos($params['action'],'category/') || strpos($params['action'],'tag/') ){
+        if( in_array($params['name'],['category_create','category_edit','tag_create','tag_edit']) ){
             $params['items'] = array_merge($params['items'], [
                 [
                     'type'=>'text',

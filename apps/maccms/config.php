@@ -1,30 +1,91 @@
 <?php
-/*
-** 插件专用配置
-** 调用方法:config('变量名');
-*/
-return [
-    'index_test'=>'我是配置演示',
-    'slide'=>[
-        [
-        'url'   => '/play/1/25154/2/kkm3u8',
-        'image' => 'https://img.ynkmjj.com/202011/f2/25fa977e126d9922a2179a272df51af2.png',
-        'title' => '地狱男爵：血皇后崛起'
-        ],
-        [
-        'url'   => '/play/1/48381/1/kkm3u8',
-        'image' => 'https://img.ynkmjj.com/202010/ff/85f9d757152ba41489aebb67068875ff.png',
-        'title' => '金刚川'
-        ],
-        [
-        'url'   => '/play/2/46571/1/kkm3u8',
-        'image' => 'https://img.ynkmjj.com/202009/68/65f72fa2f9796382484f401f61804068.png',
-        'title' => '姜子牙'
-        ],
-        [
-        'url'   => '/play/1/47971/1/kkm3u8',
-        'image' => 'https://img.ynkmjj.com/202011/c6/75fc0ea357af5b61b81a8cacb71dd7c6.png',
-        'title' => '主角无光环'
-        ],
+//扩展分类表字段
+DcConfigMerge('custom_fields.term_meta', [
+    'term_api_url',
+    'term_api_params',
+    'term_api_tid',
+    'term_api_type'
+]);
+//扩展后台菜单
+DcConfigMerge('admin_menu.addon',[
+    [
+        'menu_ico'    => 'fa-film',
+        'menu_title'  => '影视',
+        'menu_module' => 'maccms',
+        'menu_items'  => [
+            [
+                'ico' => 'fa-gear',
+                'title' => '全局设置',
+                'target' => '_self',
+                'controll' => 'admin',
+                'action' => 'index',
+                'url' => DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'index'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'资源过滤',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'filter',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'filter'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'微信设置',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'weixin',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'weixin'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'广告设置',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'poster',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'poster'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'首页轮播',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'slite',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'slite'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'友情链接',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'filter',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'link'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title' => '导航管理',
+                'target' => '_self',
+                'controll' => 'index',
+                'action' => 'index',
+                'url' => '../nav/index?op_module=maccms'
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title' => '分类管理',
+                'target' => '_self',
+                'controll' => 'index',
+                'action' => 'index',
+                'url' => '../category/index?op_module=maccms'
+            ],
+            [
+                'ico' => 'fa-home',
+                'title' => '前台首页',
+                'target' => '_self',
+                'controll' => 'admin',
+                'action' => 'home',
+                'target' => '_blank',
+                'url' => DcUrlAdmin('maccms/index/index', '', '')
+            ],
+        ]
     ]
-];
+]);

@@ -16,7 +16,7 @@ class Type extends Controller
     
     //同步资源站分类
     public function index(){
-        if( $api_url = input('apiurl/u') ){
+        if( $api_url = input('apiurl/s') ){
             $bindItem = controller('maccms/Client', 'event')->bind($api_url);//type api list
         }
         $this->assign($bindItem);
@@ -36,7 +36,7 @@ class Type extends Controller
                     continue;
                 }
             }
-            //该资源站没有添加的分类才过行添加
+            //该资源站没有添加的分类才添加
             $data = array();
             $data['term_name'] = $post['type_name'][$type_id];
             $data['term_module'] = 'maccms';

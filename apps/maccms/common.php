@@ -105,7 +105,7 @@ function apiSearch($wd='', $api=''){
 }
 
 /**
- * 按更新时间调用最新一页
+ * 按更新时间调用最新数据
  * @param int $hour 更新时间小时
  * @param string $api API入口地址 不带参数
  * @return array|false 读取失败时返回false

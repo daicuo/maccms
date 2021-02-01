@@ -1,4 +1,4 @@
-{extend name="./public/static/front.tpl" /}
+{extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{$id|DcHtml}的电影与电视剧第{$current_page|default='1'}页-{:config('common.site_name')}</title>

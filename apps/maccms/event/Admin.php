@@ -29,6 +29,16 @@ class Admin extends Controller
         return $this->fetch('maccms@admin/filter');
 	}
     
+    //首页轮播
+	public function slite(){
+        return $this->fetch('maccms@admin/slite');
+	}
+
+    //首页轮播
+	public function link(){
+        return $this->fetch('maccms@admin/link');
+	}
+    
     //保存配置
     public function update(){
         $status = \daicuo\Op::write(

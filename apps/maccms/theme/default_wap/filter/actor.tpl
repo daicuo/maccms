@@ -1,4 +1,4 @@
-{extend name="./public/static/front.tpl" /}
+{extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{$id|DcHtml}主演的电影与电视剧-{:config('common.site_name')}</title>

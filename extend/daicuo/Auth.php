@@ -13,24 +13,27 @@ class Auth
     {
         $roles = array();
         foreach(config('user_roles') as $role => $value){
-            array_push($roles, $role);
+            if(!in_array($role,['caps'])){
+                array_push($roles, $role);
+            }
         }
         return $roles;
     }
     
     /**
-     * 返回系统所有权限节点
+     * 返回系统所有已注册的权限节点
      * @return array 普通数组的形式
      */
     public static function get_caps()
     {
         $caps = array();
+        //用户组节点
         foreach(config('user_roles') as $key => $value){
             if(is_array($value)){
                 $caps = array_merge($caps, $value);
             }
         }
-        return $caps;
+        return array_unique($caps);
     }
     
     /**
@@ -82,26 +85,32 @@ class Auth
                 array_push($caps, $role);
             }
         }
-        return $caps;
+        return array_unique($caps);
     }
     
     /**
      * 检查权限
      * @param string|array $name 需要验证的规则列表,支持逗号分隔的权限规则或索引数组
-     * @param int $capabilities 认证用户的用户组
+     * @param int|array $capabilities 用户ID或者用户拥有的角色与权限节点
      * @param string $relation 如果为 'or' 表示满足任一条规则即通过验证;如果为 'and'则表示需满足所有规则才能通过验证
      * @param string $mode 执行验证的模式,可分为url,normal
      * @return bool 通过验证返回true;失败返回false
      */
     public static function check($name, $capabilities, $relation = 'or', $mode = 'url')
     {
-        //if (!$this->config['auth_on']) {
-            //return true;
-        //}
-        $roles = config('user_roles');
-        
-        $rulelist = self::get_user_caps($capabilities);
-        
+        //权限节点列表
+        if(empty($name) && empty($capabilities)){
+            return true;
+        }
+        //用户ID则直接查询
+        if( is_numeric($capabilities) ){
+            $user = \daicuo\User::get_user_by('user_id',$capabilities);
+            $rulelist = self::get_user_caps($user['user_capabilities']);
+            unset($user);
+        }else{
+            $rulelist = self::get_user_caps($capabilities);
+        }
+        //开始验证
         if (in_array('*', $rulelist)) {
             return true;
         }
@@ -136,6 +145,7 @@ class Auth
         if ('or' == $relation && !empty($list)) {
             return true;
         }
+        
         $diff = array_diff($name, $list);
         if ('and' == $relation && empty($diff)) {
             return true;

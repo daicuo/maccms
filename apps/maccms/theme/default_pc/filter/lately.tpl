@@ -1,4 +1,4 @@
-{extend name="./public/static/front.tpl" /}
+{extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{:date('Y',time())}年最新好看的电影与电视剧第{$current_page|default='1'}页-{:config('common.site_name')}</title>

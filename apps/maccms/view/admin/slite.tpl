@@ -1,7 +1,7 @@
 {extend name="./apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("admin_filter")}－{:lang('appName')}</title>
+<title>{:lang("admin_slite")}－{:lang('appName')}</title>
 {/block}
 {block name="header_addon"}
 <link href="{$path_root}{$path_addon}view/theme.css" rel="stylesheet">
@@ -10,7 +10,7 @@
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-  {:lang("admin_filter")}
+	{:lang("admin_slite")}
 </h6>
 {:DcBuildForm([
     'class'    => 'bg-white px-2 py-2',
@@ -24,16 +24,17 @@
     'callback' => '',
     'items'   => [
         [
-            'type'=>'text',
-            'name'=>'filter_play',
-            'id'=>'filter_play',
-            'title'=>lang('filter_play'),
-            'placeholder'=>lang('filter_play_placeholder'),
+            'type'=>'json',
+            'name'=>'slide_index',
+            'id'=>'slide_index',
+            'title'=>lang('slide_index'),
+            'placeholder'=>lang('slide_index_placeholder'),
             'tips'=>'',
-            'value'=>config('maccms.filter_play'),
+            'value'=>config('maccms.slide_index'),
             'readonly'=>false,
             'disabled'=>false,
             'required'=>false,
+            'rows'=>16,
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
@@ -41,35 +42,17 @@
             'class_right_tips'=>'',
         ],
         [
-            'type'=>'textarea',
-            'name'=>'filter_tid',
-            'id'=>'filter_tid',
-            'title'=>lang('filter_tid'),
-            'placeholder'=>lang('filter_tid_placeholder'),
+            'type'=>'json',
+            'name'=>'slide_index_m',
+            'id'=>'slide_index_m',
+            'title'=>lang('slide_index_m'),
+            'placeholder'=>lang('slide_index_m_placeholder'),
             'tips'=>'',
-            'value'=>config('maccms.filter_tid'),
+            'value'=>config('maccms.slide_index_m'),
             'readonly'=>false,
             'disabled'=>false,
             'required'=>false,
-            'rows'=>8,
-            'class'=>'row form-group',
-            'class_left'=>'col-md-2',
-            'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
-        ],
-        [
-            'type'=>'textarea',
-            'name'=>'filter_ids',
-            'id'=>'filter_ids',
-            'title'=>lang('filter_ids'),
-            'placeholder'=>lang('filter_ids_placeholder'),
-            'tips'=>'',
-            'value'=>config('maccms.filter_ids'),
-            'readonly'=>false,
-            'disabled'=>false,
-            'required'=>false,
-            'rows'=>8,
+            'rows'=>16,
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',

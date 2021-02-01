@@ -2,10 +2,6 @@ body{
 	padding-top:66px;
 	background-color: #29262d;
 	color: #6c757d;
-    /*background: -webkit-linear-gradient(top, #26cab3, #000000);
-    background: -o-linear-gradient(top, #29262d, #000000);
-    background: -moz-linear-gradient(top, #29262d, #000000);
-    background: linear-gradient(top, #29262d, #000000);*/
 }
 :hover.bg-play{
     background: rgba(0,0,0,0.1) url(images/play.png) center no-repeat;

@@ -1,8 +1,10 @@
 <?php
 //全局语言包
 return [
-    'indexAdmin'                    => '首页设置',
-    'filterAdmin'                   => '过滤设置',
+    'admin_index'                   => '全局设置',
+    'admin_filter'                  => '过滤设置',
+    'admin_slite'                   => '轮播设置',
+    'admin_link'                    => '友情链接',
     'site_title'                    => '首页标题',
     'site_title_placeholder'        => '自定义网站首页标题',	
     'site_keywords'                 => '首页关键字',
@@ -24,10 +26,20 @@ return [
     'term_api_params_placeholder'   => '资源站附加参数将在请求资源站时拼装在一起，如a=1&b=2',
     'term_api_tid'                  => '资源站分类ID',
     'term_api_tid_placeholder'      => '绑定资源站指定的分类ID，请通过资源站查询',
+    'term_api_type'                 => '资源站类型',
+    'term_api_type_placeholder'     => '绑定资源站的类型，请通过资源站查询，如Feifeicms',
     'filter_play'                   => '播放来源过滤',
     'filter_play_placeholder'       => '多个用英文逗号分符，过滤的播放器/播放来源不会显示',
     'filter_tid'                    => '分类ID过滤',
     'filter_tid_placeholder'        => '将不希望展示的远程API分类ID填写在此处，多个用英文逗号分符',
     'filter_ids'                    => '视频ID过滤',
     'filter_ids_placeholder'        => '将不希望展示的远程API视频ID填写在此处，多个用英文逗号分符',
+    'slide_index'                   => '首页轮播（电脑版）',
+    'slide_index_placeholder'       => 'JSON格式，用于默认模板首页',
+    'slide_index_m'                 => '首页轮播（手机版）',
+    'slide_index_m_placeholder'     => 'JSON格式，用于移动端模板首页',
+    'link_index'                    => '首页友情链接',
+    'link_index_placeholder'        => 'JSON格式，用于首页的友情链接',
+    'link_footer'                   => '全站底部链接',
+    'link_footer_placeholder'       => 'JSON格式，用于全站的底部链接优化',
 ];

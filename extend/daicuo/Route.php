@@ -1,10 +1,19 @@
 <?php
 namespace daicuo;
 
-/**
-* 路由
-*/
-class Route {
+class Route 
+{
+    // 错误信息
+    protected static $error = 'error';
+    
+    /**
+     * 获取错误信息
+     * @return mixed
+     */
+    public static function getError()
+    {
+        return self::$error;
+    }
 
     /**
      * 批量增加路由规则
@@ -16,6 +25,7 @@ class Route {
             if(false === DcCheck($value, 'common/Route')){
                 return 0;
             }
+            config('common.validate_name', false);
             $list[$key] = self::data_post($value);
         }
         return \daicuo\Op::save_all($list);
@@ -71,12 +81,10 @@ class Route {
      * @return int 添加成功返回自增ID
      */
     public static function save($data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Route')){
-            return 0;
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
+            return null;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['data'] = $data;
@@ -86,10 +94,17 @@ class Route {
         \think\Hook::listen('route_save_before', $params);
         //添加数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库
             $params['result'] = \daicuo\Op::save($params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCache('route_all', null);
+            }
         }
-        //清理全局缓存
-        DcCache('route_all', null);
         //预埋钩子
         \think\Hook::listen('route_save_after', $params);
         //返回结果
@@ -111,10 +126,11 @@ class Route {
         \think\Hook::listen('route_delete_before', $params);
         //删除数据
         if( 0 == $params['result'] ){
+            //数据库
             $params['result'] = \daicuo\Op::delete($params['where']);
+            //清理全局缓存
+            DcCache('route_all', null);
         }
-        //清理全局缓存
-        DcCache('route_all', null);
         //预埋钩子
         \think\Hook::listen('route_delete_after', $params);
         //返回结果
@@ -128,12 +144,10 @@ class Route {
      * @return null|obj 不为空时返回obj
      */
     public static function update($where, $data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Route')){
-            return 0;
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
+            return null;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -144,10 +158,17 @@ class Route {
         \think\Hook::listen('route_update_before', $params);
         //修改数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库
             $params['result'] = \daicuo\Op::update($params['where'], $params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCache('route_all', null);
+            }
         }
-        //清理全局缓存
-        DcCache('route_all', null);
         //预埋钩子
         \think\Hook::listen('route_update_after', $params);
         //返回结果
@@ -171,13 +192,14 @@ class Route {
         \think\Hook::listen('route_get_before', $params);
         //数据查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
+            //数据库
             $params['result'] = \daicuo\Op::get($params['where'], $params['cache']);
-        }
-        //获取器
-        if( !is_null($params['result']) ){
-            $data = $params['result']->toArray();
-            $params['result'] = array_merge($data, $data['op_value']);
-            unset($params['result']['op_value']);
+            //获取器
+            if( !is_null($params['result']) ){
+                $data = $params['result']->toArray();
+                $params['result'] = array_merge($data, $data['op_value']);
+                unset($params['result']['op_value']);
+            }
         }
         //预埋钩子
         \think\Hook::listen('route_get_after', $params);
@@ -202,7 +224,7 @@ class Route {
             'cache'     => true,
             'fetchSql'  => false,
             'tree'      => false,
-            'field'     => 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order',
+            'field'     => 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order,op_status',
             'sort'      => 'op_order',
             'order'     => 'desc',
             'where'     => [],
@@ -217,21 +239,22 @@ class Route {
         \think\Hook::listen('route_all_before', $params);
         //数据库查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
+            //数据库
             $params['result'] = \daicuo\Op::all($params['args']);
-        }
-        //获取器转化
-        if( !is_null($params['result']) ){
-            $datas = array();
-            foreach($params['result']->toArray() as $key=>$value){
-                if($value['op_value']){
-                    $datas[$key] = array_merge($value, $value['op_value']);
-                }else{
-                    $datas[$key] = $value;
+            //获取器
+            if( !is_null($params['result']) ){
+                $datas = array();
+                foreach($params['result']->toArray() as $key=>$value){
+                    if($value['op_value']){
+                        $datas[$key] = array_merge($value, $value['op_value']);
+                    }else{
+                        $datas[$key] = $value;
+                    }
+                    unset($datas[$key]['op_value']);
                 }
-                unset($datas[$key]['op_value']);
+                $params['result'] = $datas;
+                unset($datas);
             }
-            $params['result'] = $datas;
-            unset($datas);
         }
         //预埋钩子
         \think\Hook::listen('route_all_after', $params);
@@ -244,7 +267,20 @@ class Route {
      * @param array $post 表单数据
      * @return array 二维数组
      */
-    private static function data_post($post){
+    public static function data_post($post){
+        //表单验证
+        $validate = [];
+        $validate['data'] = $post;
+        $validate['error'] = '';
+        $validate['result'] = true;
+        //定义钩子参数
+        \think\Hook::listen('form_validate', $validate);
+        if($validate['result'] == false){
+            self::$error = $validate['error'];
+            return null;
+        }
+        unset($validate);
+        //数据整理
         $op = array();
 		$op['op_name'] = 'site_route';
 		$op['op_value'] = self::data_value_set($post);

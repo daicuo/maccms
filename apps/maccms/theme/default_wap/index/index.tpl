@@ -1,4 +1,4 @@
-{extend name="./public/static/front.tpl" /}
+{extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{:config('maccms.site_title')}-{:config('common.site_name')}</title>

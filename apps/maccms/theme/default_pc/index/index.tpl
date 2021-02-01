@@ -1,4 +1,4 @@
-{extend name="./public/static/front.tpl" /}
+{extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
 <title>{:config('maccms.site_title')}-{:config('common.site_name')}</title>
@@ -14,16 +14,14 @@
 <div class="col-12 col-md-9 px-2 px-md-2">
     <div id="dcSlide" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
-        {volist name=":config('slide')" id="dc" offset="0" length="8"}
+        {volist name=":json_decode(config('maccms.slide_index'),true)" id="dc" offset="0" length="8"}
         <li data-target="#dcSlide" data-slide-to="{$key}" {eq name="key" value="0"}class="active"{/eq}></li>
         {/volist}
       </ol>
       <div class="carousel-inner rounded">
-        {volist name=":config('slide')" id="dc" offset="0" length="8"}
+        {volist name=":json_decode(config('maccms.slide_index'),true)" id="dc" offset="0" length="8"}
         <div class="carousel-item {eq name="key" value="0"}active{/eq}">
-            <a href="{$dc.url}">
-            <img class="d-block w-100 h-slide" src="{$dc.image}" alt="{$dc.title}">
-            </a>
+          <a href="{$dc.url}"><img class="d-block w-100 h-slide" src="{$dc.image}" alt="{$dc.title}"></a>
         </div>
         {/volist}
       </div>
@@ -49,6 +47,16 @@
 </div>
 </div>
 <!-- -->
+<div class="row mb-2">
+  <div class="col-12 px-2 px-md-3 mb-2">
+    <i class="fa fa-line-chart text-warning"></i>
+    <a class="text-light text-decoration-none" href="{:DcUrl('maccms/filter/lately','','')}">最近更新</a>
+  </div>
+{volist name=":apiNew(22)" id="dc" offset="10" length="12"}
+  {include file='block/itemRow' /}
+{/volist}
+</div>
+<!-- -->
 {volist name=":categoryItem()" id="term" offset="0" length="10"}
 {if $item = apiTermIdLimit($term['term_id'], 6)}
 <div class="row mb-2">
@@ -63,29 +71,12 @@
 {/if}
 {/volist}
 <!-- -->
-<div class="row mb-2">
-  <div class="col-12 px-2 px-md-3 mb-2">
-    <i class="fa fa-line-chart text-warning"></i>
-    <a class="text-light text-decoration-none" href="{:DcUrl('maccms/filter/lately','','')}">最近更新</a>
-  </div>
-{volist name=":apiNew(22)" id="dc" offset="10" length="12"}
-  {include file='block/itemRow' /}
-{/volist}
-</div>
-<!-- -->
 <div class="row">
-<div class="col-md-4">
-  <h4>2020免费电影</h4>
-  <p>提供2020年上映的免费电影，即不收费就可观看和下载的电影。随着Internet的快速发展，许多网站都陆续都推出了。小小影视网正是这样一家网站，本站纯属爱好制作，不接受任何商业广告。</p>
+{volist name=":json_decode(config('maccms.link_index'),true)" id="dc" offset="0" length="12"}
+<div class="col-4 col-md-2">
+  <h6><a class="text-muted" href="{$dc.url}" target="{$dc.target|default='_blank'}">{$dc.title}</a></h6>
 </div>
-<div class="col-md-4">
-  <h4>2020最新电影</h4>
-  <p>提供2020年高清电影，2020年最新电视剧，好看的西瓜影音，百度影音电影和免费快播电影,最新最全的大片资源，都是高质量的精选电影，一定满足不同口味的观众需求。 </p>
-</div>
-<div class="col-md-4">
-  <h4>2020好看电影</h4>
-  <p>免费的清晰度不太高影视业务，当然也包括免费的视频网站，免费电影可以用搜索引擎搜索，一般情况下是在搜索框中输入"免费电影"、"免费视频"等关键词，便有不少互联网的免费电影站点</p>
-</div>
+{/volist}
 </div>
 <!-- -->
 </div> <!-- /container -->

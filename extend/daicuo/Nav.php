@@ -1,21 +1,32 @@
 <?php
 namespace daicuo;
 
-/**
-* 导航管理
-*/
-class Nav {
+class Nav 
+{
+    // 错误信息
+    protected static $error = 'error';
+    
+    /**
+     * 获取错误信息
+     * @return mixed
+     */
+    public static function getError()
+    {
+        return self::$error;
+    }
 
     /**
      * 批量增加导航
      * @param array $list 写入数据（二维数组） 
      * @return null|obj 添加成功返回自增ID数据集
      */
-    public static function save_all($list){
+    public static function save_all($list)
+    {
         foreach($list as $key=>$value){
             if(false === DcCheck($value, 'common/Nav')){
                 return 0;
             }
+            config('common.validate_name', false);
             $list[$key] = self::data_post($value);
         }
         return \daicuo\Op::save_all($list);
@@ -26,25 +37,11 @@ class Nav {
      * @param string $value 字段值
      * @return int 返回操作记录数
      */
-    public static function delete_id($value){
+    public static function delete_id($value)
+    {
         $where = array();
         $where['op_id'] = ['eq', $value];
         return self::delete($where);
-    }
-    
-    /**
-     * 通过ID获取导航
-     * @param int $value 字段值 
-     * @param bool $cache 是否开启缓存功能 由后台统一配置
-     * @return obj|null 不为空时返回修改后的数据
-     */
-    public static function get_id($value, $cache=true){
-        if ( ! $value ) {
-            return null;
-        }
-        $where = array();
-        $where['op_id'] = ['eq', $value];
-        return self::get($where, $cache);
     }
     
     /**
@@ -53,7 +50,8 @@ class Nav {
      * @param array $data 写入数据（一维数组） 
      * @return obj|null 不为空时返回obj
      */
-    public static function update_id($value, $data){
+    public static function update_id($value, $data)
+    {
         if ( ! $value ) {
             return null;
         }
@@ -66,17 +64,32 @@ class Nav {
     }
     
     /**
+     * 通过ID获取导航
+     * @param int $value 字段值 
+     * @param bool $cache 是否开启缓存功能 由后台统一配置
+     * @return obj|null 不为空时返回修改后的数据
+     */
+    public static function get_id($value, $cache=true)
+    {
+        if ( ! $value ) {
+            return null;
+        }
+        $where = array();
+        $where['op_id'] = ['eq', $value];
+        return self::get($where, $cache);
+    }
+    
+    /**
      * 新增一个新导航
      * @param array $data 写入数据（一维数组） 
      * @return int 添加成功返回自增ID
      */
-    public static function save($data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Nav')){
-            return 0;
+    public static function save($data)
+    {
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
+            return null;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['data'] = $data;
@@ -86,7 +99,16 @@ class Nav {
         \think\Hook::listen('nav_save_before', $params);
         //添加数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库
             $params['result'] = \daicuo\Op::save($params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCacheTag('common/Nav/Item', 'clear');
+            }
         }
         //预埋钩子
         \think\Hook::listen('nav_save_after', $params);
@@ -99,7 +121,8 @@ class Nav {
      * @param array $where 删除条件
      * @return int 返回操作记录数
      */
-    public static function delete($where){
+    public static function delete($where)
+    {
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -123,13 +146,12 @@ class Nav {
      * @param array $data 写入数据（一维数组） 
      * @return null|obj 成功时返回obj
      */
-    public static function update($where, $data){
-        //字段验证
-        if(false === DcCheck($data, 'common/Nav')){
-            return 0;
+    public static function update($where, $data)
+    {
+        //数据验证及格式化数据
+        if(!$data = self::data_post($data)){
+            return null;
 		}
-        //格式化导航格式数据
-        $data = self::data_post($data);
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -140,7 +162,16 @@ class Nav {
         \think\Hook::listen('nav_update_before', $params);
         //修改数据
         if( false == $params['result'] ){
+            //OP验证
+            config('common.validate_name', false);
+            //数据库
             $params['result'] = \daicuo\Op::update($params['where'], $params['data']);
+            //处理结果
+            if(!$params['result']){
+                self::$error = \daicuo\Op::getError();
+            }else{
+                DcCacheTag('common/Nav/Item', 'clear');
+            }
         }
         //预埋钩子
         \think\Hook::listen('nav_update_after', $params);
@@ -154,7 +185,8 @@ class Nav {
      * @param bool $cache 是否开启缓存功能由后台统一配置
      * @return mixed null|array 不为空时返回获取器修改后的array
      */
-    public static function get($where, $cache=true){
+    public static function get($where, $cache=true)
+    {
         //钩子传参定义
         $params = array();
         $params['where'] = $where;
@@ -165,13 +197,15 @@ class Nav {
         \think\Hook::listen('nav_get_before', $params);
         //数据查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
+            //数据库
             $params['result'] = \daicuo\Op::get($params['where'], $params['cache']);
-        }
-        //获取器
-        if( !is_null($params['result']) ){
-            $data = $params['result']->toArray();
-            $params['result'] = array_merge($data, $data['op_value']);
-            unset($params['result']['op_value']);
+            //获取器
+            if( !is_null($params['result']) ){
+                $data = $params['result']->toArray();
+                $data['nav_link'] = self::navLink($data['op_value']);
+                $params['result'] = array_merge($data, $data['op_value']);
+                unset($data);unset($params['result']['op_value']);
+            }
         }
         //预埋钩子
         \think\Hook::listen('nav_get_after', $params);
@@ -184,7 +218,8 @@ class Nav {
      * @param array $args 查询条件（一维数组）
      * @return obj|array 不为空时返回处理好的array
      */
-    public static function all($args){
+    public static function all($args)
+    {
         //格式验证
         if(!is_array($args)){
             return null;
@@ -211,26 +246,27 @@ class Nav {
         \think\Hook::listen('nav_all_before', $params);
         //数据库查询(由OP类接管查询缓存)
         if( false == $params['result'] ){
+            //数据库
             $params['result'] = \daicuo\Op::all($params['args']);
-        }
-        //修改器转化为NAVITEM/格式化link
-        if( !is_null($params['result']) ){
-            $list_nav = array();
-            foreach($params['result']->toArray() as $key=>$value){
-                if($value['op_value']){
-                    $list_nav[$key] = array_merge($value, $value['op_value']);
-                }else{
-                    $list_nav[$key] = $value;
+            //获取器
+            if( !is_null($params['result']) ){
+                $list_nav = array();
+                foreach($params['result']->toArray() as $key=>$value){
+                    if($value['op_value']){
+                        $list_nav[$key] = array_merge($value, $value['op_value']);
+                    }else{
+                        $list_nav[$key] = $value;
+                    }
+                    $list_nav[$key]['nav_link'] = self::navLink($value['op_value']);
+                    unset($list_nav[$key]['op_value']);
                 }
-                $list_nav[$key]['nav_link'] = self::navLink($value['op_value']);
-                unset($list_nav[$key]['op_value']);
-            }
-            $params['result'] = $list_nav;
-            unset($list_nav);
-            //是否转化为树状
-            if($params['args']['tree']){
-                $params['result'] = list_to_tree($params['result'], 'op_id', 'nav_parent');
-                $params['result'] = tree_to_level($params['result'], 'nav_text');
+                $params['result'] = $list_nav;
+                unset($list_nav);
+                //是否转化为树状
+                if($params['args']['tree']){
+                    $params['result'] = list_to_tree($params['result'], 'op_id', 'nav_parent');
+                    $params['result'] = tree_to_level($params['result'], 'nav_text');
+                }
             }
         }
         //预埋钩子
@@ -240,11 +276,46 @@ class Nav {
     }
     
     /**
+     * 转换post数据
+     * @param array $data 表单数据
+     * @return obj|null 不为空时返回obj
+     */
+    public static function data_post($data)
+    {
+        //表单验证
+        $validate = [];
+        $validate['data'] = $data;
+        $validate['error'] = '';
+        $validate['result'] = true;
+        //定义钩子参数
+        \think\Hook::listen('form_validate', $validate);
+        if($validate['result'] == false){
+            self::$error = $validate['error'];
+            return null;
+        }
+        unset($validate);
+        //数据整理
+        $op_value = array();
+        foreach($data as $key=>$value){
+            if(substr($key,0,3)=='nav'){
+                $op_value[$key] = $value;
+                unset($data[$key]);
+            }
+        }
+        $data['op_name'] = 'site_nav';
+        $data['op_value'] = $op_value;
+        $data['op_autoload'] = 'no';
+        $data['op_status'] = DcEmpty($data['op_status'], 'normal');
+        return $data;
+    }
+    
+    /**
      * 导航列表简单数组格式
      * @param array $args 查询条件（一维数组）
      * @return array;
      */
-    public static function option($args){
+    public static function option($args)
+    {
         if(empty($args)){
             $args['tree'] = true;
             $args['cache'] = false;
@@ -265,25 +336,6 @@ class Nav {
     }
     
     /**
-     * 转换post数据
-     * @param array $data 表单数据
-     * @return obj|null 不为空时返回obj
-     */
-    public static function data_post($data){
-        $op_value = array();
-        foreach($data as $key=>$value){
-            if(substr($key,0,3)=='nav'){
-                $op_value[$key] = $value;
-                unset($data[$key]);
-            }
-        }
-        $data['op_value'] = $op_value;
-        $data['op_name'] = 'site_nav';
-        $data['op_autoload'] = 'no';
-        return $data;
-    }
-    
-    /**
      * 转换导航链接
 	 * @param array $op_value 导航数据
      * @return string 处理后的导航链接
@@ -291,7 +343,7 @@ class Nav {
 	private static function navLink($op_value)
     {
 		if($op_value['nav_type'] == 'addon'){
-			return DcUrl(
+			return DcUrlAdmin(
                 $op_value['nav_module'].'/'.$op_value['nav_controll'].'/'.$op_value['nav_action'], 
                 $op_value['nav_params'],
                 $op_value['nav_suffix']

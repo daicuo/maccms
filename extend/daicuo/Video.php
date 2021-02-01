@@ -23,6 +23,7 @@ class Video
         'endUrl'       =>'',//后贴片广告
         'endTime'      =>'',//后贴片时长
         'poster'       =>'',//封面图片
+        'index'        =>0,//多个播放器时编号
         'advUnit'      =>'',//广告扩展配置
     ];
 
@@ -30,7 +31,7 @@ class Video
      public function __construct($options = [])
      {
          $json = array();
-         $json['in'] = config('common.video_in');
+         $json['in'] = DcBool(config('common.video_in'));
          $json['ai'] = config('common.video_ai');
          $json['buffer'] = config('common.video_buffer');
          $json['pause'] = config('common.video_pause');
@@ -56,7 +57,8 @@ class Video
             $this->options = array_merge($this->options, $options);
         }
         $this->options['ai'] = str_replace('[type]',$this->options['type'],$this->options['ai']);
-        return '<div class="embed-responsive embed-responsive-'.DcEmpty(config('common.video_size'),'16by9').'" id="DcPlayer"><script>var DcPlayer='.json_encode($this->options).';'.$functionName.'</script></div>';
+        $this->options['element'] = '#DcPlayer';
+        return '<div class="embed-responsive embed-responsive-'.DcEmpty(config('common.video_size'),'16by9').'" id="DcPlayer"></div><script>daicuo.media.init('.json_encode($this->options).');</script>';
     }
    
 }

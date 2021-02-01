@@ -6,11 +6,15 @@ use app\common\controller\Front;
 class Index extends Front
 {
 
-	public function _initialize(){
+	public function _initialize()
+    {
 		parent::_initialize();
 	}
 
-	public function index(){
+	public function index()
+    {
+        //dump(json_encode(config('slide')));
+        //exit();
 		return $this->fetch();
 	}
 	
