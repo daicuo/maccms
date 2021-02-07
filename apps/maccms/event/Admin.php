@@ -34,9 +34,19 @@ class Admin extends Controller
         return $this->fetch('maccms@admin/slite');
 	}
 
-    //首页轮播
+    //链接管理
 	public function link(){
         return $this->fetch('maccms@admin/link');
+	}
+    
+    //广告配置
+	public function poster(){
+        return $this->fetch('maccms@admin/poster');
+	}
+    
+    //广告配置
+	public function posterwap(){
+        return $this->fetch('maccms@admin/posterwap');
 	}
     
     //保存配置

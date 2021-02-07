@@ -42,6 +42,9 @@ class Api {
     
     //格式化分隔符
     protected function data_explode($string){
+        if(!$string){
+            return '';
+        }
         $string = str_replace(array('/','，','|','、',',,,',',,',';'), ',', $string);
         return explode(',', $string);
     }

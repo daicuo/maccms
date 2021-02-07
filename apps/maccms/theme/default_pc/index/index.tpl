@@ -11,7 +11,7 @@
 {block name="main"}
 <div class="container">
 <div class="row px-md-2 mb-3">
-<div class="col-12 col-md-9 px-2 px-md-2">
+<div class="col-12 col-md-9 px-2">
     <div id="dcSlide" class="carousel slide" data-ride="carousel">
       <ol class="carousel-indicators">
         {volist name=":json_decode(config('maccms.slide_index'),true)" id="dc" offset="0" length="8"}
@@ -35,7 +35,7 @@
       </a>
     </div>
 </div>
-<div class="col-12 col-md-3 px-2 px-md-3 d-none d-md-inline">
+<div class="col-12 col-md-3 px-2 d-none d-md-inline">
   <ul class="list-group h-slide overflow-hidden">
   {volist name=":apiNew(22)" id="dc" offset="0" length="10"}
   <li class="list-group-item bg-dark d-flex justify-content-between align-items-center py-2">
@@ -48,7 +48,7 @@
 </div>
 <!-- -->
 <div class="row mb-2">
-  <div class="col-12 px-2 px-md-3 mb-2">
+  <div class="col-12 mb-2">
     <i class="fa fa-line-chart text-warning"></i>
     <a class="text-light text-decoration-none" href="{:DcUrl('maccms/filter/lately','','')}">最近更新</a>
   </div>
@@ -60,9 +60,9 @@
 {volist name=":categoryItem()" id="term" offset="0" length="10"}
 {if $item = apiTermIdLimit($term['term_id'], 6)}
 <div class="row mb-2">
-  <div class="col-12 px-2 px-md-3 mb-2">
+  <div class="col-12 mb-2">
     <i class="fa fa-line-chart text-warning"></i> 
-    <a class="text-light text-decoration-none" href="{:categoryUrl($term['term_id'],$term['term_slug'])}">2020最新{$term.term_name|DcSubstr=0,5,false}</a>
+    <a class="text-light text-decoration-none" href="{:categoryUrl($term['term_id'],$term['term_slug'])}">2021最新{$term.term_name|DcSubstr=0,5,false}</a>
   </div>
   {volist name="$item" id="dc" offset="0" length="6"}
     {include file='block/itemRow'/}
@@ -71,7 +71,11 @@
 {/if}
 {/volist}
 <!-- -->
-<div class="row">
+<div class="row mb-2">
+  <div class="col-12 mb-2">
+    <i class="fa fa-line-chart text-warning"></i> 
+    <a class="text-light text-decoration-none" href="javascript:;">友情链接</a>
+  </div>
 {volist name=":json_decode(config('maccms.link_index'),true)" id="dc" offset="0" length="12"}
 <div class="col-4 col-md-2">
   <h6><a class="text-muted" href="{$dc.url}" target="{$dc.target|default='_blank'}">{$dc.title}</a></h6>

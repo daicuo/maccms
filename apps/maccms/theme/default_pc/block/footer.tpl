@@ -1,7 +1,11 @@
+{if config("maccms.footer_pc")}
+<div class="container text-center mb-2">
+  <div class="bg-white py-2 rounded">{:config("maccms.footer_pc")}</div>
+</div>
+{/if}
 <hr />
 <!-- -->
 <div class="container">
-
 <div class="row">
 {volist name=":json_decode(config('maccms.link_footer'),true)" id="dc" offset="0" length="12"}
 <div class="col-6 col-md-4">

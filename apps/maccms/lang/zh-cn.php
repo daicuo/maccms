@@ -5,6 +5,8 @@ return [
     'admin_filter'                  => '过滤设置',
     'admin_slite'                   => '轮播设置',
     'admin_link'                    => '友情链接',
+    'admin_poster'                  => '站点广告',
+    'admin_poster_wap'              => '手机广告',
     'site_title'                    => '首页标题',
     'site_title_placeholder'        => '自定义网站首页标题',	
     'site_keywords'                 => '首页关键字',

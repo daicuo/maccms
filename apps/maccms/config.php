@@ -39,11 +39,19 @@ DcConfigMerge('admin_menu.addon',[
             ],
             [
                 'ico' => 'fa-gear',
-                'title'=>'广告设置',
+                'title'=>'站点广告',
                 'target' => '_self',
                 'controll'=>'admin',
                 'action'=>'poster',
                 'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'poster'])
+            ],
+            [
+                'ico' => 'fa-gear',
+                'title'=>'手机广告',
+                'target' => '_self',
+                'controll'=>'admin',
+                'action'=>'posterwap',
+                'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'posterwap'])
             ],
             [
                 'ico' => 'fa-gear',

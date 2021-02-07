@@ -10,9 +10,11 @@
 {block name="main"}
 <div class="container">
 <!-- -->
-<div class="jumbotron jumbotron-fluid pt-0 pb-0 mb-2">
-    {$vod_player}
-</div>
+<div class="jumbotron jumbotron-fluid pt-0 pb-0 mb-2">{$vod_player}</div>
+<!-- -->
+{if config("maccms.thread_pc")}
+<div class="bg-white py-2 mb-2 rounded text-center">{:config("maccms.thread_pc")}</div>
+{/if}
 <!-- -->
 {assign name="n" value="1" /}
 {foreach name="play_list" item="playOne" key="playFrom"}
@@ -22,9 +24,9 @@
       <i class="fa fa-play-circle-o text-warning"></i> 播放地址{$n++}
     </div>
   </div>
-  {volist name="playOne" id="play"}
+  {volist name=":DcArraySequence($playOne,'play_title','SORT_DESC')" id="play"}
   <div class="col-3 col-md-1 mt-2 px-1">
-    <a class="text-truncate btn btn-sm btn-block btn-{:DcDefault($playFrom.$play_index, $play_from.$i, 'dark', 'secondary')}" href="{:playUrl(['tid'=>$type_id,'id'=>$vod_id,'ep'=>$i,'from'=>$playFrom],['term_id'=>$term_id,'term_slug'=>$term_slug])}"><small>{$play.play_title}</small></a>
+    <a class="text-truncate btn btn-sm btn-block btn-{:DcDefault($playFrom.$play['play_index'], $play_from.$play_index, 'dark', 'secondary')}" href="{:playUrl(['tid'=>$type_id,'id'=>$vod_id,'ep'=>$play['play_index'],'from'=>$playFrom],['term_id'=>$term_id,'term_slug'=>$term_slug])}"><small>{$play.play_title}</small></a>
   </div>
   {/volist}
 </div>
@@ -32,7 +34,8 @@
 <!-- -->
 <div class="card bg-dark mb-3">
   <div class="card-header text-white">
-    <i class="fa fa-edit text-warning"></i> {$vod_title}<small class="text-muted h6 ml-1">{$episode_status}{$episode_title}</small>
+    <i class="fa fa-edit text-warning"></i> {$vod_title}
+    <small class="text-muted ml-1">{$episode_status} {$episode_title|DcEmpty='完结'} {if $episode_total}/{$episode_total}{/if}</small>
   </div>
   <div class="card-body text-break pt-2 pb-0">
     <a class="mr-1 text-light" href="{:categoryUrl($term_id,$term_slug)}">{$term_name}</a>/
@@ -42,10 +45,14 @@
     {volist name="vod_year" id="year"}
     <a class="mr-1 text-light" href="{:DcUrl('maccms/filter/year',['id'=>$year,'page'=>1],'')}">{$year}</a>/
     {/volist}
-    {volist name="vod_language" id="language"}<a class="mr-1 text-light" href="{:DcUrl('maccms/filter/language',['id'=>$language,'page'=>1],'')}">{$language}</a>/{/volist} 
+    {volist name="vod_language" id="language"}
+    <a class="mr-1 text-light" href="{:DcUrl('maccms/filter/language',['id'=>$language,'page'=>1],'')}">{$language}</a>/
+    {/volist} 
     <span class="text-light">{$vod_updatetime}</span>
   </div>
-  <div class="card-body pt-2 pb-0">{volist name="vod_actor" id="actor"}<a class="mr-2 text-light" href="{:DcUrl('maccms/search/index',['wd'=>$actor],'')}">{$actor}</a>{/volist}
+  <div class="card-body pt-2 pb-0">
+    {volist name="vod_actor" id="actor"}<a class="mr-2 text-light" href="{:DcUrl('maccms/filter/actor',['id'=>$actor],'')}">{$actor}</a>{/volist}
+    {volist name="vod_director" id="director"}<a class="mr-2 text-light" href="{:DcUrl('maccms/filter/director',['id'=>$director],'')}">{$director}</a>{/volist}
   </div>
   <div class="card-body pt-2">
     {$vod_content}
