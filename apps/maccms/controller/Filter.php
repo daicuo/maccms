@@ -6,12 +6,14 @@ use app\common\controller\Front;
 class Filter extends Front
 {
 
-	public function _initialize(){
+	public function _initialize()
+    {
 		parent::_initialize();
 	}
     
     //最近更新
-	public function lately(){
+	public function lately()
+    {
         $list = apiItem(['limit'=>intval(config('maccms.page_size')), 'pg'=>$this->query['page']]);
         $this->assign($this->query);
         $this->assign($list['page']);
@@ -26,17 +28,20 @@ class Filter extends Front
 	}
     
     //筛选页
-    public function _empty($name){
+    public function _empty($name)
+    {
         return DcHtml($name);
     }
     
     //主演页
-    public function actor(){
+    public function actor()
+    {
         return $this->_field('actor',input('get.id/s','刘德华'));
     }
     
     //导演页
-    public function director(){
+    public function director()
+    {
         return $this->_field('director',input('get.id/s','王晶'));
     }
     
@@ -46,17 +51,20 @@ class Filter extends Front
     }
     
     //年代页
-    public function year(){
+    public function year()
+    {
         return $this->_field('year',input('get.id/s','2020'));
     }
     
     //语言页
-    public function language(){
+    public function language()
+    {
         return $this->_field('language',input('get.id/s','国语'));
     }
     
     //按字段获取
-    private function _field($field,$value){
+    private function _field($field,$value)
+    {
         $value = DcHtml($value);
         $args = [];
         $args['limit'] = intval(config('maccms.page_size'));

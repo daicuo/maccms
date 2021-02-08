@@ -13,8 +13,10 @@ class Api extends Front
     protected $term = '';
 
     //继承
-    public function _initialize(){
+    public function _initialize()
+    {
         parent::_initialize();
+        
         if( $tid = input('tid/d', 0) ){
             $this->term = categoryMeta('term_api_tid', $tid );
         }else{
@@ -23,12 +25,14 @@ class Api extends Front
     }
     
     //首页
-    public function index(){
+    public function index()
+    {
         
     }
     
     //分类页 maccms/api/type?tid=12
-    public function type(){
+    public function type()
+    {
         //跳转至绑定的分类ID
         if( $this->term['term_id'] ){
             $this->redirect('maccms/category/index', ['id'=>$this->term['term_id']]);
@@ -48,12 +52,14 @@ class Api extends Front
     }
     
     //搜索页
-    public function search(){
+    public function search()
+    {
         
     }
     
     //详情页 maccms/api/detail?tid=12&id=182
-    public function detail(){
+    public function detail()
+    {
         //跳转至绑定的分类ID
         if( $this->term['term_id'] ){
             $this->redirect('maccms/detail/index', ['tid'=>$this->term['term_id'],'id'=>input('id/d',1)]);
@@ -76,7 +82,8 @@ class Api extends Front
     }
     
     //播放页 maccms/api/play?tid=12&id=182&ep=77&from=play0
-    public function play(){
+    public function play()
+    {
         $tid   = input('tid/d',0);   //分类ID
         $id    = input('id/d',51930);//视频ID
         $ep    = input('ep/d',51930)-1;//视频集数

@@ -49,6 +49,11 @@ class Admin extends Controller
         return $this->fetch('maccms@admin/posterwap');
 	}
     
+    //微信平台
+	public function weixin(){
+        return $this->fetch('maccms@admin/weixin');
+	}
+    
     //保存配置
     public function update(){
         $status = \daicuo\Op::write(

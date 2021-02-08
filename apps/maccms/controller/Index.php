@@ -13,8 +13,6 @@ class Index extends Front
 
 	public function index()
     {
-        //dump(json_encode(config('slide')));
-        //exit();
 		return $this->fetch();
 	}
 	

@@ -12,12 +12,14 @@ class Play extends Front{
     private $term = [];
 
     //继承
-    public function _initialize(){
+    public function _initialize()
+    {
         parent::_initialize();
     }
     
     //按本地分类获取数据入口
-    public function index(){
+    public function index()
+    {
         if($tid = input('tid/d',0)){
             return $this->get( categoryId($tid) );
         }else{
@@ -27,7 +29,8 @@ class Play extends Front{
     
     //按远程分类获取数据入口 
     //如果有多个资源站,可能存在多个资源站tid相同的情况
-    public function type(){
+    public function type()
+    {
         if($tid = input('tid/d',0)){
             return $this->get( categoryMeta('term_api_tid', $tid) );
         }else{
@@ -45,7 +48,8 @@ class Play extends Front{
     }
     
     //按本地分类ID获取远程数据
-    private function get($term = []){
+    private function get($term = [])
+    {
         $id    = input('id/d',1);//视频ID
         $ep    = input('ep/d',1)-1;//视频集数
         $from  = input('from/s','play0');//播放器组

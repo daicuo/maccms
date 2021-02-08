@@ -66,7 +66,7 @@ DcConfigMerge('admin_menu.addon',[
                 'title'=>'友情链接',
                 'target' => '_self',
                 'controll'=>'admin',
-                'action'=>'filter',
+                'action'=>'link',
                 'url'=>DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'link'])
             ],
             [

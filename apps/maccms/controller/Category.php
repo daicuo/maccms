@@ -12,12 +12,14 @@ class Category extends Front
 	protected $cateId = 0;//分类ID
 	
 	//继承
-	public function _initialize(){
+	public function _initialize()
+    {
 		parent::_initialize();
 	}
     
     //分类ID
-    public function index(){
+    public function index()
+    {
         $term = categoryId(input('id/d'));
         $term['term_api_pg'] = input('page/d',1);
         $list = apiTerm($term);
@@ -34,7 +36,8 @@ class Category extends Front
     }
     
     //空操作
-	public function _empty($name){
+	public function _empty($name)
+    {
         $term = categorySlug(DcHtml($name));
         $term['term_api_pg'] = input('page/d',1);
         $list = apiTerm($term);

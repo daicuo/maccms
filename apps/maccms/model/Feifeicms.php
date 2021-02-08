@@ -175,8 +175,13 @@ class Feifeicms extends Api{
             list($play_name, $play_url, $logo) = explode('$',$value);
             //list($title, $url, $logo, $title_rc, $player) = explode('$', $val);
             $urlOne[$key]['play_index'] = $key+1;
-            $urlOne[$key]['play_title'] = DcEmpty($play_name, '第'.($key+1).'集');
-            $urlOne[$key]['play_url']   = $play_url;
+            if($play_url){
+                $urlOne[$key]['play_title'] = DcEmpty($play_name, '第'.($key+1).'集');
+                $urlOne[$key]['play_url']   = $play_url;  
+            }else{
+                $urlOne[$key]['play_title'] = '第'.($key+1).'集';
+                $urlOne[$key]['play_url']   = $play_name;
+            }
             $urlOne[$key]['play_cover'] = $logo;
         }
         return $urlOne;

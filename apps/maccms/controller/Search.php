@@ -6,13 +6,16 @@ use app\common\controller\Front;
 class Search extends Front{
 	
 	//继承
-	public function _initialize(){
+	public function _initialize()
+    {
 		parent::_initialize();
     }
     
     //空操作
-	public function _empty($name){
+	public function _empty($name)
+    {
         $wd = maccmsSearch(urldecode($this->query['wd']));
+        dump($wd);
         
         $list = apiItem(['wd'=>$wd,'pg'=>$this->query['page']]);
         
