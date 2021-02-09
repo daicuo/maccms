@@ -1,5 +1,5 @@
 /cache
 /log
 /temp
-#/db/#cache.s3db
-#/db/#daicuo.s3db
+/db/#cache.s3db
+/db/#daicuo.s3db

@@ -6,6 +6,9 @@ body{
 :hover.bg-play{
     background: rgba(0,0,0,0.1) url(images/play.png) center no-repeat;
 }
+.navbar-nav > li:hover .dropdown-menu {
+    display: block;
+}
 .embed-responsive-16by9{
 	max-height:540px;
 }

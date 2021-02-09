@@ -29,14 +29,14 @@ class Weixin extends Front{
             $this->none = config('maccms.wx_none');
         }
         
-        //认证
+        /*认证
 		if($this->checkSignature() == false){
 			exit();
 		}else{
 			if(isset($_GET['echostr'])){
 				exit($_GET['echostr']);
 			}
-		}
+		}*/
 	}
 	
 	// 微信服务器推送
@@ -191,16 +191,25 @@ class Weixin extends Front{
 	//关键字搜索
 	private function search($wd)
     {
+        $limit = DcEmpty(config('maccms.wx_limit'), 5);//返回多少条结果
+        
         $list = apiItem(['wd'=>$wd]);
         
         $item = array();
         
 		foreach($list['item'] as $key=>$value){
-            array_push($item, '<a href="'.config('maccms.wx_domain').playUrl( $value['play_last'] ).'">《'.$value['vod_title'].'》</a>免费观看');
+        
+            if( $key >= $limit ){
+                break;
+            }
+            
+            array_push($item, '<a href="'.config('maccms.wx_domain').playUrl($value['play_last']).'">《'.$value['vod_title'].'》</a>免费观看');
 		}
-        if($item){
+        
+        if( count($list['item']) > $limit){
             array_push($item, '<a href="'.config('maccms.wx_domain').DcUrl('maccms/search/index',['wd'=>$wd],'').'">查看更多...</a>');
         }
+        
 		return $item;
 	}
 }

@@ -38,8 +38,8 @@
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
+            'class_right_control'=>'form-control form-control-sm',
+            'class_tips'=>'',
         ],
         [
             'type'=>'json',
@@ -56,8 +56,8 @@
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
+            'class_right_control'=>'form-control form-control-sm',
+            'class_tips'=>'',
         ],
     ]
 ])}

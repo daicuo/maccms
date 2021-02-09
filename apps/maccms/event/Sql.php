@@ -194,7 +194,7 @@ class Sql
             [
                 'term_name'       => '动漫',
                 'term_module'     => 'maccms',
-                'term_slug'       => 'deongman',
+                'term_slug'       => 'dongman',
                 'term_order'      => 7,
                 'term_much_type'  => 'category',
                 'term_much_info'  => '电视剧的说明',

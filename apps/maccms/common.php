@@ -258,8 +258,9 @@ function navItem($params=[]){
     $args['sort']  = 'op_order';
     $args['order'] = 'asc';
     $args['tree']  = true;
-    $args['where']['op_module'] = ['eq', 'maccms'];
     $args['where']['op_status'] = ['eq', 'normal'];
+    //$args['where']['op_module'] = ['eq', 'maccms'];
+    $args['where']['op_controll'] = ['eq', 'header'];
     //$args['cache'] = false;
     //$args['fetchSql'] = true;
     //$args['limit'] = 0;
@@ -267,8 +268,17 @@ function navItem($params=[]){
     if($params){
         $args = array_merge($args, $params);
     }
-    $list = \daicuo\Nav::all($args);
-    return $list;
+    //重置树型结构为2级菜单
+    if( $args['tree'] ){
+        $args['tree']  = false;
+        $list = \daicuo\Nav::all($args);
+        if($list){
+             return list_to_tree($list, 'op_id', 'nav_parent');
+        }
+        return $list;
+    }
+    //默认数据级结构
+    return \daicuo\Nav::all($args);
 }
 
 /**

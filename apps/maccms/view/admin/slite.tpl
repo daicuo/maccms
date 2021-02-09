@@ -10,7 +10,7 @@
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-	{:lang("admin_slite")}
+  {:lang("admin_slite")}
 </h6>
 {:DcBuildForm([
     'class'    => 'bg-white px-2 py-2',
@@ -38,8 +38,8 @@
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
+            'class_right_control'=>'form-control form-control-sm',
+            'class_tips'=>'',
         ],
         [
             'type'=>'json',
@@ -56,8 +56,8 @@
             'class'=>'row form-group',
             'class_left'=>'col-md-2',
             'class_right'=>'col-md-6',
-            'class_right_control'=>'form-control',
-            'class_right_tips'=>'',
+            'class_right_control'=>'form-control form-control-sm',
+            'class_tips'=>'',
         ],
     ]
 ])}

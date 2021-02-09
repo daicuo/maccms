@@ -10,9 +10,20 @@
         <a class="nav-link" href="{:DcUrl('maccms/index/index','','')}">首页 <span class="sr-only">(current)</span></a>
       </li>
       {volist name=":navItem(['limit'=>10])" id="maccms" offset="0" length="10"}
-      <li class="nav-item {:DcDefault($controll.$action, $maccms['nav_active'], 'active', '')}">
-        <a class="nav-link" href="{$maccms.nav_link}">{$maccms.nav_text|DcSubstr=0,5,false}</a>
-      </li>
+      {if $maccms['_child']}
+        <li class="nav-item {:DcDefault($controll.$action, $maccms['nav_active'], 'active', '')} position-relative">
+          <a class="nav-link dropdown-toggle" href="javascript:;" data-toggle="dropdown">{$maccms.nav_text|DcSubstr=0,5,false}</a>
+          <div class="dropdown-menu">
+            {volist name="maccms._child" id="navSon"}
+            <a class="dropdown-item" href="{$navSon.nav_link}" target="{$navSon.nav_target}">{$navSon.nav_text|DcSubstr=0,5,false}</a>
+            {/volist}
+          </div>
+        </li>
+      {else/}
+        <li class="nav-item {:DcDefault($controll.$action, $maccms['nav_active'], 'active', '')}">
+          <a class="nav-link" href="{$maccms.nav_link}" target="{$maccms.nav_target}">{$maccms.nav_text|DcSubstr=0,5,false}</a>
+        </li>
+      {/if}
       {/volist}
     </ul>
     <form class="form-inline my-2 my-lg-0" action="{:DcUrl('maccms/search/index','','')}" method="get">

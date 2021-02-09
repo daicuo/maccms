@@ -15,7 +15,6 @@ class Search extends Front{
 	public function _empty($name)
     {
         $wd = maccmsSearch(urldecode($this->query['wd']));
-        dump($wd);
         
         $list = apiItem(['wd'=>$wd,'pg'=>$this->query['page']]);
         
