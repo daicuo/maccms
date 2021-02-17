@@ -9,14 +9,15 @@
 {block name="header"}{include file="block/header" /}{/block}
 <!-- -->
 {block name="main"}
-<div id="dcSlide" class="carousel slide" data-ride="carousel">
+<div class="container">
+<div id="dcSlide" class="carousel slide">
   <ol class="carousel-indicators">
-    {volist name=":config('slide')" id="dc" offset="0" length="8"}
+    {volist name=":json_decode(config('maccms.slide_index_m'),true)" id="dc" offset="0" length="8"}
     <li data-target="#dcSlide" data-slide-to="{$key}" {eq name="key" value="0"}class="active"{/eq}></li>
     {/volist}
   </ol>
   <div class="carousel-inner">
-    {volist name=":config('slide')" id="dc" offset="0" length="8"}
+    {volist name=":json_decode(config('maccms.slide_index'),true)" id="dc" offset="0" length="8"}
     <div class="carousel-item {eq name="key" value="0"}active{/eq}">
      <a href="{$dc.url}">
      <img src="{$dc.image}" class="d-block w-100 img-slide" alt="{$dc.title}">
@@ -33,10 +34,9 @@
     <span class="sr-only">Next</span>
   </a>
 </div>
-<div class="container">
 <!-- -->
-<div class="row px-0 text-center">
-  {volist name=":navItem(['limit'=>10])" id="maccms" mod="5" offset="0" length="10"}
+<div class="row px-0 text-center mb-2">
+  {volist name=":navItem(['limit'=>10,'where'=>['op_module'=>['eq','maccms']]])" id="maccms" mod="5" offset="0" length="10"}
   <div class="col px-1 mt-3">
     <a class="text-dark text-decoration-none" href="{$maccms.nav_link}">
       {assign name="color" value=":colorRand($key)" /}
@@ -51,24 +51,50 @@
   {/volist}
 </div>
 <!-- -->
-<div class="row px-0">
-  <div class="col-12 px-1 mt-3 mb-2">
-    <fieldset>
-      <legend class="h6 px-4">
-        <i class="fa fa-line-chart text-purple"></i>
-        <a class="text-dark text-decoration-none" href="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">最近更新</a>
-      </legend>
-    </fieldset>
-  </div>
+{volist name=":categoryItem()" id="term" offset="0" length="5"}
+{if $item = apiTermIdLimit($term['term_id'], 6)}
+<fieldset class="mx-2 mt-2">
+  <legend class="h6 px-4 mb-2">
+    <i class="fa fa-line-chart text-info"></i>
+    <a class="text-dark text-decoration-none" href="{:categoryUrl($term['term_id'],$term['term_slug'])}">{$term.term_name|DcSubstr=0,5,false}</a>
+  </legend>
+</fieldset>
+<div class="row mx-1">
+  {volist name="$item" id="maccms" offset="0" length="6"}
+    {include file='block/itemRow'/}
+  {/volist}
 </div>
-<div class="row px-0" id="row" data-api="filter" data-url="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">
+{/if}
+{/volist}
+<!-- -->
+<fieldset class="mx-2 mt-2">
+  <legend class="h6 px-4 mb-2">
+    <i class="fa fa-line-chart text-info"></i>
+    <a class="text-dark text-decoration-none" href="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">最近更新</a>
+  </legend>
+</fieldset>
+<div class="row mx-1" id="row" data-api="filter" data-url="{:DcUrl('maccms/filter/lately',['page'=>1],'')}">
   <p class="mx-auto"><span class="fa fa-spinner fa-spin"></span> loading...</p>
 </div>
 <!--page start -->
-<div class="row px-0 mt-2">
-    <div class="col-12 px-1">
-      <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/lately',['page'=>''],'')}" data-page="1" data-target="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
-    </div>
+<div class="row mx-2 mt-2">
+  <div class="col-12 px-1">
+    <a class="btn btn-block btn-outline-dark" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/lately',['page'=>''],'')}" data-page="1" data-target="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
+  </div>
+</div>
+<!-- -->
+<fieldset class="mx-2 mt-3">
+  <legend class="h6 px-4 mb-2">
+    <i class="fa fa-line-chart text-info"></i>
+    <a class="text-dark text-decoration-none" href="javascript:;">友情链接</a>
+  </legend>
+</fieldset>
+<div class="row mx-1">
+{volist name=":json_decode(config('maccms.link_index'),true)" id="dc" offset="0" length="12"}
+<div class="col-4 col-md-2">
+  <h6><a class="text-muted" href="{$dc.url}" target="{$dc.target|default='_blank'}">{$dc.title}</a></h6>
+</div>
+{/volist}
 </div>
 <!-- -->
 </div>

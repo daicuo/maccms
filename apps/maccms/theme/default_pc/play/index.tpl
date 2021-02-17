@@ -13,7 +13,7 @@
 <div class="jumbotron jumbotron-fluid pt-0 pb-0 mb-2">{$vod_player}</div>
 <!-- -->
 {if config("maccms.thread_pc")}
-<div class="bg-white py-2 mb-2 rounded text-center">{:config("maccms.thread_pc")}</div>
+<div class="bg-white py-2 mb-2 rounded text-center">{:posterParse("maccms.thread_pc")}</div>
 {/if}
 <!-- -->
 {assign name="n" value="1" /}
@@ -55,7 +55,7 @@
     {volist name="vod_director" id="director"}<a class="mr-2 text-light" href="{:DcUrl('maccms/filter/director',['id'=>$director],'')}">{$director}</a>{/volist}
   </div>
   <div class="card-body pt-2">
-    {$vod_content}
+    {$vod_content|DcStrip|DcHtml}
   </div> 
 </div>
 <!-- -->

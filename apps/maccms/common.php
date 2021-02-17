@@ -93,49 +93,55 @@ function apiTerm($term, $params){
 /**
  * 按关键字调用最新一页 xml/json只能搜索片名
  * @param string $wd 搜索关键字
+ * @param int $limit 分页大小（需资源站支持）
+ * @param int $pg 当前分页
  * @param string $api API入口地址 不带参数
  * @return array|false 读取失败时返回false
  */
-function apiSearch($wd='', $api=''){
+function apiSearch($wd='', $limit=20, $pg=1, $api=''){
     if(!$wd){
         return null;
     }
-    $item = apiItem(['wd'=>$wd], $api);
+    $item = apiItem(['wd'=>$wd, 'limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
     return $item['item'];
 }
 
 /**
- * 按更新时间调用最新数据
- * @param int $hour 更新时间小时
+ * 按最新时间调用最新一页
+ * @param int $limit 分页大小（需资源站支持）
+ * @param int $pg 当前分页
  * @param string $api API入口地址 不带参数
  * @return array|false 读取失败时返回false
  */
-function apiHour($hour=24, $api=''){
-    $item = apiItem(['h'=>$hour], $api);
+function apiNew($limit=20, $pg=1, $api=''){
+    $item = apiItem(['limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
+    return $item['item'];
+}
+
+/**
+ * 按更新时间段调用最新数据
+ * @param int $hour 更新时间小时
+ * @param int $limit 分页大小（需资源站支持）
+ * @param int $pg 当前分页
+ * @param string $api API入口地址 不带参数
+ * @return array|false 读取失败时返回false
+ */
+function apiHour($hour=24, $limit=20, $pg=1, $api=''){
+    $item = apiItem(['h'=>$hour, 'limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
     //krsort($item['item']);
     return $item['item'];
 }
 
 /**
- * 按更新时间调用最新一页
- * @param int $hour 更新时间小时
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
- */
-function apiNew($limit=20, $api=''){
-    $item = apiItem(['pg'=>1,'limit'=>DcEmpty($limit, 20)]);
-    return $item['item'];
-}
-
-/**
  * 按远程分类调用最新一页
- * @param int id 视频id
+ * @param int $typeId 分类ID
+ * @param int $limit 分页大小（需资源站支持）
+ * @param int $pg 当前分页
  * @param string $api API入口地址 不带参数
- * @param string $result API返回类型 可选json|xml
  * @return array|false 读取失败时返回false
  */
-function apiType($typeId, $api=''){
-    $item = apiItem(['t'=>$typeId], $api);
+function apiType($typeId, $limit=20, $pg=1, $api=''){
+    $item = apiItem(['t'=>$typeId, 'limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
     return $item['item'];
 }
 
@@ -447,10 +453,23 @@ function playUrl($args, $term=[]){
  * @return string 网址链接
  */
 function imageUrl($image_url){
-    if(config('maccms.image_url')){
-        return config('maccms.image_url').urlencode($image_url);
+    if(config('maccms.upload_referer')){
+        return config('maccms.upload_referer').urlencode($image_url);
     }
     return $image_url;
+}
+
+/**
+ * CPS渠道转换
+ * @param string $name 广告标识
+ * @return string 网址链接
+ */
+function posterParse($name){
+    $string = config($name);
+    if(config('common.site_id')){
+        return str_replace('{SITEID}', config('common.site_id'), $string);
+    }
+    return $string;
 }
 
 /**

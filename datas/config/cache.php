@@ -2,7 +2,7 @@
 return array (
   'cache' => 
   array (
-    'type' => 'File',
+    'type' => 'Redis',
     'prefix' => '',
     'path' => 'datas/cache',
     'db' => 'datas/db/#cache.s3db',

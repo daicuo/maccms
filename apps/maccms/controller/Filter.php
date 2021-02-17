@@ -14,7 +14,7 @@ class Filter extends Front
     //最近更新
 	public function lately()
     {
-        $list = apiItem(['limit'=>intval(config('maccms.page_size')), 'pg'=>$this->query['page']]);
+        $list = apiItem(['limit'=>intval(config('maccms.page_size')), 'pg'=>$this->query['page'], 'order'=>'addtime', 'sort'=>'desc']);
         $this->assign($this->query);
         $this->assign($list['page']);
         $this->assign('type', $list['type']);
@@ -63,21 +63,29 @@ class Filter extends Front
     }
     
     //按字段获取
-    private function _field($field,$value)
+    private function _field($field, $value)
     {
-        $value = DcHtml($value);
+        $value = DcHtml(urldecode($value));
+        //接口参数
         $args = [];
         $args['limit'] = intval(config('maccms.page_size'));
         $args['pg'] = $this->query['page'];
         $args[$field] = $value;
+        //调用数据
         $list = apiItem($args);
+        //模板变量
         $this->assign($this->query);
         $this->assign($list['page']);
         $this->assign('type', $list['type']);
         $this->assign('item', $list['item']);
+        //AJAX模板
         if($this->request->isAjax()){
+            if($this->query['page'] > $list['page']['last_page']){
+                return null;
+            }
             return $this->fetch('ajax');
         }
+        //普通模板
         $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
 			DcUrl('maccms/filter/'.$field,['id'=>$value,'page'=>'[PAGE]'],'')));
 		return $this->fetch();

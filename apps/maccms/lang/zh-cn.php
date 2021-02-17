@@ -14,8 +14,6 @@ return [
     'site_keywords_placeholder'     => '自定义网站首页关键字',
     'site_description'              => '首页描述',
     'site_description_placeholder'  => '自定义网站首页描述',
-    'image_url'                     => '图床地址',
-    'image_url_placeholder'         => '使用图床地址来提升图片的访问速度，不填写则不使用此功能',
     'page_size'                     => '分页大小',
     'page_size_placeholder'         => '资源站支持的情况下有效，使用limit这个参数',
     'api_bind'                      => '点击这里同步指定资源站的分类',

@@ -11,9 +11,11 @@ class Sql
     {
         //首页轮播
         $slide_index = [
-            ['title'=>'MacCms','image'=>'http://kanp0.123.sogoucdn.com/imgu/2021/01/20210122183151_464.jpg','url'=>'http://www.maccms.co','describe'=>''],
-            ['title'=>'MacCms','image'=>'http://kanp0.123.sogoucdn.com/imgu/2021/01/20210112170802_817.jpg','url'=>'http://www.maccms.co','describe'=>''],
-            ['title'=>'MacCms','image'=>'http://kanp6.123.sogoucdn.com/imgu/2021/01/20210108165106_509.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/01.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/01.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/03.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/04.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/05.jpg','url'=>'http://www.maccms.co','describe'=>''],
         ];
         //友情链接
         $link_index = [
@@ -25,6 +27,13 @@ class Sql
             ['title'=>'2021免费电影','url'=>'http://www.maccms.co','target'=>'_blank','describe'=>'提供2021年上映的免费电影，即不收费就可观看和下载的电影。'],
             ['title'=>'2021最新电影','url'=>'http://www.maccms.co','target'=>'_blank','describe'=>'提供2021年高清电影，2021年最新电视剧，好看的免费高质量影片。'],
             ['title'=>'2020好看电影','url'=>'http://www.maccms.co','target'=>'_blank','describe'=>'提供2021已上映好看的电影排行榜、电视剧排行榜，动漫排行榜等。'],
+        ];
+        //广告
+        $poster = [
+            ['footer_pc'=>'<a href="https://hao.daicuo.cc/cps/?type=douyin&id=
+{SITEID}" target="_blank"><img class="img-fluid" src="https://cdn.daicuo.cc/images/cps/douyin97090.png" alt="doubi"></a>'],
+            ['center_wap'=>'<a class="btn btn-block btn-info text-light" href="https://hao.daicuo.cc/cps/?type=douyin&id=
+{SITEID}" target="_blank">抖音币充值，最低8折抢购中</a>'],
         ];
         
         //写入插件配置
@@ -41,6 +50,8 @@ class Sql
             'slide_index_m'   => json_encode($slide_index),
             'link_index'      => json_encode($link_index),
             'link_footer'     => json_encode($link_footer),
+            'footer_pc'       => $poster['footer_pc'],
+            'center_wap'      => $poster['center_wap'],
         ], 'maccms', '', '', '0', 'yes');
         if(!$result){
             return false;

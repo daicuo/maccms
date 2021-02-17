@@ -39,6 +39,6 @@
 </nav>
 {if config("maccms.header_pc")}
 <div class="container text-center mb-2">
-  <div class="bg-white py-2 rounded">{:config("maccms.header_pc")}</div>
+  <div class="bg-white py-2 rounded">{:posterParse("maccms.header_pc")}</div>
 </div>
 {/if}

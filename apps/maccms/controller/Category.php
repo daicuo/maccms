@@ -22,14 +22,19 @@ class Category extends Front
     {
         $term = categoryId(input('id/d'));
         $term['term_api_pg'] = input('page/d',1);
+        
         $list = apiTerm($term);
         $this->assign($this->query);
         $this->assign($term);
         $this->assign($list['page']);
         $this->assign('item', $list['item']);
         if($this->request->isAjax()){
+            if($this->query['page'] > $list['page']['last_page']){
+                return null;
+            }
             return $this->fetch('ajax');
         }
+        
         $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
 			DcUrl('maccms/category/index',['id'=>$term['term_id'], 'page'=>'[PAGE]'],'')));
         return $this->fetch();
@@ -40,14 +45,19 @@ class Category extends Front
     {
         $term = categorySlug(DcHtml($name));
         $term['term_api_pg'] = input('page/d',1);
+        
         $list = apiTerm($term);
         $this->assign($this->query);
         $this->assign($term);
         $this->assign($list['page']);
         $this->assign('item', $list['item']);
         if($this->request->isAjax()){
+            if($this->query['page'] > $list['page']['last_page']){
+                return null;
+            }
             return $this->fetch('ajax');
         }
+        
         $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
 			DcUrl('maccms/category/'.$name,['page'=>'[PAGE]'],'')));
         return $this->fetch('index');

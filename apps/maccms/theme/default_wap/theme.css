@@ -2,9 +2,15 @@ html, body {
   overflow-x: hidden;
 }
 body{
-	padding-top:0;
-	max-width:575.98px;
-	margin:0 auto;
+	padding-top:56px;
+}
+.navbar{
+    max-width:540px;
+}
+.container{
+    max-width:540px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 /*nav-purple.tabs*/
 .nav-purple.nav-tabs>.nav-item{
@@ -79,6 +85,7 @@ fieldset legend {
 }
 /*dcImages*/
 .img-slide{
+    width:100%;
 	height:180px;
 }
 .img-cover{
@@ -103,14 +110,17 @@ fieldset legend {
 		height:180px;
 	}
 	.img-slide{
-		height-:190px;
+		height:210px;
 	}
 }
 /*ipad*/
 @media (min-width: 479.98px) {
 	.img-cover{
 		height:230px;
-	}	
+	}
+    .img-slide{
+		height:250px;
+	}
 }
 /*ipad pro*/
 @media (min-width: 767.98px) {

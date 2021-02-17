@@ -1,8 +1,5 @@
 $(function(){
 	$.extend(daicuo.fn, {
-		test : function($int){
-			return $int;
-		},
         filter : function(){
             $('[data-api="filter"]').each(function() {
                 var $target = $(this);
