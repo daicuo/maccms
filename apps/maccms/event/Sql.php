@@ -12,15 +12,15 @@ class Sql
         //首页轮播
         $slide_index = [
             ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/01.jpg','url'=>'http://www.maccms.co','describe'=>''],
-            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/01.jpg','url'=>'http://www.maccms.co','describe'=>''],
+            ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/02.jpg','url'=>'http://www.maccms.co','describe'=>''],
             ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/03.jpg','url'=>'http://www.maccms.co','describe'=>''],
             ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/04.jpg','url'=>'http://www.maccms.co','describe'=>''],
             ['title'=>'MacCms','image'=>'https://cdn.daicuo.cc/images/slide/05.jpg','url'=>'http://www.maccms.co','describe'=>''],
         ];
         //友情链接
         $link_index = [
+            ['title'=>'MacCms','url'=>'https://www.maccms.co','target'=>'_blank','describe'=>''],
             ['title'=>'DaiCuo','url'=>'http://www.daicuo.net','target'=>'_blank','describe'=>''],
-            ['title'=>'MacCms','url'=>'http://www.maccms.co','target'=>'_blank','describe'=>''],
         ];
         //底部链接
         $link_footer = [
@@ -30,10 +30,8 @@ class Sql
         ];
         //广告
         $poster = [
-            ['footer_pc'=>'<a href="https://hao.daicuo.cc/cps/?type=douyin&id=
-{SITEID}" target="_blank"><img class="img-fluid" src="https://cdn.daicuo.cc/images/cps/douyin97090.png" alt="doubi"></a>'],
-            ['center_wap'=>'<a class="btn btn-block btn-info text-light" href="https://hao.daicuo.cc/cps/?type=douyin&id=
-{SITEID}" target="_blank">抖音币充值，最低8折抢购中</a>'],
+            'footer_pc'=>'<a href="/maccms/cps/?type=douyin" target="_blank"><img class="img-fluid" src="https://cdn.daicuo.cc/images/cps/douyin97090.png" alt="doubi"></a>',
+            'center_wap'=>'<a class="btn btn-block btn-info text-light" href="/maccms/cps/?type=douyin" target="_blank">抖音币充值，最低8折抢购中</a>',
         ];
         
         //写入插件配置
@@ -44,7 +42,7 @@ class Sql
             'theme'           => 'default_pc',
             'theme_wap'       => 'default_wap',
             'page_size'       => 30,
-            'api_url'         => 'http://cdn.feifeicms.co/api/hao123/index.php',
+            'api_url'         => 'http://cdn.feifeicms.co/api/hao124/index.php',
             'api_params'      => '',
             'slide_index'     => json_encode($slide_index),
             'slide_index_m'   => json_encode($slide_index),
@@ -184,7 +182,7 @@ class Sql
                 'term_much_type'  => 'category',
                 'term_much_info'  => '电影的说明',
                 'term_tpl'        => 'index',
-                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao123/index.php',
+                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao124/index.php',
                 'term_api_params' => '',
                 'term_api_tid'    => 1,
                 'term_api_type'   => 'Feifeicms',
@@ -197,7 +195,7 @@ class Sql
                 'term_much_type'  => 'category',
                 'term_much_info'  => '电视剧的说明',
                 'term_tpl'        => 'index',
-                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao123/index.php',
+                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao124/index.php',
                 'term_api_params' => '',
                 'term_api_tid'    => 2,
                 'term_api_type'   => 'Feifeicms',
@@ -210,7 +208,7 @@ class Sql
                 'term_much_type'  => 'category',
                 'term_much_info'  => '电视剧的说明',
                 'term_tpl'        => 'index',
-                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao123/index.php',
+                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao124/index.php',
                 'term_api_params' => '',
                 'term_api_tid'    => 3,
                 'term_api_type'   => 'Feifeicms',
@@ -223,7 +221,7 @@ class Sql
                 'term_much_type'  => 'category',
                 'term_much_info'  => '电视剧的说明',
                 'term_tpl'        => 'index',
-                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao123/index.php',
+                'term_api_url'    => 'http://cdn.feifeicms.co/api/hao124/index.php',
                 'term_api_params' => '',
                 'term_api_tid'    => 4,
                 'term_api_type'   => 'Feifeicms',
