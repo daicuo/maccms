@@ -604,24 +604,34 @@ function maccmsIsBig($str) {
 
 //简转繁
 function maccmss2t($str){
-	$url = 'http://api.k780.com/?app=code.hanzi_fanjian&typeid=1&wd='.urlencode($str).'&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json';
+    $url = 'http://api.daicuo.cc/jianfan/?token='.DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea').'&type=s2t&text='.urlencode($str);
 	$json = json_decode(DcCurl('windows',10,$url),true);
-	return $json['result']['text'];
+	return $json['data'];
 }
 
 //繁转简
 function maccmst2s($str){
-	$url = 'http://api.k780.com/?app=code.hanzi_fanjian&typeid=2&wd='.urlencode($str).'&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json';
+	$url = 'http://api.daicuo.cc/jianfan/?token='.DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea').'&type=t2s&text='.urlencode($str);
 	$json = json_decode(DcCurl('windows',10,$url),true);
-	return $json['result']['text'];
+	return $json['data'];
 }
 
-//将繁体字转为简体后搜索
+//关键字搜索转换、将繁体字转为简体后搜索
 function maccmsSearch($str){
-	if(maccmsIsBig($str)){//存在繁体字就转为简体
-		if( $strt2s = maccmst2s($str) ){
-			return $strt2s;
-		}
-	}
+    if( config('maccms.api_search') == 't2s' ){
+        //存在繁体字就转为简体
+        if(maccmsIsBig($str)){
+            if( $strt2s = maccmst2s($str) ){
+                return $strt2s;
+            }
+        }
+    }else if( config('maccms.api_search') == 's2t' ){
+        //简体转繁体
+        if( $strs2t = maccmss2t($str) ){
+            return $strs2t;
+        }
+    }
+    
+    // 原样返回
 	return $str;
 }

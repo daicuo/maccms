@@ -16,122 +16,6 @@ use think\Response;
 use think\Session;
 use think\Url;
 use think\View;
-/**************************************************分类组件***************************************************/
-/**
- * 获取导航列表简单数组格式
- * @param array $args 查询条件（一维数组）
- * @return mixed null|array;
- */
-function DcCategoryOption($args){
-    if($args){
-        $args = array_merge(['cache'=>false], $args);
-    }else{
-        $args['module'] = DcHtml(input('op_module/s',''));
-        $args['cache'] = false;
-    }
-    return \daicuo\Term::option($args);
-}
-/**************************************************导航组件***************************************************/
-/**
- * 获取导航列表
- * @param array $args 查询条件（一维数组）
- * @return mixed null|array;
- */
-function DcNavAll($args){
-    return \daicuo\Nav::all($args);
-}
-/**
- * 获取导航列表简单数组格式
- * @param array $args 查询条件（一维数组）
- * @return mixed null|array;
- */
-function DcNavOption($args){
-    if(!$args){
-        $args['where'] = DcWhereByQuery(['op_module','op_controll','op_action']);
-        $args['cache'] = false;
-    }
-    return \daicuo\Nav::option($args);
-}
-/**************************************************权限组件***************************************************/
-/**
- * 获取导航列表简单数组格式
- * @return array;
- */
-function DcRolesOption(){
-    $options = [];
-    foreach(\daicuo\Auth::get_roles() as $role){
-        $options[$role] = lang($role);
-    }
-    return $options;
-}
-/**************************************************视频组件***************************************************/
-/**
- * 调用播放器
- * @param array $options  播放器参数，数组格式，
- * @return string
- */
-function DcPlayer($options=[]){
-    $video = new \daicuo\Video();
-    return $video->player($options);
-}
-/**************************************************分页组件***************************************************/
-/**
- * 解析页码为HTML
- * @param $index number 当前页
- * @param $rows number 每页数量 
- * @param $total number 总记录数
- * @param $path string URL路径
- * @param $query array URL额为参数
- * @param $fragment string URL锚点 
- * @param $varpage string 分页变量
- * @return string
- */
-function DcPage($indexpage=1, $rows=10, $total=1, $path='', $query=[], $fragment='', $varpage='page'){
-    $page = new \page\Bootstrap('', $rows, $indexpage, $total, false, [
-        'var_page' => $varpage,
-        'path' => str_replace('%5BPAGE%5D','[PAGE]',$path),//url('home/index/index','','')
-        'query' => $query,
-        'fragment' => $fragment,
-    ]);
-    return $page->render();
-}
-function DcPageSimple($pageIndex, $totalPage=1, $path=''){//&raquo;
-    if($totalPage < 1){
-        return '';
-    }
-    $path = str_replace('%5BPAGE%5D','[PAGE]',$path);//将转义后的方括号[page]
-    if($pageIndex == 1){
-        $prev = '<li class="page-item disabled"><a class="page-link" href="javascript:;">&laquo;</a></li>';
-    }else{
-        if(strpos($path,'[PAGE]')){
-            $url = str_replace('[PAGE]',($pageIndex-1),$path);
-        }else{
-            $url = $path.($pageIndex-1);
-        }
-        $prev = '<li class="page-item"><a class="page-link" href="' . htmlentities($url) . '">&laquo;</a></li>';
-    }
-    if($pageIndex < $totalPage){
-        if(strpos($path,'[PAGE]')){
-            $url = str_replace('[PAGE]',($pageIndex+1),$path);
-        }else{
-            $url = $path.($pageIndex);
-        }
-        $next = '<li class="page-item"><a class="page-link" href="' . htmlentities($url) . '">&raquo;</a></li>';
-    }else{
-        $next = '<li class="page-item disabled"><a class="page-link" href="javascript:;">&raquo;</a></li>';
-    }
-    return sprintf('<ul class="pagination pagination-lg">%s %s</ul>', $prev, $next);
-}
-/**************************************************模板组件***************************************************/
-/**
- * 生成模板调用配置标签
- * @param string $module 模块
- * @param string $field 字段
- * @return string;
- */
-function DcTplLabelOp($module, $field){
-    return DcHtml('{:config("'.$module.'.'.$field.'")}');
-}
 /**************************************************系统常用函数***************************************************/
 /**
  * 加载配置文件（PHP格式）
@@ -186,7 +70,9 @@ function DcIsArray($array, $count=false){
         return false;
     }
 }
-/**************************************************字符串处理***************************************************/
+
+
+/**************************************************字符串与输出***************************************************/
 //字符串截取
 function DcSubstr($str, $start=0, $length, $suffix=true, $charset="UTF-8"){
     $str = trim($str);
@@ -261,7 +147,9 @@ function DcParseArgs($args, $defaults = ''){
     }
 	return $r;
 }
-/**************************************************Array、Xml、Json***************************************************/
+
+
+/**************************************************Array、Xml、Json、Serialize***************************************************/
 //XML转数组
 function DcXmlUnSerialize(&$xml, $isnormal = FALSE) {
     $xml_parser = new \net\Xml($isnormal);
@@ -347,6 +235,8 @@ function DcArraySearch($array, $condition, $key=''){
     }
     return $array_search;
 }
+
+
 /**************************************************采集内核***************************************************/
 function DcCurl($useragent='auto', $timeout=10, $url, $post_data='', $referer='', $headers='', $cookie='', $proxy=''){
     $ch = curl_init();
@@ -424,6 +314,8 @@ function DcPregMatch($rule,$html){
         return $data[1].'';
     }
 }
+
+
 /**************************************************数据转化***************************************************/
 /**
  * 普通数据转多对多关系
@@ -591,6 +483,8 @@ function DcWhereByQuery($fields=[], $condition='eq'){
     }
     return $where;
 }
+
+
 /****************************************************ThinkPhp配置***************************************************/
 /**
 * 获取系统配置.支持多级层次
@@ -649,6 +543,8 @@ function DcCheck($data = [], $name, $scene='', $layer='validate'){
     }
     return true;
 }
+
+
 /**************************************************ThinkPhp钩子***************************************************/
 /**
 * 动态添加行为扩展到某个标签
@@ -682,6 +578,8 @@ function DcHookListen($tag, &$params = null, $extra = null, $once = false){
 function DcHookExec($class, $tag = '', &$params = null, $extra = null){
     \think\Hook::exec($class, $tag, $params, $extra);
 }
+
+
 /**************************************************ThinkPhp缓存***************************************************/
 /**
  * 缓存标识函数、支持清空缓存(value=false)
@@ -759,6 +657,8 @@ function DcCacheKey($value){
     }
     return md5($value);
 }
+
+
 /**************************************************ThinkPhp模板、路径***************************************************/
 /**
  * 系统根目录
@@ -814,7 +714,7 @@ function DcUrlAttachment($file, $key=0){
         return '';
     }
     //多图分割
-    $file = explode(',',$file);
+    $file = explode(';',$file);
     //当前第几个
     $file = $file[$key];
     //判断本地附件还是远程附件
@@ -860,6 +760,8 @@ function DcTheme($module='index', $isMobile=false){
     }
     return DcEmpty(config($module.'.theme'),config('common.site_theme'));
 }
+
+
 /**************************************************ThinkPhp数据模型操作***************************************************/
 /**
  * 将数据添加至数据库
@@ -1338,6 +1240,8 @@ function DcDbSelect($name, $params){
     }
     return $list;
 }
+
+
 /*---------------------------------------------ThinkPhp数据库操作------------------------------------------------------------*/
 /**
  * 数据查询多个
@@ -1492,6 +1396,8 @@ function dbInsert($name='', $data){
     //return db($name)->insertGetId($data);//返回添加数据的自增主键
     //return db($name)->insert($data);返回添加成功的条数
 }
+
+
 /**************************************************ThinkPHP扩展函数库***************************************************/
 /**
  * 判断邮箱
@@ -1525,67 +1431,6 @@ function is_username($str) {
  */
 function is_not_json($str){  
     return is_null(json_decode($str));
-}
-/**
- * 读取文件
- * @param string $path 完整文件路径名
- * @return bool
- */
-function read_file($path){
-    return @file_get_contents($path);
-}
-/**
- * 写入文件
- * @param string $l1 完整文件路径名
- * @param string $l2 要写入文件的内容 
- * @return bool
- */
-function write_file($l1, $l2=''){
-    $dir = dirname($l1);
-    if(!is_dir($dir)){
-        mkdir_ss($dir);
-    }
-    return @file_put_contents($l1, $l2);
-}
-/**
- * 数组保存到文件
- * @param string $filename 完整文件路径名
- * @param string $arr 数组
- * @return bool
- */
-function write_arr2file($filename, $arr=''){
-    if(is_array($arr)){
-        $con = var_export($arr,true);
-    } else{
-        $con = $arr;
-    }
-    $con = "<?php\nreturn $con;\n?>";//\n!defined('IN_MP') && die();\nreturn $con;\n
-    write_file($filename, $con);
-}
-/**
- * 递归创件文件
- * @param string $dirs 完整文件路径名
- * @param string $mode 权限 
- * @return bool
- */
-function mkdir_ss($dirs,$mode=0777) {
-    if(!is_dir($dirs)){
-        mkdir_ss(dirname($dirs), $mode);
-        return @mkdir($dirs, $mode);
-    }
-    return true;
-}
-/**
- * 列出所有文件夹名
- * @param string $dir 完整文件夹路径
- * @return array
- */
-function glob_basename($path = 'apps/home/theme/') {
-    $list = glob($path.'*');
-    foreach ($list as $i=>$file){
-        $dir[] = basename($file);
-    }    
-    return $dir;
 }
 /**
  * 在数据列表中搜索
@@ -1742,6 +1587,9 @@ function remove_xss($val) {
    }
    return $val;
 }
+
+
+/**************************************************扩展函数－驼峰**************************************************/
 /**
 * 下划线转驼峰
 * @param string $uncamelized_words 下划线样式的字符串
@@ -1763,7 +1611,62 @@ function camelize($uncamelized_words, $separator='_'){
 function uncamelize($camelCaps, $separator='_'){
     return strtolower(preg_replace('/([a-z])([A-Z])/', "$1" . $separator . "$2", $camelCaps));
 }
-/**************************************************无限层级分类***************************************************/
+
+
+/**************************************************扩展函数－文件与目录***************************************************/
+/**
+ * 读取文件
+ * @param string $path 完整文件路径名
+ * @return bool
+ */
+function read_file($path){
+    $file = new \files\File();
+    return $file->read($path);
+}
+/**
+ * 写入文件
+ * @param string $filename 完整文件路径名
+ * @param string $data 要写入文件的内容 
+ * @return bool
+ */
+function write_file($filename='', $data=''){
+    $file = new \files\File();
+    return $file->write($filename, $data);
+}
+/**
+ * 数组保存到文件
+ * @param string $filename 完整文件路径名
+ * @param string $dataArray 数组
+ * @return bool
+ */
+function write_array($filename, $dataArray=''){
+    $file = new \files\File();
+    return $file->write_array($filename, $dataArray);
+}
+/**
+ * 递归创件目录
+ * @param string $dirs 完整文件路径名
+ * @return bool
+ */
+function mkdir_ss($dirs) {
+    $file = new \files\File();
+    return $file->d_create($dirs);
+}
+/**
+ * 列出目录下单层所有文件夹名
+ * @param string $dir 完整文件夹路径
+ * @return array
+ */
+function glob_basename($path = 'apps/index/theme/') {
+    $list = glob($path.'*');
+    foreach ($list as $i=>$file){
+        $dir[] = basename($file);
+    }    
+    return $dir;
+}
+
+
+/**************************************************扩展函数－无限层级分类***************************************************/
 /**
  * 获取指定分类的所有子集(递归法)
  * @param array $categorys 数组列表

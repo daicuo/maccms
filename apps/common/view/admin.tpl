@@ -117,10 +117,12 @@
     <div class="main-right col-12 col-md-10 col-xl-11 pt-2">
       {block name="main"}<!-- main -->{/block}
       <footer class="text-center bg-white py-5">
-        Powered by <a class="text-purple" href="{:lang('appUrl')}" target="_blank">{:lang('appName')}</a>
+        Powered by
+        {if config('common.apply_name')}
+        <a class="text-purple" href="{:DcUrl('/admin/apply/jump','module='.config('common.apply_module'),'')}" target="_blank">{:config('common.apply_name')}</a> <small>{:config('common.apply_version')}</small>
+        {else/}
+        <a class="text-purple" href="{:lang('appUrl')}" target="_blank">{:lang('appName')}</a>
         <small>{:config('daicuo.version')}</small>
-        {if condition="config('common.apply_name')"}
-        & <a class="text-purple" href="{:DcUrl('/admin/apply/jump','module='.config('common.apply_module'),'')}" target="_blank">{:config('common.apply_name')}</a> <small>{:config('common.apply_version')}</small>
         {/if}
       </footer>
     </div>

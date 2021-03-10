@@ -59,10 +59,12 @@ $(document).ready(function(){
           </form>
         </div>
         <div class="card-footer bg-white text-muted">
+          {if config('common.apply_name')}
+          <a class="text-purple" href="{$api_url}/home/?module={:config('common.apply_module')}" target="_blank">{:config('common.apply_name')}</a> 
+          <small>{:config('common.apply_version')}</small>
+          {else/}
           <a class="text-purple" href="{:lang('appUrl')}" target="_blank">{:lang('appName')}</a>
-          {:config('daicuo.version')}
-          {if condition="config('common.apply_name')"}
-          & <a class="text-purple" href="{$api_url}/home/?module={:config('common.apply_module')}" target="_blank">{:config('common.apply_name')}</a> <small>{:config('common.apply_version')}</small>
+          <small>{:config('daicuo.version')}</small>
           {/if}
         </div>
       </div>

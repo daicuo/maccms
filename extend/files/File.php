@@ -26,18 +26,20 @@ class File
     }
 	
     /**
-     * d_create 创建目录
+     * d_create 递归创建目录
      * @param   dir string  目录
      * @return  bool 
      */
     public function d_create($dir='')
     {
 		if(!$dir || $dir=="." || $dir =="./") return true;
+        
         if(!$this->d_has($dir))
 		{
-			 $is = mkdir($dir,0777,true); 
+			 $is = mkdir($dir, 0777, true); 
 		     return $is ? 1 : 0 ;
 		}
+        
 		return 1;
     }
 	
@@ -60,6 +62,25 @@ class File
 		}
 		$is = file_put_contents($filename,$data);
 		return $is ? 1 : 0 ;
+    }
+    
+    /**
+     * write_array 数组保存到文件
+     * @param   filename string  文件路径
+     * @param   dataArray array  数组
+     * @return  bool 
+     */
+    public function write_array($filename='', $dataArray='')
+    {
+		if(is_array($dataArray)){
+            $con = var_export($dataArray,true);
+        } else{
+            $con = $dataArray;
+        }
+        
+        $con = "<?php\nreturn $con;\n?>";//\n!defined('IN_MP') && die();\nreturn $con;\n
+        
+        return $this->write($filename, $con);
     }
 	
     /**

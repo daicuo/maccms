@@ -210,7 +210,7 @@ window.daicuo.form = {
                 urls.push(value.url);
             });*/
             //回填input
-            $(inputId).val(urls.join(','));
+            $(inputId).val(urls.join(';'));
         }
     },
     // 单个图片上传失败 data.code data.msg
@@ -239,7 +239,7 @@ window.daicuo.form = {
                 var prefix = $(this).data('cdn')+$(this).data('root')+$(this).data('path')+'/';
                 //拼装预览HTML代码
                 var html = [];
-                $.each(src.split(','), function(index, value){
+                $.each(src.split(';'), function(index, value){
                     html.push('<div class="border rounded my-2 p-2"><img class="img-fluid" src="'+prefix+value+'" /></div>');
                 });
                 //模态框展示

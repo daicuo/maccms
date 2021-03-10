@@ -44,8 +44,14 @@ class Cache extends Admin
 				$this->error(lang('unSupport').$config['type']);
 			}
 		}
-		write_arr2file('./datas/config/cache.php',['cache'=>$config]);
-		$this->success(lang('success'));
+        //将配置写入文件
+        $file = new \files\File();
+        $result = $file->write_array('./datas/config/cache.php', ['cache'=>$config]);
+        if($result){
+            $this->success(lang('success'));
+        }else{
+            $this->error(lang('fail'));
+        }
 	}
     
 }

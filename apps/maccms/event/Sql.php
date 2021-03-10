@@ -42,6 +42,7 @@ class Sql
             'theme'           => 'default_pc',
             'theme_wap'       => 'default_wap',
             'page_size'       => 30,
+            'api_search'      => 't2s',
             'api_url'         => 'http://cdn.feifeicms.co/api/hao124/index.php',
             'api_params'      => '',
             'slide_index'     => json_encode($slide_index),

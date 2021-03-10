@@ -1,5 +1,3 @@
-/cache
 /log
-/temp
+/config/cache.php
 /db/#cache.s3db
-/db/#daicuo.s3db
