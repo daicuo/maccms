@@ -580,16 +580,9 @@ function objectToArray($d) {
  **/  
 function arrayToObject($d) {  
     if (is_array($d)) {  
-        /* 
-        * Return array converted to object 
-        * Using __FUNCTION__ (Magic constant) 
-        * for recursive call 
-        */  
-        return (object) array_map(__FUNCTION__, $d);  
-    }  
-    else {  
-        // Return object  
-        return $d;  
+        return (object) array_map(__FUNCTION__, $d);
+    } else {  
+        return $d;
     }  
 }
 
@@ -604,15 +597,15 @@ function maccmsIsBig($str) {
 
 //简转繁
 function maccmss2t($str){
-    $url = 'http://api.daicuo.cc/jianfan/?token='.DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea').'&type=s2t&text='.urlencode($str);
-	$json = json_decode(DcCurl('windows',10,$url),true);
+    $url = 'http://api.daicuo.cc/jianfan/?token='.maccmsToken().'&type=s2t&text='.urlencode($str);
+	$json = json_decode(DcCurl('windows',10,$url), true);
 	return $json['data'];
 }
 
 //繁转简
 function maccmst2s($str){
-	$url = 'http://api.daicuo.cc/jianfan/?token='.DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea').'&type=t2s&text='.urlencode($str);
-	$json = json_decode(DcCurl('windows',10,$url),true);
+	$url = 'http://api.daicuo.cc/jianfan/?token='.maccmsToken().'&type=t2s&text='.urlencode($str);
+	$json = json_decode(DcCurl('windows',10,$url), true);
 	return $json['data'];
 }
 
@@ -634,4 +627,9 @@ function maccmsSearch($str){
     
     // 原样返回
 	return $str;
+}
+
+//返回MacCms默认TOKEN
+function maccmsToken(){
+    return DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea');
 }

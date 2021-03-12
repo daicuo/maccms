@@ -55,6 +55,14 @@ DcConfigMerge('admin_menu.addon',[
             ],
             [
                 'ico' => 'fa-gear',
+                'title'=>'广告收入',
+                'target' => '_blank',
+                'controll'=>'admin',
+                'action'=>'posterwap',
+                'url'=>DcUrlAdmin('maccms/cps/reward', '', '')
+            ],
+            [
+                'ico' => 'fa-gear',
                 'title'=>'首页轮播',
                 'target' => '_self',
                 'controll'=>'admin',

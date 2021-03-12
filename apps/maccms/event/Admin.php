@@ -15,7 +15,8 @@ class Admin extends Controller
 	}
     
     //管理首页
-	public function index(){
+	public function index()
+    {
         $themes = array();
         foreach( glob_basename('apps/maccms/theme/') as $value){
             $themes[$value] = $value;
@@ -25,37 +26,44 @@ class Admin extends Controller
 	}
     
     //过滤配置
-	public function filter(){
+	public function filter()
+    {
         return $this->fetch('maccms@admin/filter');
 	}
     
     //首页轮播
-	public function slite(){
+	public function slite()
+    {
         return $this->fetch('maccms@admin/slite');
 	}
 
     //链接管理
-	public function link(){
+	public function link()
+    {
         return $this->fetch('maccms@admin/link');
 	}
     
     //广告配置
-	public function poster(){
+	public function poster()
+    {
         return $this->fetch('maccms@admin/poster');
 	}
     
     //广告配置
-	public function posterwap(){
+	public function posterwap()
+    {
         return $this->fetch('maccms@admin/posterwap');
 	}
     
     //微信平台
-	public function weixin(){
+	public function weixin()
+    {
         return $this->fetch('maccms@admin/weixin');
 	}
     
     //保存配置
-    public function update(){
+    public function update()
+    {
         $status = \daicuo\Op::write(
             input('post.'),
             input('module/s','maccms'), 

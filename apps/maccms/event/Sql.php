@@ -241,6 +241,14 @@ class Sql
     */
     public function upgrade()
     {
+        //应用打包配置
+        $result = \daicuo\Op::write([
+            'apply_version'   => '1.3.0',
+        ]);
+        if(!$result){
+            return false;
+        }
+        
         return true;
 	}
     
