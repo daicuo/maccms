@@ -42,7 +42,7 @@ return [
     'url_domain_deploy' =>  true,
 
     // 扩展函数文件
-    'extra_file_list'        => [THINK_PATH . 'helper' . EXT, APP_PATH . 'helper' . EXT],
+    'extra_file_list'   => [THINK_PATH . 'helper' . EXT, APP_PATH . 'helper' . EXT],
     
     'log'   => [
         //file|socket|test
@@ -147,7 +147,7 @@ return [
     //系统特殊变量
     'daicuo' => [
         'error'   => 'fail',
-        'version' => '1.4.70',
+        'version' => '1.4.71',
     ],
     
     //系统基础配置
@@ -238,7 +238,7 @@ return [
         'guest'  => [
             'admin/index/login',
             'admin/index/logout',
-            //'index/login/?url=test',
+            'admin/index/token',
         ],
         //扩展节点
         'caps' => [

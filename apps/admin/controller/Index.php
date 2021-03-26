@@ -63,4 +63,14 @@ class Index extends Admin
         
         $this->success(lang('logout').lang('success'), 'index/login');
     }
+    
+    /**
+    * 申请token
+    * @return mixed
+    */
+    public function token()
+    {
+        $service = new \daicuo\Service();
+        $this->redirect($service->apiUrl().'/token/?'.http_build_query($this->query),302);
+    }
 }

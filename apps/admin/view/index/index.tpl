@@ -58,7 +58,11 @@
        <tr>
         <td>{:lang('web_domain')}</td>
         <td>{:input('server.server_name')}({:input('server.server_addr')}:{:input('server.server_port')})</td>
-      </tr>     
+      </tr>
+      <tr>
+        <td>{:lang('database_type')}</td>
+        <td>{:config('database.type')}</td>
+      </tr>
       <tr>
         <td>{:lang('php_version')}</td>
         <td>{$Think.PHP_VERSION}</td>

@@ -240,7 +240,12 @@ window.daicuo.form = {
                 //拼装预览HTML代码
                 var html = [];
                 $.each(src.split(';'), function(index, value){
-                    html.push('<div class="border rounded my-2 p-2"><img class="img-fluid" src="'+prefix+value+'" /></div>');
+                    if(daicuo.tools.isAbsoluteURL(value)){
+                        var previewSrc = value;
+                    }else{
+                        var previewSrc = prefix+value;
+                    }
+                    html.push('<div class="border rounded my-2 p-2"><img class="img-fluid" src="'+previewSrc+'" /></div>');
                 });
                 //模态框展示
                 daicuo.bootstrap.dialog(html.join(''),daicuo.lang.preview);
@@ -1047,6 +1052,10 @@ window.daicuo.tools = {
             var ret = {code: -1, msg: e.message, data: null};
         }
         return ret;
+    },
+    // 判断是否为绝对地址
+    isAbsoluteURL : function($str){
+        return /^[a-z][a-z0-9+.-]*:/.test($str);
     }
 };
 

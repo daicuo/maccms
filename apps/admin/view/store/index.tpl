@@ -38,13 +38,8 @@
     <div class="form-group mr-1">
       <input class="form-control form-control-sm" type="text" name="searchText" id="searchText" value="{$query.searchText|DcHtml}" placeholder="{:lang('keyword')}">
     </div>
-    <div class="form-group mr-2">
-      <button type="button" class="btn btn-purple btn-sm queryButton">{:lang('query')}</button>
-    </div>
     <div class="form-group">
-      <a class="btn btn-sm btn-danger" href="{:lang('appUrl')}" target="_blank">
-        {:lang('site_token')}
-      </a>
+      <button type="button" class="btn btn-purple btn-sm queryButton">{:lang('query')}</button>
     </div>
   </form>
 </div>

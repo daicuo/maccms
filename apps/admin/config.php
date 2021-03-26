@@ -150,18 +150,18 @@ return [
         //应用
         'apply' => [
             [
-                'ico'     => 'fa fa-fw fa-archive',
-                'title'   => lang('apply_index'),
-                'controll'=> 'apply',
-                'action'  => 'index',
-                'url'     => DcUrl('admin/apply/index','',''),
-            ],
-            [
                 'ico'     => 'fa fa-fw fa-cloud',
                 'title'   => lang('apply_store'),
                 'controll'=> 'store',
                 'action'  => 'index',
                 'url'     => DcUrl('admin/store/index','',''),
+            ],
+            [
+                'ico'     => 'fa fa-fw fa-archive',
+                'title'   => lang('apply_index'),
+                'controll'=> 'apply',
+                'action'  => 'index',
+                'url'     => DcUrl('admin/apply/index','',''),
             ],
             [
                 'ico'     => 'fa fa-fw fa-gear',

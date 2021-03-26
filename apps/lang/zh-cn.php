@@ -275,8 +275,8 @@ return [
     'apply_unzip_failed'                    => '应用解压失败（检查./datas是否有读取权限、检查./apps是否有创建文件权限）',
     'apply_dir_access'                      => '应用安装失败（./apps没有创建文件权限，请暂时设置0777权限）',
     'daicuo_module_empty'                   => '应用标识不能为空',
-    'daicuo_token_empty'                    => '未绑定开放平台密钥、申请后填至(设置>全局设置)',
-    'daicuo_token_error'                    => '开放平台密钥错误',
+    'daicuo_token_empty'                    => '<p>请先绑定您在呆错开放平台的唯一令牌标识<p/><p><a href="../index/token" target="_blank">免费申请</a>后填至(后台>设置>全局设置>联盟令牌)</p>',
+    'daicuo_token_error'                    => '开放平台令牌错误',
     'daicuo_score_error'                    => '开放平台积分不足',
     //应用市场在线升级
     'apply_module_uninstall'                => '请先安装此应用',

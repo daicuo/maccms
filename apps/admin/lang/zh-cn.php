@@ -140,6 +140,7 @@ return [
     'web_directory'                     => '网站目录',
     'physical_path'                     => '物理路径',
     'web_domain'                        => '网站域名IP',
+    'database_type'                     => '数据库类型',
     'php_version'                       => 'PHP版本',
     'php_engine'                        => 'PHP引擎',
     'email_funtion'                     => '邮件发送需要用到的组件',
