@@ -26,7 +26,7 @@
       <p class="my-2 text-muted">{$apply.info|DcHtml}</p>
       <p class="my-0">
       	{eq name="apply.install" value="true"}
-          <a class="btn btn-sm btn-purple" href="{:DcUrlAddon( ['module'=>'index','controll'=>'admin','action'=>'index'] )}">{:lang('manage')}</a>
+          <a class="btn btn-sm btn-purple" href="{:DcUrlAddon( ['module'=>$apply['module'],'controll'=>'admin','action'=>'index'] )}">{:lang('manage')}</a>
           {if $apply['disable']}
             <a class="btn btn-sm btn-warning" href="{:DcUrl('/admin/apply/enable',['module'=>$apply['module']],'')}">{:lang('enable')}</a>
           {else/}

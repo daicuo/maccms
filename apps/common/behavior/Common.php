@@ -14,16 +14,20 @@ namespace app\common\behavior;
 class Common
 {
     //应用初始化
-    public function appInit(&$params){
+    public function appInit(&$params)
+    {
         //加载缓存配置
-        DcLoadConfig('./datas/config/cache.php');
+        if( !\think\Env::get('cache.type') ){
+            DcLoadConfig('./datas/config/cache.php');
+        }
         //加载路由配置
         action('common/Route/appInt','','event');
         //Route::rule('new/:id','home/News/read');
     }
     
     //应用开始
-    public function appBegin(&$params){
+    public function appBegin(&$params)
+    {
         //加载框架动态配置
         action('common/Op/appBegin','','event');
         //主域名与移动端域名切换
@@ -33,7 +37,8 @@ class Common
     }
     
     //模块初始化
-    public function moduleInit(&$params){
+    public function moduleInit(&$params)
+    {
         //获取当前模块名
         $module = request()->module();
         //加载框架所有应用插件信息配置函数等

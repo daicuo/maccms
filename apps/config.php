@@ -106,20 +106,27 @@ return [
         'auto_start'     => true,
     ],
     
-    /*    
-    'cache'                  => [
+     
+    'cache' => [
         // 驱动方式
-        'type'   => 'File',
+        'type'   => Env::get('cache.type', 'File'),
         // 缓存保存目录
-        'path'   => RUNTIME_PATH.'cache/',
+        'path'   => Env::get('cache.path', RUNTIME_PATH.'cache/'),
         // 缓存前缀
-        'prefix' => '',
+        'prefix' => Env::get('cache.prefix', ''),
+        // sqlite3缓存数据库
+        'db'     => Env::get('cache.db', RUNTIME_PATH.'db/#cache.s3db'),
+        // 缓存服务器主机IP
+        'host'   => Env::get('cache.host', '127.0.0.1'),
+        // 缓存服务器端口
+        'port'   => Env::get('cache.port', '6379'),
         // 缓存有效期 0表示永久缓存
-        'expire' => 0,
-            // sqlite3缓存数据库
-            'db'   => RUNTIME_PATH.'cache.s3db',
-        ],                
-    */
+        'expire' => Env::get('cache.expire', 0),
+        // 缓存有效期 内容
+        'expire_detail' => Env::get('cache.expire_detail', ''),
+        // 缓存有效期 列表
+        'expire_item'   => Env::get('cache.expire_item', ''),
+    ],
   
     // 错误显示信息,非调试模式有效
     'error_message'          => '页面错误！请稍后再试～',
@@ -147,7 +154,7 @@ return [
     //系统特殊变量
     'daicuo' => [
         'error'   => 'fail',
-        'version' => '1.4.71',
+        'version' => '1.5.4',
     ],
     
     //系统基础配置
