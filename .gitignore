@@ -3,8 +3,8 @@
 .idea
 .env
 /apps/database.php
+/datas/log/
+/datas/cache/
+/datas/temp/
 /datas/config/cache.php
 /datas/db/#cache.s3db
-/datas/log/*
-/datas/cache/*
-/datas/temp/*
