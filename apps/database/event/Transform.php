@@ -12,20 +12,23 @@ use think\Db;
 class Transform extends Controller
 {
 	
-	public function _initialize(){
-		parent::_initialize();
-	}
+    public function _initialize()
+    {
+        parent::_initialize();
+    }
 
-	public function index(){
+    public function index()
+    {
         return $this->fetch('database@transform/index');
-	}
+    }
     
     //执行转换
-    public function update(){
+    public function update()
+    {
         //获取MYSQL配置信息
         $data = [
             'type'      => 'mysql',
-            'dsn'       => '',
+            'sn'        => '',
             'charset'   => 'utf8',
             'hostname'  => input('post.hostname/s', '127.0.0.1'),
             'database'  => input('post.database/s', 'daicuo'),
@@ -42,14 +45,14 @@ class Transform extends Controller
             $this->error('请检查主机地址/用户名/密码/端口');
         }
         // 数据库不存在,尝试建立
-		if(!@mysql_select_db($data['database'])){
+		    if(!@mysql_select_db($data['database'])){
             //创建数据库语句
-			mysql_query("CREATE DATABASE `".$data["database"]."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
+			      mysql_query("CREATE DATABASE `".$data["database"]."` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
             //数据库创建失败
             if(!@mysql_select_db($data['database'])){
                 $this->error('MYSQL用户没有建立数据库的权限');
             }
-		}
+		    }
         //手动关闭MYSQL链接
         mysql_close($connect);
         
@@ -82,6 +85,8 @@ class Transform extends Controller
         
         //创建SQLITE备份文件
         $database = new dbOper($file, $config);
+        
+        //是否有MYSQL数据库写入权限
         if($database->create() !== false) {
             // 备份指定表
             foreach(\think\Db::getTables() as $table){
@@ -112,11 +117,11 @@ class Transform extends Controller
         Dir::delDir($config['path']);
         
         //创建MYSQL连接配置
-        write_arr2file('./apps/database.php', $data);
+        write_array('./apps/database.php', $data);
         
         //转换完成
         $this->success(lang('success'));
-	}
+    }
     
     //导入数据
     public function import($fileName, $config)

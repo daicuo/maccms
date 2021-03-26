@@ -218,11 +218,14 @@ class Database {
         $result = Db::query("select * from sqlite_master");
         //备份表结构
         if(0 == $start){
+            //生成建表语句列表
             $result = Db::query("select * from sqlite_master where type = 'table' and name = '".$table."'");
+            //生成索引语句列表
             $index = Db::query("select * from sqlite_master where type = 'index' and tbl_name = '".$table."'");
-            //生成建表语句
+            //建表语句处理
             if($result[0]['sql']){
                 $sql_create = preg_replace('/\[(.*)\]/i',"`$1`",$result[0]['sql']);
+                $sql_create = str_replace(['“','”'],'`',$sql_create);
                 $sql_create = str_replace(['AUTOINCREMENT','TEXT','INTEGER'],['AUTO_INCREMENT','LONGTEXT','BIGINT(20)'],$sql_create);
             }
             $sql  = "\n";
@@ -231,19 +234,18 @@ class Database {
             $sql .= "-- -----------------------------\n";
             $sql .= "DROP TABLE IF EXISTS `{$table}`;\n";
             $sql .= trim($sql_create) . "ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;\n";
-            //生成索引语句
+            //索引语句处理
             foreach($index as $key=>$value){
                 if($value['sql']){
-                    $sql .= str_replace(['[',']'],['`','`'],trim($value['sql'])) . ";\n";
+                    $sql .= str_replace(['[',']','“','”'], '`', trim($value['sql'])) . ";\n";
                 }
             }
             //还原不需要转换的字段
-            $sql = str_replace('`op_order` BIGINT(20)', '`op_order` INT(11)', $sql);
             $sql = str_replace('`info_excerpt` LONGTEXT', '`info_excerpt` TEXT', $sql);
+            $sql = str_replace('`term_much_count` BIGINT(20)', '`term_much_count` INT(11)', $sql);
             $sql = str_replace('create_time` BIGINT(20)', 'create_time` INT(11)', $sql);
             $sql = str_replace('update_time` BIGINT(20)', 'update_time` INT(11)', $sql);
             $sql = str_replace('order` BIGINT(20)', 'order` INT(11)', $sql);
-            $sql = str_replace('`term_much_count` BIGINT(20)', '`term_much_count` INT(11)', $sql);
             //生成语句
             if(false === $this->write($sql)){
                 return false;
