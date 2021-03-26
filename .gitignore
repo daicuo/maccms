@@ -2,9 +2,3 @@
 *.temp
 .idea
 .env
-/datas/log/
-/datas/cache/
-/datas/temp/
-/datas/config/
-/datas/db/#cache.s3db
-/apps/database.php
