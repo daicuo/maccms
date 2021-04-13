@@ -254,7 +254,7 @@ class Sql
         
         //更新应用打包配置
         $result = \daicuo\Op::write([
-            'apply_version'   => '1.3.0',
+            'apply_version'   => '1.3.2',
         ]);
         if(!$result){
             return false;

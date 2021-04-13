@@ -10,7 +10,8 @@ use think\Controller;
 class Admin extends Controller
 {
 	
-	public function _initialize(){
+	public function _initialize()
+    {
 		parent::_initialize();
 	}
     
@@ -76,5 +77,16 @@ class Admin extends Controller
 		    $this->error(lang('fail'));
         }
         $this->success(lang('success'));
+	}
+    
+    //手动执行升级脚本
+    public function upgrade()
+    {
+        $apply = controller('common/Apply','event');
+        if( !$apply->install('maccms','upgrade') ){
+            $error = explode('%',$apply->getError());
+            $this->error(lang($error[0]).$error[2],$error[1]);
+        }
+        $this->success(lang('success'), 'store/index');
 	}
 }
