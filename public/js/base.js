@@ -638,7 +638,7 @@ window.daicuo.language = {
     // 默认值
     defaults : {
         selector: '',//document.body
-        method: 's2t'//s2t||t2s||auto||refresh
+        method: 'auto'//s2t||t2s||auto||refresh
     },
     // 初始化调用
     init: function(options){
@@ -891,7 +891,7 @@ window.daicuo.page = {
                 //window.history.pushState(null, null, $url+$page);
                 //图片懒加载
                 if( $event.data('target-lazyload') ){
-                    daicuo.lazyload.init({target:$event.data('target-lazyload')});
+                    daicuo.lazyload.init({selector:$event.data('target-lazyload')});
                 }
                 //是否简繁转化
                 if( $event.data('target-language') ){

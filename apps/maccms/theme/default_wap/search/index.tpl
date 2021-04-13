@@ -19,7 +19,7 @@
 </section>
 <!--page start -->
 <section>
-  <a class="btn btn-block btn-outline-light text-light bg-info" data-toggle="pageClick" data-pageScroll="false" data-url="{:DcUrl('maccms/search/'.action,['wd'=>DcHtml($wd)],'')}&page=" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+  <a class="btn btn-block btn-outline-light text-light bg-info" data-pageClick="true" data-pageScroll="false" data-url="{:DcUrl('maccms/search/'.action,['wd'=>DcHtml($wd)],'')}&page=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
 </section>
 <!-- -->
 </div> <!-- /container -->

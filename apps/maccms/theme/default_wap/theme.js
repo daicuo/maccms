@@ -16,9 +16,8 @@ $(function(){
             });
         }
 	});
-	daicuo.lazyload.image();
-	daicuo.language.s2t();
-	daicuo.page.click();
-	daicuo.page.scroll();
+	daicuo.lazyload.init();
+	daicuo.language.init({method:'auto'});
+	daicuo.page.init();
     daicuo.fn.filter();
 });

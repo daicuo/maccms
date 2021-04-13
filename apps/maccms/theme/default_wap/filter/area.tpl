@@ -26,8 +26,8 @@
 <!--page start -->
 <div class="row mx-1">
   <div class="col-12 px-1">
-    <a class="btn btn-block btn-outline-secondary" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/area',['id'=>DcHtml($id),
-    'page'=>''],'')}" data-page="{$current_page}" data-target="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/area',['id'=>DcHtml($id),
+    'page'=>''],'')}" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
   </div>
 </div>
 <!-- -->

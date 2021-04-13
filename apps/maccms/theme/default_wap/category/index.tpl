@@ -28,7 +28,7 @@
 <!--page start -->
 <div class="row mx-2 mt-2">
   <div class="col-12 px-1">
-    <a class="btn btn-block btn-outline-dark" data-toggle="pageClick" data-pageScroll="true" data-url="{:DcUrl('maccms/category/'.$action,['id'=>$term_id,'page'=>''],'')}" data-page="1" data-target="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
+    <a class="btn btn-block btn-outline-dark" data-pageClick="true" data-pageScroll="true" data-url="{:DcUrl('maccms/category/'.$action,['id'=>$term_id,'page'=>''],'')}" data-page="1" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">查看更多 <i class="fa fa-lg fa-angle-down"></i></a>
   </div>
 </div>
 <!-- -->
