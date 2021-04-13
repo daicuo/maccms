@@ -29,21 +29,22 @@ return [
     //默认后缀
     'url_html_suffix'   => 'html',
     
-    // 默认全局过滤方法 用逗号分隔多个
+    //默认全局过滤方法 用逗号分隔多个
     'default_filter'   => 'trim,htmlspecialchars_decode',
-    
-    // 是否开启路由
+
+    //是否开启路由
     'url_route_on'  =>  true,
     
-    // 是否强制路由
+    //是否强制路由
     'url_route_must'=>  false,
     
     //域名路由
     'url_domain_deploy' =>  true,
 
-    // 扩展函数文件
+    //扩展函数文件
     'extra_file_list'   => [THINK_PATH . 'helper' . EXT, APP_PATH . 'helper' . EXT],
     
+    //日志配置
     'log'   => [
         //file|socket|test
         'type'         => 'test',
@@ -51,7 +52,7 @@ return [
         'level'        => ['error'],
         //最多只会保留30个
         'max_files'    => 30,
-        // error和sql日志单独记录
+        //error和sql日志单独记录
         'apart_level'  => ['error','sql'],
     ],
   
@@ -128,10 +129,10 @@ return [
         'expire_item'   => Env::get('cache.expire_item', ''),
     ],
   
-    // 错误显示信息,非调试模式有效
+    //错误显示信息,非调试模式有效
     'error_message'          => '页面错误！请稍后再试～',
 
-    // 显示错误信息
+    //显示错误信息
     'show_error_msg'         => false,
     
     //默认错误跳转对应的模板文件
@@ -140,7 +141,7 @@ return [
     //默认成功跳转对应的模板文件
     'dispatch_success_tmpl'  => APP_PATH . 'common' . DS . 'view' . DS . 'thinkphp' . DS .'dispatch_jump.tpl',
     
-    // 异常页面的模板文件
+    //异常页面的模板文件
     'exception_tmpl'         => APP_PATH . 'common' . DS . 'view' . DS . 'thinkphp' . DS .'think_exception.tpl',
     
     //404页面定义 部署模式才生效
@@ -154,7 +155,7 @@ return [
     //系统特殊变量
     'daicuo' => [
         'error'   => 'fail',
-        'version' => '1.5.4',
+        'version' => '1.5.19',
     ],
     
     //系统基础配置
@@ -223,6 +224,8 @@ return [
         'editor'   => APP_PATH.'common/view/form/editor.tpl',
         'image'    => APP_PATH.'common/view/form/image.tpl',
         'file'     => APP_PATH.'common/view/form/file.tpl',
+        'datetime' => APP_PATH.'common/view/form/datetime.tpl',
+        'captcha'  => APP_PATH.'common/view/form/captcha.tpl',
         'default'  => APP_PATH.'common/view/form/default.tpl'
     ],
     

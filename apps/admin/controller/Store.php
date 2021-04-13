@@ -29,18 +29,18 @@ class Store extends Admin
             //数据处理
             foreach($data['list'] as $key=>$value){
                 $operate = array();
+                $operate['demo']     = '<a class="btn btn-sm btn-outline-secondary" href="'.$value['demo'].'" target="_blank"><i class="fa fa-eye mr-1"></i>'.lang('demo').'</a>';
+                $operate['forum']    = '<a class="btn btn-sm btn-secondary" href="'.$value['forum'].'" target="_blank"><i class="fa fa-comment mr-1"></i>'.lang('forum').'</a></div><div class="btn-group">';
+                $operate['down']     = '<a class="btn btn-sm btn-outline-purple" href="'.DcUrl('apply/down',['module'=>$value['module'],'version'=>$value['version']]).'" target="_blank"><i class="fa fa-download mr-1"></i>'.lang('down').'</a>';
                 if($apps[$value['module']]){
+                    $operate['delete']  = '<a class="btn btn-sm btn-danger" href="'.DcUrl('apply/delete',['module'=>$value['module']]).'" data-toggle="delete"><i class="fa fa-trash-o mr-1"></i>'.lang('delete').'</a>';
                     if($apps[$value['module']]['version'] != $value['version']){
-                        $operate['upgrade']  = '<a class="btn btn-sm btn-primary mr-1" href="'.DcUrl('apply/upgrade',['module'=>$value['module']]).'" data-toggle="get"><i class="fa fa-arrow-up mr-1"></i>'.lang('upgrade').'</a>';
+                        $operate['upgrade']  = '<a class="btn btn-sm btn-outline-purple" href="'.DcUrl('apply/upgrade',['module'=>$value['module']]).'" data-toggle="get"><i class="fa fa-arrow-up mr-1"></i>'.lang('upgrade').'</a>';
                     }
-                    $operate['delete']  = '<a class="btn btn-sm btn-danger mr-1" href="'.DcUrl('apply/delete',['module'=>$value['module']]).'" data-toggle="delete"><i class="fa fa-trash-o mr-1"></i>'.lang('delete').'</a>';
                 }else{
-                    $operate['install']  = '<a class="btn btn-sm btn-success mr-1" href="'.DcUrl('apply/install',['module'=>$value['module'],'version'=>$value['version']]).'" data-toggle="get"><i class="fa fa-cloud-download mr-1"></i>'.lang('install').'</a>';
+                    $operate['install']  = '<a class="btn btn-sm btn-purple" href="'.DcUrl('apply/install',['module'=>$value['module'],'version'=>$value['version']]).'" data-toggle="get"><i class="fa fa-cloud-download mr-1"></i>'.lang('install').'</a>';
                 }
-                $operate['down']     = '<a class="btn btn-sm btn-secondary mr-1" href="'.DcUrl('apply/down',['module'=>$value['module'],'version'=>$value['version']]).'" target="_blank"><i class="fa fa-download mr-1"></i>'.lang('down').'</a>';
-                $operate['forum']    = '<a class="btn btn-sm btn-purple mr-1" href="'.$value['forum'].'" target="_blank"><i class="fa fa-comment mr-1"></i>'.lang('forum').'</a>';
-                $operate['demo']     = '<a class="btn btn-sm btn-info" href="'.$value['demo'].'" target="_blank"><i class="fa fa-flash mr-1"></i>'.lang('demo').'</a>';
-                $data['list'][$key]['operate'] = implode('',$operate);
+                $data['list'][$key]['operate'] = '<div class="btn-group mr-1">'.implode('',$operate).'</div>';
             }
             return json($data['list']);
         }

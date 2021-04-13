@@ -111,6 +111,7 @@ return [
     'target_option_2'                       => '父窗口',
     'target_option_3'                       => '顶层窗品',
     'target_option_4'                       => '固定窗口',
+    'captcha_rewrite'                       => '验证码需重新填写',
     //常用验证提示
     'alpha_module'                          => '模块名必须且为纯字母',
     'download_failed'                       => '文件下载失败',
@@ -262,12 +263,13 @@ return [
     'apply_rely'                            => '依赖应用',
     'apply_rely_placeholder'                => '多个插件用逗号分隔，在此列表内的应用将禁止卸载',
     //本地应用安装应用
-    'apply_fail_op'                         => '插件列表处理失败',
-    'apply_fail_sql'                        => '执行插件脚本出错，请检查',
+    'apply_fail_op'                         => '插件列表获取失败',
+    'apply_fail_sql'                        => '执行插件脚本出错',
     'apply_fail_rely'                       => '系统核心模块，禁止卸载',
-    'apply_fail_update'                     => '版本过低，请先升级',
+    'apply_fail_update_frame'               => '框架版本不匹配，适用于DaiCuo',
+    'apply_fail_update_app'                 => '插件版本不匹配，适用于',
     'apply_fail_datatype'                   => '数据库类型不支持，请更换框架数据库类型',
-    'apply_fail_uninstall'                  => '还未安装，请先安装后再重新安装此插件',
+    'apply_fail_uninstall'                  => '安装此插件前需要先安装',
     'apply_fail_disable'                    => '插件已禁用，请至后台>应用>开启',
     //应用市场在线安装
     'apply_download_failed'                 => '应用下载失败（请尝试手动下载安装）',

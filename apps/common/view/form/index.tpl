@@ -41,7 +41,7 @@
 {case value="select"}
     {include file="$view.select" /}
 {/case}
-{case value="select.custom"}
+{case value="custom"}
     {include file="$view.custom" /}
 {/case}
 {case value="image"}
@@ -52,6 +52,12 @@
 {/case}
 {case value="editor"}
     {include file="$view.editor" /}
+{/case}
+{case value="datetime"}
+    {include file="$view.datetime" /}
+{/case}
+{case value="captcha"}
+    {include file="$view.captcha" /}
 {/case}
 {default /}
     {include file="$view.default" /}

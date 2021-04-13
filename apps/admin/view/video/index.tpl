@@ -37,7 +37,7 @@
             'class_tips'=>'',
         ],
         [
-            'type'=>'select.custom',
+            'type'=>'custom',
             'name'=>'video_size',
             'id'=>'video_size',
             'title'=>lang('video_size'),

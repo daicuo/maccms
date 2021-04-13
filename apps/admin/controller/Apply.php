@@ -18,11 +18,7 @@ class Apply extends Admin
         $apply = controller('common/Apply','event');
         if( !$apply->upgradeOnline($this->query['module']) ){
             $error = explode('%',$apply->getError());
-            if($error[2]){
-                $this->error($error[1].lang($error[0]),$error[2]);
-            }else{
-                $this->error($error[1].lang($error[0]),'store/index/?searchText='.$error[1]);
-            }
+            $this->error(lang($error[0]).$error[2],$error[1]);
         }
         $this->success(lang('success'));
     }
@@ -33,11 +29,7 @@ class Apply extends Admin
         $event = controller('common/Apply','event');
         if( !$event->installOnline($this->query) ){
             $error = explode('%',$event->getError());
-            if($error[2]){
-                $this->error($error[1].lang($error[0]),$error[2]);
-            }else{
-                $this->error($error[1].lang($error[0]),'store/index/?searchText='.$error[1]);
-            }
+            $this->error(lang($error[0]).$error[2],$error[1]);
 		}
         $this->success(lang('success'));
 	}
@@ -105,17 +97,13 @@ class Apply extends Admin
         $this->success(lang('success'),'apply/index');
     }
     
-    // 本地安装
+    // 本地手动安装
 	public function update()
     {
         $event = controller('common/Apply','event');
         if( !$event->install( input('get.module/s') ) ){
             $error = explode('%',$event->getError());
-            if($error[2]){
-                $this->error($error[1].lang($error[0]),$error[2]);
-            }else{
-                $this->error($error[1].lang($error[0]),'store/index/?searchText='.$error[1]);
-            }
+            $this->error(lang($error[0]).$error[2],$error[1]);
 		}
         $this->success(lang('success'));
 	}

@@ -9,7 +9,7 @@
 	{:lang("apply_create")}
 </h6>
 {:DcBuildForm([
-    'class'=>'bg-white px-0 py-2',
+    'class'=>'bg-white px-2 py-2',
     'action'=>DcUrl('admin/apply/save', '', ''),
     'method'=>'post',
     'ajax'=>true,

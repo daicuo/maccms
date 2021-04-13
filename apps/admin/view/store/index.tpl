@@ -112,6 +112,7 @@
             'data-align'=>'left',
             'data-halign'=>'center',
         ],
+        
         [
             'data-field'=>'info',
             'data-title'=>lang('info'),
@@ -119,12 +120,13 @@
             'data-halign'=>'center',
         ],
         [
-            'data-field'=>'module',
-            'data-title'=>lang('module'),
-            'data-width'=>'10',
+            'data-field'=>'version',
+            'data-title'=>lang('version'),
+            'data-width'=>'6',
             'data-width-unit'=>'%',
             'data-align'=>'center',
             'data-halign'=>'center',
+            'data-formatter'=>'',
         ],
         [
             'data-field'=>'view',
@@ -149,19 +151,10 @@
             'data-halign'=>'center',
         ],
         [
-            'data-field'=>'version',
-            'data-title'=>lang('version'),
-            'data-width'=>'6',
-            'data-width-unit'=>'%',
-            'data-align'=>'center',
-            'data-halign'=>'center',
-            'data-formatter'=>'',
-        ],
-        [
             'data-field'=>'operate',
             'data-title'=>lang('operate'),
-            //'data-width'=>'20',
-            //'data-width-unit'=>'%',
+            'data-width'=>'30',
+            'data-width-unit'=>'%',
             'data-align'=>'center',
             'data-halign'=>'center',
             'data-formatter'=>'',

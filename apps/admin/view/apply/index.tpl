@@ -17,7 +17,7 @@
 {else/}
 <ul class="list-unstyled">
   {volist name="applys" id="apply"}
-  <li class="media bg-white mb-2 py-3 border-bottom">
+  <li class="media bg-white mb-2 px-2 py-3 border-bottom">
     <div class="media-body">
       <h6>
         <strong>{$apply.name|DcHtml}</strong>

@@ -40,13 +40,13 @@ body {
     z-index:2;
 }
 .sidebar {
-    position: relative;
+    position: -webkit-sticky;
+    position: sticky;
     top: 0;
-    min-height: calc(100vh - 53px);
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    display: block !important;
+    height: calc(100vh - 53px);
+    overflow-y: auto;
+    /*box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);*/
 }
 .scrollbar::-webkit-scrollbar {/*滚动条整体样式*/
     width: 5px;

@@ -87,7 +87,7 @@ return [
     'cache_expire_item_placeholder'     => '循环数据缓存时间(秒)，留空不启用缓存，0为永久缓存',
     //系统>>常规管理
     'clear_cache'                       => '清空系统缓存',
-    'clear_runtime'                     => '清空系统临时文件', 
+    'clear_runtime'                     => '清空临时文件', 
     'clear_option'                      => '清空系统配置',
     //系统>>路由管理
     'route_rule'                        => '伪静态结构',

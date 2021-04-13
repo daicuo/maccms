@@ -66,8 +66,8 @@ $(function() {
     window.daicuo.upload.init();
     window.daicuo.json.init();
     window.daicuo.table.init({
-        'urlSort': window.daicuo.config.file + '/' + window.daicuo.config.controll + '/sort?id=',
-        'urlEdit': window.daicuo.config.file + '/' + window.daicuo.config.controll + '/edit?id=',
-        'urlDelete': window.daicuo.config.file + '/' + window.daicuo.config.controll + '/delete?id='
+        urlSort: window.daicuo.config.file + '/' + window.daicuo.config.controll + '/sort?id=',
+        urlEdit: window.daicuo.config.file + '/' + window.daicuo.config.controll + '/edit?id=',
+        urlDelete: window.daicuo.config.file + '/' + window.daicuo.config.controll + '/delete?id='
     });
 }); //jquery

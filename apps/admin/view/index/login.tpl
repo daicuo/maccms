@@ -6,23 +6,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta name="renderer" content="webkit">
 <title>{:lang('admin_login')}</title>
-<link href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-<script src="//lib.baomitu.com/jquery/3.3.1/jquery.slim.min.js"></script>
-<link href="//lib.baomitu.com/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-<script src="//lib.baomitu.com/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="//lib.baomitu.com/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<link href="{$path_root}public/css/base.css" rel="stylesheet">
-<link href="{$path_root}{$path_view}theme.css" rel="stylesheet">
-<script>
-$(document).ready(function(){
-    $('#captcha').attr('src', '../../?s=captcha&r=' + Math.random());
-    $('#captcha').on('click',function(){
-        $(this).attr('src', '../../?s=captcha&r=' + Math.random());
-    });
-});
-</script>
+<!-- fonts -->
+<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.css">
+<!-- bootsrtap -->
+<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<!-- base.css -->
+<link rel="stylesheet" type="text/css" href="{$path_root}public/css/base.css?{:config('daicuo.version')}">
+<!-- theme.css -->
+<link rel="stylesheet" type="text/css" href="{$path_root}{$path_view}theme.css?{:config('daicuo.version')}">
+<!-- jquery -->
+<script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+<!-- bootsrtap -->
+<script type="text/javascript" src="//lib.baomitu.com/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+<!-- base.js-->
+<script type="text/javascript" src="{$path_root}public/js/base.js?{:config('daicuo.version')}" data-id="daicuo" data-file="{$file}" data-root="{$path_root}" data-view="{$path_view}" data-upload="{$path_upload}" data-module="{$module}" data-controll="{$controll}" data-action="{$action}" data-page="{$page}" data-user-id="{$user.user_id|default=0}" data-lang="{:config('default_lang')}"></script>
 </head>
-<body class="bg-light">
+<body>
 <div class="container">
   <div class="row">
     <div class="col-md-6 offset-md-3 col-lg-4 offset-lg-4 pt-5">
@@ -31,27 +30,27 @@ $(document).ready(function(){
           {:lang('admin_login')}
         </div>
         <div class="card-body pb-2">
-          <form action="{:DcUrl('admin/index/login','','','')}" method="post" role="form">
+          <form action="{:DcUrl('admin/index/login','','','')}" method="post" role="form" data-toggle="form">
           <div class="input-group input-group-sm mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
             </div>
-            <input type="text" class="form-control" name="user_name" value="" required="true" placeholder="{:lang('user_name')}">
+            <input type="text" class="form-control" id="user_name" name="user_name" required="true" placeholder="{:lang('user_name')}" autocomplete="off">
           </div>
           <div class="input-group input-group-sm mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-fw fa-lock"></i></span>
             </div>
-            <input type="password" class="form-control" name="user_pass" value="" required="true" placeholder="{:lang('user_pass')}">
+            <input type="password" class="form-control" id="user_pass" name="user_pass" required="true" placeholder="{:lang('user_pass')}" autocomplete="off">
           </div>
           <div class="input-group input-group-sm mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-fw fa-key"></i></span>
             </div>
-            <input type="text" class="form-control" name="user_captcha" value="" required="true" autocomplete="off" placeholder="{:lang('user_captcha')}">
+            <input type="text" class="form-control" id="user_captcha" name="user_captcha" required="true" placeholder="{:lang('user_captcha')}" autocomplete="off">
           </div>
           <p class="card-text border rounded py-2 mb-3">
-            <img class="img-fluid" id="captcha" style="cursor:pointer" src="{$path_root}public/images/x.gif" alt="{:lang('user_captcha')}" />
+            <img class="img-fluid" id="captcha" src="{$path_root}public/images/x.gif" alt="{:lang('user_captcha')}" data-toggle="captcha"/>
           </p>
           <p class="card-text">
               <button class="btn btn-info btn-block mb-3 btn-purple" type="submit">{:lang('login')}</button>
@@ -71,5 +70,44 @@ $(document).ready(function(){
     </div>
   </div>
 </div>
+<script language="javascript">
+$(document).ready(function(){
+
+    window.daicuo.captcha.refresh();
+    
+    window.daicuo.captcha.init();
+    
+    $(document).on('submit', '[data-toggle="form"]', function() {
+        var self = $(this);
+        
+        self.find('.is-invalid').removeClass('is-invalid');
+        
+        self.find('.invalid-feedback').remove();
+        
+        daicuo.ajax.post($(this).attr('action'), $(this).serialize(), function($data, $status, $xhr) {
+            var $field = '';
+            
+            var $msg = $data.msg.split('%');
+            
+            if($msg.length > 1){
+                $field = $msg[0];
+                $msg = $msg[1];
+            }
+            if ($data.code == 1) {
+                window.location.href = $data.url;
+            }else{
+                self.find('#'+$field).removeClass('is-valid').addClass('is-invalid');
+                
+                self.find('#'+$field).after('<div class="invalid-feedback pt-2 mb-0 text-left">'+$msg+'</div>');
+                
+                $('#user_captcha').attr('placeholder','{:lang("captcha_rewrite")}').val('');
+                
+                window.daicuo.captcha.refresh({element:'#captcha'});
+            }
+        });
+        return false;
+    });
+});
+</script>
 </body>
 </html>

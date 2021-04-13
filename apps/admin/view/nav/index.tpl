@@ -158,7 +158,7 @@
 {/block}
 <!-- -->
 {block name="js"}
-<script>
+<script language="javascript">
 //回调操作
 callAjax = function($data, $status, $xhr) {
     daicuo.bootstrap.dialogForm($data);

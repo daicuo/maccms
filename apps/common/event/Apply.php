@@ -151,8 +151,9 @@ class Apply
         $applys = config('common.site_applys');
         //数据库依赖验证
         if( config('apply.datatype') ){
+            //数据库不匹配
             if( !in_array(config('database.type'), config('apply.datatype')) ){
-                $this->error = 'apply_fail_datatype%database';//数据库不匹配
+                $this->error = 'apply_fail_datatype%store/index/?searchText=database';
                 return false;
             }
         }
@@ -160,17 +161,21 @@ class Apply
         $version = new \daicuo\Version();
         foreach(config('apply.rely') as $key=>$value){
             if($key == 'daicuo'){
+                //验证框架版本
                 if( !$version->check(config('daicuo.version'), $value) ){
-                    $this->error = 'apply_fail_update%daicuo%index/index#update';//请升级框架
+                    $this->error = 'apply_fail_update_frame%index/index#update%'.implode(',',$value);
                     return false;
                 }
             }else{
+                //验证依赖插件
                 if( is_null($applys[$key]) ){
-                    $this->error = 'apply_fail_uninstall%'.$key;//未安装依赖插件
+                    //未安装依赖插件
+                    $this->error = 'apply_fail_uninstall%store/index/?searchText='.$key.'%'.$key.implode(',',$value);
                     return false;
                 }else{
+                    //依赖插件版本过低
                     if( !$version->check($applys[$key]['version'], $value) ){
-                        $this->error = 'apply_fail_update%'.$key;//依赖插件版本过低
+                        $this->error = 'apply_fail_update_app%store/index/?searchText='.$key.'%'.$key.implode(',',$value);
                         return false;
                     }
                 }

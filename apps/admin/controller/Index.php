@@ -38,7 +38,11 @@ class Index extends Admin
                 $this->error(config('daicuo.error'));
             }
             
-            $this->redirect('index/index', '', '');
+            if( $this->request->isAjax() ){
+                $this->success(lang('success'), 'index/index');
+            }else{
+                $this->redirect('index/index', '', '');
+            }
         }
         
         if($this->site['user']['user_id']){
