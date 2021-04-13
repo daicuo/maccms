@@ -76,7 +76,7 @@
             'class_tips'=>'',
         ],
         [
-            'type'=>'select.custom',
+            'type'=>'custom',
             'name'=>'theme',
             'id'=>'theme',
             'title'=>lang('site_theme'),
@@ -95,7 +95,7 @@
             'class_tips'=>'',
         ],
         [
-            'type'=>'select.custom',
+            'type'=>'custom',
             'name'=>'theme_wap',
             'id'=>'theme_wap',
             'title'=>lang('wap_theme'),
@@ -114,7 +114,7 @@
             'class_tips'=>'',
         ],
         [
-            'type'=>'select.custom',
+            'type'=>'custom',
             'name'=>'api_search',
             'id'=>'api_search',
             'title'=>lang('api_search'),

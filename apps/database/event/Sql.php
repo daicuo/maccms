@@ -18,6 +18,12 @@ class Sql
     */
     public function upgrade()
     {
+        //更新应用配置信息
+        $event = controller('common/Apply','event');
+        $result = $event->updateStatus('database', 'enable');
+        if(!$result){
+            return false;
+        }
         return true;
     }
     

@@ -16,10 +16,10 @@
 <div class="toolbar mb-2" id="toolbar">
   <div class="btn-group btn-group-sm">
     <button class="btn btn-outline-secondary" type="submit" data-toggle="submit" data-action="{:DcUrlAddon(['module'=>'database','controll'=>'admin','action'=>'export'])}">
-      <i class="fa fa-trash"></i> {:lang('database_manage_export')}
+      <i class="fa fa-file"></i> {:lang('database_manage_export')}
     </button>
     <button class="btn btn-outline-secondary" type="submit" data-toggle="submit" data-action="{:DcUrlAddon(['module'=>'database','controll'=>'admin','action'=>'optimize'])}">
-      <i class="fa fa-trash"></i> {:lang('database_manage_optimize')}
+      <i class="fa fa-wrench"></i> {:lang('database_manage_optimize')}
     </button>
     <button class="btn btn-outline-secondary" type="submit" data-toggle="submit" data-action="{:DcUrlAddon(['module'=>'database','controll'=>'admin','action'=>'repair'])}">
       <i class="fa fa-trash"></i> {:lang('database_manage_repair')}

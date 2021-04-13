@@ -71,27 +71,29 @@ class Import extends Controller
     // 删除备份文件
     public function delete()
     {
-        $id = input('request.id/s');
+        $ids = input('request.id/a');
         
-        if (empty($id)) {
+        if (empty($ids)) {
             return $this->error(lang('mustIn'));
         }
         
         $data = $this->filesList( config('database_backup_path') ) ;
         
-        if($data[$id]){
+        foreach($ids as $key=>$id){
+            if($data[$id]){
         
-            $file = new \files\File();
-            
-            $max = $data[$id]['count'];
-            
-            $extension = DcDefault($data[$id]['extension'],'sql','.sql','.sql.gz');
-            
-            for($i=1;$i<=$max;$i++){
-            
-                $filePath = config('database_backup_path').$data[$id]['name'].'-'.$i.$extension;
-                
-                $file->f_delete($filePath);
+                $file = new \files\File();
+
+                $max = $data[$id]['count'];
+
+                $extension = DcDefault($data[$id]['extension'],'sql','.sql','.sql.gz');
+
+                for($i=1;$i<=$max;$i++){
+
+                    $filePath = config('database_backup_path').$data[$id]['name'].'-'.$i.$extension;
+
+                    $file->f_delete($filePath);
+                }
             }
         }
         
