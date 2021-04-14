@@ -155,7 +155,7 @@ return [
     //系统特殊变量
     'daicuo' => [
         'error'   => 'fail',
-        'version' => '1.5.19',
+        'version' => '1.5.20',
     ],
     
     //系统基础配置
