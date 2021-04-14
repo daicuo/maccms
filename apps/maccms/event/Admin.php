@@ -82,11 +82,8 @@ class Admin extends Controller
     //手动执行升级脚本
     public function upgrade()
     {
-        $apply = controller('common/Apply','event');
-        if( !$apply->install('maccms','upgrade') ){
-            $error = explode('%',$apply->getError());
-            $this->error(lang($error[0]).$error[2],$error[1]);
-        }
+        controller('maccms/Sql','event')->upgrade();
+        
         $this->success(lang('success'), 'store/index');
 	}
 }

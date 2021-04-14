@@ -245,8 +245,15 @@ class Sql
     */
     public function upgrade()
     {
-        //更新应用配置信息
         $event = controller('common/Apply','event');
+        
+        //更新数据库基础信息
+        $result = $event->updateStatus('database', 'enable');
+        if(!$result){
+            return false;
+        }
+        
+        //更新MACCMS基础信息
         $result = $event->updateStatus('maccms', 'enable');
         if(!$result){
             return false;
