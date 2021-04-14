@@ -94,14 +94,21 @@ DcConfigMerge('admin_menu.addon',[
                 'url' => '../category/index?op_module=maccms'
             ],
             [
-                'ico' => 'fa-home',
-                'title' => '前台首页',
+                'ico' => 'fa-gear',
+                'title' => '同步升级',
                 'target' => '_self',
                 'controll' => 'admin',
                 'action' => 'home',
-                'target' => '_blank',
-                'url' => DcUrlAdmin('maccms/index/index', '', '')
+                'url' => DcUrlAddon(['module'=>'maccms','controll'=>'admin','action'=>'upgrade'])
             ],
+            [
+                'ico' => 'fa-home',
+                'title' => '前台首页',
+                'target' => '_blank',
+                'controll' => 'admin',
+                'action' => 'home',
+                'url' => DcUrlAdmin('maccms/index/index', '', '')
+            ]
         ]
     ]
 ]);
