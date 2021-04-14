@@ -31,7 +31,7 @@
 #### 联系我们
 
 - 官方网站：[www.maccms.co](https://www.maccms.co)
-- 交流论坛：[http://bbs.daicuo.net](http://bbs.daicuo.net/forum-60-1.html)
+- 交流论坛：[bbs.daicuo.net](http://bbs.daicuo.net/forum-60-1.html)
 
 
 #### 参与贡献
