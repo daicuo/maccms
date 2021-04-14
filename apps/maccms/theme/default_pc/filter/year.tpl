@@ -26,9 +26,9 @@
   <div class="d-flex justify-content-center">{$pages}</div>
 </div>
 <!--page start -->
-<div class="row d-md-none">
+<div class="row d-md-none mb-2">
   <div class="col-12 px-2 px-md-3">
-    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="true" data-url="{:DcUrl('maccms/filter/year',['id'=>DcHtml($id)],'')}&page=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="false" data-url="{:DcUrl('maccms/filter/year',['id'=>DcHtml($id)],'')}&page=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
   </div>
 </div>
 <!-- -->
