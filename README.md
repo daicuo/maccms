@@ -1,9 +1,6 @@
-# 青苹果影视系统（MacCms）
-
 #### 关于MacCms
 
-使用青苹果影视系统（MacCms）可以快速搭建一个免更新、免维护的影视聚合、影视导航、影视点播网站。
-
+青苹果影视系统简称（MacCms），使用 MacCms 可以快速搭建一个免更新、免维护的影视聚合、影视导航、影视点播网站。
 
 #### MacCms的优点
 
@@ -20,22 +17,21 @@
 #### 环境要求
 
 - PHP >= 5.4 （支持PHP7）
+- Mysql >= 5.x（可选）
 - CURL PHP Extension
-- mysql5.x-mysql8.x（可选）
 
-#### 使用说明
+#### 安装说明
 
-1. 通过官网[https://www.maccms.co](www.maccms.co)下载最新稳定版本安装
-2. 通过GIT安装（Gitee、Github）
-3. 将下载后的源码或通过GIT安装至运行环境目录
-4. 后台入口（admin.php）、默认用户名（admin）、默认密码（admin888）
-5. 前台入口（index.php）
+1. 通过官网 [www.maccms.co](https://www.maccms.co)下载最新版本上传至网站运行目录即可使用
+2. 或者通过GIT克隆本仓库代码至网站运行环境目录即可使用
+3. 后台入口（admin.php）、默认用户名（admin）、默认密码（admin888）
+4. 前台入口（index.php）
 
 
-#### 关于我们
+#### 联系我们
 
-- 官方网站：[https://www.maccms.co](www.maccms.co)
-- 交流论坛：[http://bbs.daicuo.co](http://bbs.daicuo.co)
+- 官方网站：[www.maccms.co](https://www.maccms.co)
+- 交流论坛：[http://bbs.daicuo.net](http://bbs.daicuo.net/forum-60-1.html)
 
 
 #### 参与贡献
