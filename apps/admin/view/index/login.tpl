@@ -7,30 +7,30 @@
 <meta name="renderer" content="webkit">
 <title>{:lang('admin_login')}</title>
 <!-- fonts -->
-<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.css">
+<link rel="stylesheet" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <!-- bootsrtap -->
-<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="//lib.baomitu.com/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
 <!-- base.css -->
-<link rel="stylesheet" type="text/css" href="{$path_root}public/css/base.css?{:config('daicuo.version')}">
+<link rel="stylesheet" href="{$path_root}public/css/base.css?{:config('daicuo.version')}">
 <!-- theme.css -->
-<link rel="stylesheet" type="text/css" href="{$path_root}{$path_view}theme.css?{:config('daicuo.version')}">
+<link rel="stylesheet" href="{$path_root}{$path_view}theme.css?{:config('daicuo.version')}">
 <!-- jquery -->
-<script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
 <!-- bootsrtap -->
-<script type="text/javascript" src="//lib.baomitu.com/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
+<script src="//lib.baomitu.com/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
 <!-- base.js-->
-<script type="text/javascript" src="{$path_root}public/js/base.js?{:config('daicuo.version')}" data-id="daicuo" data-file="{$file}" data-root="{$path_root}" data-view="{$path_view}" data-upload="{$path_upload}" data-module="{$module}" data-controll="{$controll}" data-action="{$action}" data-page="{$page}" data-user-id="{$user.user_id|default=0}" data-lang="{:config('default_lang')}"></script>
+<script src="{$path_root}public/js/base.js?{:config('daicuo.version')}" data-id="daicuo" data-file="{$file}" data-root="{$path_root}" data-view="{$path_view}" data-upload="{$path_upload}" data-module="{$module}" data-controll="{$controll}" data-action="{$action}" data-page="{$page}" data-user-id="{$user.user_id|default=0}" data-lang="{:config('default_lang')}"></script>
 </head>
 <body>
 <div class="container">
   <div class="row">
     <div class="col-md-6 offset-md-3 col-lg-4 offset-lg-4 pt-5">
       <div class="card text-center">
-        <div class="card-header h5">
+        <div class="card-header h6">
           {:lang('admin_login')}
         </div>
         <div class="card-body pb-2">
-          <form action="{:DcUrl('admin/index/login','','','')}" method="post" role="form" data-toggle="form">
+          <form action="{:DcUrl('admin/index/login')}" method="post" role="form" data-toggle="form">
           <div class="input-group input-group-sm mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-fw fa-user"></i></span>
@@ -49,11 +49,11 @@
             </div>
             <input type="text" class="form-control" id="user_captcha" name="user_captcha" required="true" placeholder="{:lang('user_captcha')}" autocomplete="off">
           </div>
-          <p class="card-text border rounded py-2 mb-3">
-            <img class="img-fluid" id="captcha" src="{$path_root}public/images/x.gif" alt="{:lang('user_captcha')}" data-toggle="captcha"/>
+          <p class="card-text mb-3">
+            <img class="img-fluid w-100 rounded" id="captcha" src="{$path_root}index.php?s=captcha" alt="{:lang('user_captcha')}" data-toggle="captcha"/>
           </p>
           <p class="card-text">
-              <button class="btn btn-info btn-block mb-3 btn-purple" type="submit">{:lang('login')}</button>
+            <button class="btn btn-info btn-block mb-3 btn-purple" type="submit">{:lang('login')}</button>
            </p>
           </form>
         </div>
@@ -70,10 +70,8 @@
     </div>
   </div>
 </div>
-<script language="javascript">
+<script>
 $(document).ready(function(){
-
-    window.daicuo.captcha.refresh();
     
     window.daicuo.captcha.init();
     

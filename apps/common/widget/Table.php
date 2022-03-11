@@ -6,13 +6,13 @@ use think\Controller;
 class Table extends Controller
 {
 
-    public function build($args)
+    public function build($args=[])
     {
         $table = array();
         //$table['columns'] = [];
         $table['data-toggle'] = 'bootstrap-table';
-		$table['data-locale'] = str_replace(['zh-cn','zh-tw'], ['zh-CN','zh-TW'], config('default_lang'));
-        $table['data-classes'] = 'table table-bordered table-hover table-striped';//table-dark table-sm table-borderless
+		//$table['data-locale'] = str_replace(['zh-cn','zh-tw'], ['zh-CN','zh-TW'], config('default_lang'));
+        $table['data-classes'] = 'table table-bordered table-hover table-striped text-nowrap';//table-dark table-sm table-borderless
         $table['data-thead-classes'] = '';//thead-light thead-dark
         $table['data-data'] = '';
         $table['data-url'] = '';
@@ -25,7 +25,7 @@ class Table extends Controller
         //$table['data-ajax'] = '';//(function)
         //$table['data-ajax-options'] = '{}';//(object)
         //$table['data-query-params'] = 'queryParams';//function请求远程数据时发送其他参数 (pageSize, pageNumber, searchText, sortName, sortOrder)
-        $table['data-query-params-type'] = 'limit';//'limit'时为发送具有RESTFul类型的查询参数,上条参数则为(limit, offset, search, sort, order)
+        $table['data-query-params-type'] = 'params';//'limit'时为发送具有RESTFul类型的查询参数,上条参数则为(limit, offset, search, sort, order)
         //$table['data-response-handler'] = 'function(){}';//function响应数据
         //
         $table['data-toolbar'] = '.toolbar';
@@ -46,7 +46,7 @@ class Table extends Controller
         $table['data-show-toggle'] = 'false';//设置true显示切换按钮以切换表格/卡片视图
         $table['data-show-fullscreen'] = 'false';//设置true显示全屏按钮
         $table['data-smart-display'] = 'true';//设置true为智能显示分页或名片视图
-        $table['data-escape'] = 'false';//设置true为转义用于插入HTML的字符串
+        $table['data-escape'] = 'true';//设置true为转义用于插入HTML的字符串
         //$table['data-filter-options'] = '{ filterAlgorithm: \'and\' }';
         //$table['data-id-field'] = '';//指明哪个字段将用作复选框/单选框值
         //$table['data-select-item-name'] = 'btSelectItem';//单选或复选框输入的名称
@@ -117,6 +117,5 @@ class Table extends Controller
         unset($table);unset($args);
         //模板渲染
         return $this->fetch('common@table/index');
-        //return $this->fetch(APP_PATH.'common'.DS.'view'.DS.'daicuo_table.tpl'); 
     }	
 }

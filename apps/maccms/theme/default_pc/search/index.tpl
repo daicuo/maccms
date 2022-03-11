@@ -26,16 +26,7 @@
 <div class="d-none d-md-block">
   <div class="d-flex justify-content-center">{$pages}</div>
 </div>
-<!--page sm -->
-<div class="row d-md-none">
-  <div class="col-12 px-2">
-    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="true" data-url="{:DcUrl('maccms/search/index',['wd'=>DcHtml($wd)],'')}&page=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果<i class="fa fa-lg fa-angle-down mx-1"></i></a>
-  </div>
-</div>
 <!-- /container -->
 </div> 
 {/block}
 {block name="footer"}{include file="block/footer" /}{/block}
-<!-- -->
-{block name="js"}
-{/block}

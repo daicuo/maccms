@@ -15,6 +15,15 @@ class Upload
     }*/
     
     /**
+     * 获取错误信息（支持多语言）
+     * @return string
+     */
+    public function getError()
+    {
+        return self::$error;
+    }
+    
+    /**
      * 批量上传附件
      * @param array $data 写入数据（一维数组） 
      * @param string|array $relation 关联表 
@@ -198,7 +207,8 @@ class Upload
      * @param string $max_size 待转化的字符，如:10mb
      * @return int 字节数
      */
-    private static function byte($max_size){
+    private static function byte($max_size)
+    {
         $max_size = strtolower($max_size);
         preg_match('/([0-9\.]+)(\w+)/', $max_size, $matches);
         $size = $matches ? $matches[1] : $max_size;
@@ -212,7 +222,8 @@ class Upload
      * @param obj $file TP的文件类
      * @return bool|string true为自动生成,字符串为自定义文件名
      */
-    private static function buildSaveName($file){
+    private static function buildSaveName($file)
+    {
         //包含/时为自定义文件名
         if($file && count(explode('/',config('common.upload_save_rule'))) > 1){
             $filename = $file->getInfo('name');
@@ -231,15 +242,6 @@ class Upload
         }
         //自动生成条件
         return true;
-    }
-    
-    /**
-     * 获取错误信息（支持多语言）
-     * @return string
-     */
-    public function getError()
-    {
-        return self::$error;
     }
     
     /**

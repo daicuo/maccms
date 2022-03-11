@@ -1,6 +1,10 @@
 html, body {
   overflow-x: hidden;
 }
+/*nvabar*/
+.navbar-dark{
+    font-size: 14px!important;
+}
 /*purple*/
 .bg-purple {
     background-color: #563d7c;

@@ -9,7 +9,7 @@ class User extends Model
     //protected $pk = 'user_id';
 
 	//开启自动写入时间戳
-	protected $autoWriteTimestamp = true;
+	protected $autoWriteTimestamp = false;
 	
 	//定义时间戳字段名
     protected $createTime = 'user_create_time';
@@ -22,34 +22,58 @@ class User extends Model
     
     //获取器不存在的字段
     protected $append = ['user_status_text'];
+    
+    //修改器
+	public function setUserSlugAttr($value, $data)
+    {
+        if( empty($value) ){
+            $value = \daicuo\Pinyin::get(trim($data['user_name']));
+        }
+        return DcSlugUnique('user', $value, intval($data['user_id']));
+    }
 	
 	//修改器
 	public function setUserPassAttr($value, $data)
     {
         return md5(trim($value));
     }
-		
+    
+    public function setUserCreateTimeAttr($value, $data)
+    {
+        if( empty($value) ){
+            return time();
+        }
+        return strtotime($data['user_create_time']);
+    }
+    
+    public function setUserUpdateTimeAttr($value, $data)
+    {
+        if( empty($value) ){
+            return time();
+        }
+        return strtotime($data['user_update_time']);
+    }
+
 	public function setUserCreateIpAttr($value, $data)
     {
-        return request()->ip();
+        if( empty($value) ){
+            return request()->ip();
+        }
+        return $data['user_create_ip'];
     }
 	
 	public function setUserUpdateIpAttr($value, $data)
     {
-        return request()->ip();
+        if( empty($value) ){
+            return request()->ip();
+        }
+        return $data['user_update_ip'];
     }
-    
-    /*获取器
-    public function getUserStatusAttr($value, $data)
-    {
-        $status = ['normal'=>'正常','hidden'=>'禁用'];
-        return $status[$value];
-    }*/
     
     //获取器增加不存在的字段
     public function getUserStatusTextAttr($value, $data)
     {
-        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden')];
+        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden'),'private'=>lang('private'),'public'=>lang('public')];
         return $status[$data['user_status']];
     }
     

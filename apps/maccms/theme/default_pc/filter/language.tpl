@@ -1,7 +1,7 @@
 {extend name="./apps/common/view/front.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>说{$id|DcHtml}的电影与电视剧第{$current_page|default='1'}页-{:config('common.site_name')}</title>
+<title>说{$wd|DcHtml}的电影与电视剧第{$current_page|default='1'}页-{:config('common.site_name')}</title>
 {/block}
 <!-- -->
 {block name="header"}{include file="block/header" /}{/block}
@@ -28,7 +28,7 @@
 <!--page start -->
 <div class="row d-md-none mb-2">
   <div class="col-12 px-2 px-md-3">
-    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="false" data-url="{:DcUrl('maccms/filter/language',['id'=>DcHtml($id)],'')}&page=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
+    <a class="btn btn-block btn-outline-secondary" data-pageClick="true" data-pageScroll="false" data-url="{:DcUrl('maccms/filter/language',['id'=>DcHtml($id)])}&pageNumber=" data-page="{$current_page}" data-target="#row" data-target-lazyload="#row img[data-original]" data-target-language="#row">更多结果 <i class="fa fa-lg fa-angle-down"></i></a>
   </div>
 </div>
 <!-- -->
@@ -36,4 +36,3 @@
 {/block}
 <!-- -->
 {block name="footer"}{include file="block/footer" /}{/block}
-{block name="js"}{/block}

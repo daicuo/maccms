@@ -3,10 +3,17 @@ namespace app\common\model;
 
 use think\Model;
 
-class TermMap extends Model{
-    
-    public function termMuch(){
-		return $this->belongsTo('TermMuch','term_much_id','term_much_id')->bind('term_much_id,term_much_type,term_much_info,term_much_parent,term_much_count');
+class TermMap extends Model
+{
+    //相对关联反向获取队列信息
+    public function term()
+    {
+		return $this->belongsTo('Term','term_id','term_id');
 	}
     
+    //相对关联反向获取内容信息
+	public function info()
+    {
+		return $this->belongsTo('Info','detail_id','info_id');
+	}
 }

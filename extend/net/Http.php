@@ -136,7 +136,7 @@ class Http {
             
             @unlink($savePath);
             
-            self::$error = $curlInfo['http_code'].$curlInfo['content_type'];//http错误码
+            self::$error = $curlInfo['content_type'];//$curlInfo['http_code']http错误码
             
             return false;
         } else {

@@ -12,13 +12,13 @@ class Search extends Front{
     }
     
     //空操作
-	public function _empty($name)
+	public function index()
     {
         $wd = maccmsSearch(urldecode($this->query['wd']));
         
-        $list = apiItem(['wd'=>$wd,'pg'=>$this->query['page']]);
+        $list = apiItem(['wd'=>$wd,'pg'=>$this->site['page']]);
         
-        if($this->query['page'] > $list['page']['last_page']){
+        if($this->site['page'] > $list['page']['last_page']){
           return '';
         }
         $this->assign($this->query);
@@ -28,9 +28,18 @@ class Search extends Front{
         if($this->request->isAjax()){
             return $this->fetch('ajax');
         }
-        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
-			DcUrl('maccms/search/index',['wd'=>DcHtml($this->query['wd']), 'page'=>'[PAGE]'],'')));
+        $this->assign('pages',DcPage(
+            $list['page']['current_page'],
+            $list['page']['per_page'],
+            $list['page']['total'],
+			DcUrl('maccms/search/index',['wd'=>DcHtml($this->query['wd']), 'pageNumber'=>'[PAGE]'])
+        ));
         return $this->fetch('index');
 	}
     
+    //空操作
+    public function _empty($name)
+    {
+        return DcHtml($name);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 namespace app\common\validate;
+
 use think\Validate;
 
 class Op extends Validate

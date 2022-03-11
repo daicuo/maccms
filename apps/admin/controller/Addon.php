@@ -1,11 +1,10 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 class Addon extends Admin
 {
-
 	//插件管理入口
     public function index()
     {
@@ -13,14 +12,14 @@ class Addon extends Admin
         if( (empty($this->query['module'])) || (empty($this->query['controll'])) || (empty($this->query['action'])) ){
             $this->error(lang('mustIn'));
         }
-        //定义插件路径
-        $this->site['path_addon'] = 'apps/'.Dchtml($this->query['module']).'/';
-        //初始化插件钩子
-        \think\Hook::listen('hook_admin_init', $this->site);
+        //过滤非法参数
+        $module   = DcHtml($this->query['module']);
+        $controll = DcHtml($this->query['controll']);
+        $action   = DcHtml($this->query['action']);
         //后台插件模板变量
-        $this->assign('path_addon', $this->site['path_addon']);
+        $this->assign('path_addon', 'apps/'.$module.'/');
         //调用插件模块、控制器、操作
-        return action(Dchtml($this->query['module']).'/'.ucfirst(Dchtml($this->query['controll'])).'/'.Dchtml($this->query['action']), '', 'event');
+        return action($module.'/'.ucfirst($controll).'/'.$action, '', 'event');
 	}
     
     //空操作
@@ -28,5 +27,4 @@ class Addon extends Admin
     {
         return $this->index();
 	}
-	
 }

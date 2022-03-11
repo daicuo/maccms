@@ -37,9 +37,9 @@
 </div>
 <div class="col-12 col-md-3 px-2 d-none d-md-inline">
   <ul class="list-group h-slide overflow-hidden">
-  {volist name=":apiNew(22)" id="dc" offset="0" length="10"}
+  {volist name="news" id="dc" offset="0" length="10"}
   <li class="list-group-item bg-dark d-flex justify-content-between align-items-center py-2">
-    <a class="text-light small" href="{$dc.play_last|playUrl}">{$dc.vod_title}</a>
+    <a class="text-light small" href="{$dc.play_last|playUrl}">{$dc.vod_title|DcSubstr=0,14}</a>
     <span class="badge badge-light badge-pill">{$key+1}</span>
   </li>
   {/volist}
@@ -47,18 +47,20 @@
 </div>
 </div>
 <!-- -->
+{if count($news) > 10}
 <div class="row mb-2">
   <div class="col-12 mb-2">
     <i class="fa fa-line-chart text-warning"></i>
-    <a class="text-light text-decoration-none" href="{:DcUrl('maccms/filter/lately','','')}">最近更新</a>
+    <a class="text-light text-decoration-none" href="{:DcUrl('maccms/filter/index')}">最近更新</a>
   </div>
-{volist name=":apiNew(22)" id="dc" offset="10" length="12"}
+{volist name="news" id="dc" offset="10" length="6"}
   {include file='block/itemRow' /}
 {/volist}
 </div>
+{/if}
 <!-- -->
-{volist name=":categoryItem()" id="term" offset="0" length="10"}
-{if $item = apiTermIdLimit($term['term_id'], 6)}
+{volist name="categorys" id="term"}
+{if $item = apiType($term['term_api_tid'], 6)}
 <div class="row mb-2">
   <div class="col-12 mb-2">
     <i class="fa fa-line-chart text-warning"></i> 

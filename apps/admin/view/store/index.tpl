@@ -1,16 +1,16 @@
 {extend name="apps/common/view/admin.tpl" /}
 <!-- -->
 {block name="header_meta"}
-<title>{:lang("apply_store")}－{:lang('appName')}</title>
+<title>{:lang("admin/store/index")}－{:lang('appName')}</title>
 {/block}
 <!-- -->
 {block name="main"}
 <h6 class="border-bottom pb-2 text-purple">
-  {:lang("apply_store")}
+  {:lang("admin/store/index")}
 </h6>
-<div class="toolbar mb-2" id="toolbar">
-  <form class="form-inline" action="{:DcUrl('admin/category/delete','','')}" method="post" data-toggle="form">
-    <div class="form-group mr-1">
+<div class="toolbar" id="toolbar">
+  <form class="form-inline mb-0" action="{:DcUrl('admin/store/delete')}" method="post" data-toggle="form">
+    <div class="form-group mb-0 mr-1">
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text">{:lang('category')}</span>
@@ -23,7 +23,7 @@
         </select>
       </div>
     </div>
-    <div class="form-group mr-1">
+    <div class="form-group mb-0 mr-1">
       <div class="input-group input-group-sm">
         <div class="input-group-prepend">
           <span class="input-group-text">{:lang('score')}</span>
@@ -35,151 +35,130 @@
         </select>
       </div>
     </div>
-    <div class="form-group mr-1">
-      <input class="form-control form-control-sm" type="text" name="searchText" id="searchText" value="{$query.searchText|DcHtml}" placeholder="{:lang('keyword')}">
-    </div>
-    <div class="form-group">
-      <button type="button" class="btn btn-purple btn-sm queryButton">{:lang('query')}</button>
+    <div class="form-group mb-0 mr-1">
+      <a class="btn btn-sm btn-purple" href="javascript:;" data-toggle="refresh">
+        <i class="fa fa-refresh"></i> {:lang('refresh')}
+      </a>
     </div>
   </form>
 </div>
 {:DcBuildTable([
-    //'data-escape'           => 'true',
+    'data-name'               => 'admin/apply/store',
+    'data-escape'             => 'false',
     'data-toggle'             => 'bootstrap-table',
-    'data-url'                => DcUrl('admin/store/index', '', ''),
+    'data-url'                => DcUrl('admin/store/index'),
     'data-buttons-prefix'     => 'btn',
     'data-buttons-class'      => 'purple',
-    'data-buttons-align'      => 'none float-md-right',
     'data-icon-size'          => 'sm',
     
     'data-toolbar'            => '.toolbar',
     'data-toolbar-align'      => 'none float-md-left',
+    'data-buttons-align'      => 'right',
     'data-search-align'       => 'none float-md-right',
-    'data-search'             => 'false',
-    'data-show-search-button' => 'true',
-    'data-show-refresh'       => 'true',
-    'data-show-toggle'        => 'true',
-    'data-show-fullscreen'    => 'true',
-    'data-smart-display'      => 'true',
+    'data-search-text'        => $query['searchText'],
+    'data-search'             => true,
+    'data-show-search-button' => true,
+    'data-show-refresh'       => false,
+    'data-show-toggle'        => true,
+    'data-show-fullscreen'    => true,
+    'data-show-button-text'   => false,
+    'data-smart-display'      => false,
     
     'data-unique-id'          => 'id',
     'data-id-field'           => 'id',
     'data-select-item-name'   => 'id[]',
     'data-query-params-type'  => 'params',
-    'data-query-params'       => 'queryParams',
-    'data-sort-name'          => 'id',
+    'data-query-params'       => 'daicuo.admin.store.query',
+    'data-sort-name'          => 'view',
     'data-sort-order'         => 'desc',
-    //'data-sort-class'       => 'table-active',
-    //'data-sort-stable'      => 'false',
+    'data-sort-class'         => 'table-active',
+    'data-sort-stable'        => 'false',
     
-    //'data-side-pagination'  => 'server',
-    //'data-total-field'      => 'total',
-    //'data-data-field'       => 'data',
-    
+    'data-side-pagination'    => 'server',
+    'data-total-field'        => 'total',
+    'data-data-field'         => 'list',
+
+    'data-pagination'         => false,
     'data-page-number'        => $page,
-    'data-page-size'          => '30',
-    'data-page-list'          => [],
-    
-    'data-pagination'                  => 'true',
-    //'data-pagination-h-align'        => 'left',
-    //'data-pagination-detail-h-align' => 'right',
-    //'data-pagination-v-align'        => 'top',
-    //'data-show-extended-pagination'  => 'true',
+    'data-page-size'          => 50,
+    'data-page-list'          => '[50, 100, 200]',
 
     'columns'=>[
         [
-            'data-field'=>'id',
-            'data-title'=>'id',
-            'data-width'=>'3',
-            'data-width-unit'=>'%',
-            'data-sortable'=>'true',
-            'data-sort-name'=>'id',
-            'data-sort-order'=>'asc',
-            'data-class'=>'',
-            'data-align'=>'center',
-            'data-valign'=>'middle',
-            'data-halign'=>'center',
-            'data-falign'=>'center',
-            'data-visible'=>'true',
-            //'data-formatter'=>'',
-            //'data-footer-formatter'=>'',
+            'data-field'      => 'id',
+            'data-title'      => 'id',
+            'data-class'      => '',
+            'data-align'      => 'center',
+            'data-valign'     => 'middle',
+            'data-halign'     => 'center',
+            'data-falign'     => 'center',
+            'data-visible'    => true,
+            'data-width'      => '60',
+            'data-sortable'   => true,
+            'data-sort-name'  => 'id',
+            'data-sort-order' => 'asc',
         ],
         [
-            'data-field'=>'name',
-            'data-title'=>lang('name'),
-            'data-width'=>'15',
-            'data-width-unit'=>'%',
-            'data-align'=>'left',
-            'data-halign'=>'center',
-        ],
-        
-        [
-            'data-field'=>'info',
-            'data-title'=>lang('info'),
-            'data-align'=>'left',
-            'data-halign'=>'center',
+            'data-field'      => 'name',
+            'data-title'      => lang('name'),
+            'data-align'      => 'left',
+            'data-halign'     => 'center',
         ],
         [
-            'data-field'=>'version',
-            'data-title'=>lang('version'),
-            'data-width'=>'6',
-            'data-width-unit'=>'%',
-            'data-align'=>'center',
-            'data-halign'=>'center',
-            'data-formatter'=>'',
+            'data-field'      => 'module',
+            'data-title'      => lang('module'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '120',
         ],
         [
-            'data-field'=>'view',
-            'data-title'=>lang('down'),
-            'data-width'=>'6',
-            'data-width-unit'=>'%',
-            'data-sortable'=>'true',
-            'data-sort-name'=>'view',
-            'data-sort-order'=>'desc',
-            'data-align'=>'center',
-            'data-halign'=>'center',
+            'data-field'      => 'version',
+            'data-title'      => lang('version'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '80',
         ],
         [
-            'data-field'=>'score',
-            'data-title'=>lang('score'),
-            'data-width'=>'6',
-            'data-width-unit'=>'%',
-            'data-sortable'=>'true',
-            'data-sort-name'=>'score',
-            'data-sort-order'=>'desc',
-            'data-align'=>'center',
-            'data-halign'=>'center',
+            'data-field'      => 'score',
+            'data-title'      => lang('score'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '80',
+            'data-sortable'   => true,
+            'data-sort-name'  => 'score',
+            'data-sort-order' => 'desc',
         ],
         [
-            'data-field'=>'operate',
-            'data-title'=>lang('operate'),
-            'data-width'=>'30',
-            'data-width-unit'=>'%',
-            'data-align'=>'center',
-            'data-halign'=>'center',
-            'data-formatter'=>'',
+            'data-field'      => 'view',
+            'data-title'      => lang('down'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '80',
+            'data-sortable'   => true,
+            'data-sort-name'  => 'view',
+            'data-sort-order' => 'desc',
+        ],
+        [
+            'data-field'      => 'info',
+            'data-title'      => lang('info'),
+            'data-align'      => 'left',
+            'data-halign'     => 'center',
+        ],
+        [
+            'data-field'      => 'demo',
+            'data-title'      => lang('demo'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '60',
+        ],
+        [
+            'data-field'      => 'operate',
+            'data-title'      => lang('operate'),
+            'data-align'      => 'center',
+            'data-halign'     => 'center',
+            'data-width'      => '140',
+            'data-escape'     => false,
         ]
     ]
 ])}
-{/block}
-<!-- -->
-{block name="js"}
-<script>
-//刷新查询
-var queryParams = function queryParams(params){
-   var param = { 
-     pageNumber: params.pageNumber, 
-     pageSize: params.pageSize,
-     sortName: params.sortName,
-     sortOrder: params.sortOrder,
-     searchText: $("#searchText").val(),
-     termId: $("#term_id").val(),
-     price: $("#price").val()
-    }; 
-    return param; 
-};
-$(document).on('click', ".queryButton",function(){
-   $('table[data-toggle="bootstrap-table"]').bootstrapTable('refresh');
-});
-</script>
 {/block}

@@ -1,5 +1,5 @@
 html, body {
-  overflow-x: hidden;
+    overflow-x: hidden;
 }
 body{
 	padding-top:56px;
@@ -27,15 +27,6 @@ body{
 	background-color: #fff;
 	border: 1px solid transparent;
 	border-bottom-color: #563d7c;
-}
-/*fieldset*/
-fieldset {
-	border-top: 1px solid #efefef;
-}
-fieldset legend {
-	width: auto;
-	margin-left: auto;
-	margin-right: auto;
 }
 /*media*/
 .embed-responsive-16by9{
@@ -82,6 +73,19 @@ fieldset legend {
 /*dcAll*/
 .dc-opacity{
 	opacity:0.8;
+}
+/*text*/
+.h7{
+    font-size: 0.95rem;
+}
+/*fieldset*/
+fieldset {
+	border-top: 1px solid #efefef;
+}
+fieldset legend {
+	width: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 /*dcImages*/
 .img-slide{

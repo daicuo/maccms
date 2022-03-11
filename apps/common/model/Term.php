@@ -3,7 +3,8 @@ namespace app\common\model;
 
 use think\Model;
 
-class Term extends Model{
+class Term extends Model
+{
 
     //数据自动完成
 	protected $auto = [];
@@ -28,18 +29,18 @@ class Term extends Model{
     //获取器增加不存在的字段
     public function getTermStatusTextAttr($value, $data)
     {
-        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden')];
+        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden'),'private'=>lang('private'),'public'=>lang('public')];
         return $status[$data['term_status']];
     }
 	
-	//关联一对一
-	public function termMuch(){
-		return $this->hasOne('TermMuch','term_id')->field('*')->bind('term_much_id,term_much_type,term_much_info,term_much_parent,term_much_count');
-	}
-	
-	//关联一对多
+	//一对多hasMany('关联模型名','外键名','主键名',['模型别名定义']);
 	public function termMeta(){
 		return $this->hasMany('TermMeta','term_id')->field('term_meta_id,term_meta_key,term_meta_value,term_id');
 	}
-	
+    
+    //一对多hasMany('关联模型名','外键名','主键名',['模型别名定义']);
+    public function termMap()
+    {
+        return $this->hasMany('TermMap','term_id')->field('detail_id,term_id');
+	}
 }

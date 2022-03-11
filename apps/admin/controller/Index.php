@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 /**
  * 后台首页
@@ -34,8 +34,8 @@ class Index extends Admin
                 $this->error(lang('user_captcha_error'));
             }
             
-            if(\daicuo\User::login() == false){
-                $this->error(config('daicuo.error'));
+            if(\daicuo\User::login(input('post.')) == false){
+                $this->error(\daicuo\User::getError());
             }
             
             if( $this->request->isAjax() ){
@@ -66,15 +66,5 @@ class Index extends Admin
         \daicuo\User::logout();
         
         $this->success(lang('logout').lang('success'), 'index/login');
-    }
-    
-    /**
-    * 申请token
-    * @return mixed
-    */
-    public function token()
-    {
-        $service = new \daicuo\Service();
-        $this->redirect($service->apiUrl().'/token/?'.http_build_query($this->query),302);
     }
 }

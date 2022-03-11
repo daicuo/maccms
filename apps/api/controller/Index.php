@@ -12,6 +12,10 @@ class Index extends Api
 
 	public function index()
     {
-        $this->success(lang('success'));
+        $api = [];
+        $api['login']   = url('api/token/login', ['user_captcha'=>'test','user_name'=>'test','user_pass'=>'test'], '', true);
+        $api['refresh'] = url('api/token/refresh', '', '', true);
+        $api['delete']  = url('api/token/delete', '', '', true);
+        $this->success( lang('success'), $api );
 	}
 }

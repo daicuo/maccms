@@ -7,7 +7,7 @@
   </li>
   {/volist}
 </ul>
-<div class="tab-content {$class_content}" id="formTabContent">
+<div class="tab-content {$class_content|default='border p-3'}" id="formTabContent">
   {volist name="group" id="groups" key="n"}
   <div class="tab-pane fade {:DcDefault($n, 1, 'show active')}" id="group-{$n}"> 
     {volist name="groups.items" id="form"}
@@ -75,7 +75,7 @@
     {/volist}
   </div>
   {/volist}
-  <div class="form-group text-center mt-5">
+  <div class="{$class_button|default='form-group text-center mb-0'}">
     <button type="submit" class="btn btn-purple">{$submit}</button>
     {if $reset}
     <button type="reset" class="btn btn-info">{$reset}</button>

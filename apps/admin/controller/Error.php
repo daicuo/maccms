@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 class Error extends Admin
 {

@@ -1,10 +1,11 @@
 <?php
 namespace app\maccms\model;
 
-class Api {
+class Api{
 
     //获取最后一集播放地址
-    protected function play_last($tid, $id, $array){
+    protected function play_last($tid=0, $id=0, $array=[])
+    {
         $i = 1;
         foreach($array as $key=>$value){
             if($i == 1){
@@ -22,7 +23,8 @@ class Api {
     }
     
     //字典转换
-    protected function data_fields($array){
+    protected function data_fields($array=[])
+    {
         //$array = ['a'=>1,'b'=>2,'c'=>3];
         $fields = array_flip($this->fields);
         $data = array();
@@ -41,7 +43,8 @@ class Api {
     }
     
     //格式化分隔符
-    protected function data_explode($string){
+    protected function data_explode($string='')
+    {
         if(!$string){
             return '';
         }

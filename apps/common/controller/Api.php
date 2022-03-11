@@ -1,14 +1,4 @@
 <?php
-// +----------------------------------------------------------------------
-// | DaiCuo框架[基于ThinkPHP5.0开发]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2019-2020 http://www.daicuo.net
-// +----------------------------------------------------------------------
-// | DaiCuo承诺基础框架永久免费开源，您可用于学习和商用，但必须保留软件版权信息。
-// +----------------------------------------------------------------------
-// | Author: 老谭 <271513820@qq.com>
-// +----------------------------------------------------------------------
-
 namespace app\common\controller;
 
 use app\common\controller\Base;
@@ -82,7 +72,7 @@ class Api extends Base
             }
             // 不需要鉴权的白名单里没有此规则需要验证是否有对应权限关系
             if( !in_array($this->auth['rule'], $this->auth['none_right']) ){
-                if ( false == \daicuo\Auth::check($this->auth['rule'], $this->site['user']['user_capabilities']) ) {
+                if ( false == \daicuo\Auth::check($this->auth['rule'], $this->site['user']['user_capabilities'], $this->site['user']['user_caps']) ) {
                     $this->error( DcError(lang('user_capabilities_error')), null, 0);//403
                 }
             }

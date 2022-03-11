@@ -9,57 +9,49 @@
 body{
 	font-family: 'Microsoft Yahei', Verdana, arial, sans-serif;
 	font-size:14px;
+    color:#666;
 	background:#FCFCFC;
+    overflow-x:hidden;
+	text-align:center;
 }
 a{
 	text-decoration:none;
-	color:#174B73;
+	color:#333;
 }
 a:hover{
 	text-decoration:none;
-	color:#FF6600;
+	color:#000;
 }
 h2{
 	border-bottom:1px solid #DDD;
-	padding:10px 0;
-  font-size:25px;
+	padding:15px 0;
+    font-size:25px;
 }
 .title{
-	margin:4px 0;
+	margin:10px 5px;
 	color:#F60;
 	font-weight:bold;
 }
-.notice{
-  padding:20px 0;
-	color:#666;
-	background:#FCFCFC;
-}
-.center{
-	text-align:center;
-}
 .powered{
-	padding-top:10px;
-}
-.text,a.text:hover{
-	color:#FCFCFC;
+    position: absolute;
+    width: 100%;
+    bottom: 10px;
 }
 </style>
 </head>
-<body>
-<div class="notice">
-  <h2 class="center">
+<body class="notice">
+  <h2>
     {:lang('error404')}
   </h2>
-  <div class="center">
-    [ <a class="title" href="javascript:history.back()">{:lang('goBack')}</a> ]
-    [ <a class="title" href="<?php echo(strip_tags($_SERVER['PHP_SELF']))?>">{:lang('goHome')}</a> ]
-  </div>
-  <p class="center text">
-    powered by <a class="text" href="{:lang('appUrl')}" target="_blank">{:lang('appName')}</a>
+  <p>
+    [<a class="title" href="javascript:history.back()">{:lang('goBack')}</a>]
+    [<a class="title" href="/">{:lang('goHome')}</a>]
   </p>
-</div>
-<div style="display:none">
-    <script type="text/javascript" src="https://js.users.51.la/16951758.js"></script>
-</div>
+  <p class="powered">
+    powered by <a href="{:lang('appUrl')}" target="_blank">{:lang('appName')}</a>
+  </p>
+  <div style="display:none">
+    <script src="https://cdn.daicuo.cc/51la/16951758.js"></script>
+  </div>
 </body>
 </html>

@@ -2,11 +2,12 @@
 /*-------------------本地参数调用API接口-------------------------------*/
 /**
  * 按系统分类ID获取API数据列表第N页
- * @param int $id 分类ID
- * @param int $page 页码
+ * @version 1.2.0 首次引入
+ * @param int $id 必需;分类ID;默认：0
+ * @param int $page 必需;页码;默认：1
  * @return array 数据列表
  */
-function apiTermId($id, $page=1){
+function apiTermId($id=0, $page=1){
     $term = categoryId($id);
     $term['term_api_pg'] = $page;
     $term = apiTerm($term);
@@ -15,11 +16,12 @@ function apiTermId($id, $page=1){
 
 /**
  * 按系统分类别名获取API数据列表第N页
- * @param string $slug 分类别名
- * @param int $page 页码
+ * @version 1.2.0 首次引入
+ * @param string $slug 必需;分类别名;默认：空
+ * @param int $page 必需;页码;默认：1
  * @return array 数据列表
  */
-function apiTermSlug($slug, $page=1){
+function apiTermSlug($slug='', $page=1){
     $term = categorySlug($slug);
     $term['term_api_pg'] = $page;
     $term = apiTerm($term);
@@ -28,42 +30,46 @@ function apiTermSlug($slug, $page=1){
 
 /**
  * 按系统分类ID获取API数据列表最新N条(参数由后台分类设置)
- * @param int $id 分类ID
- * @param int $limit 数量
+ * @version 1.2.0 首次引入
+ * @param int $id 必需;分类ID;默认：0
+ * @param int $limit 必需;数量;默认：10
  * @return array 数据列表不带分页
  */
-function apiTermIdLimit($id, $limit=10){
+function apiTermIdLimit($id=0, $limit=10){
     $term = apiTerm(categoryId($id), ['limit'=>$limit]);
     return $term['item'];
 }
 
 /**
  * 按系统分类ID获取API数据列表(参数不固定)
- * @param int $id 分类ID
- * @param int $args 自定义参数
+ * @version 1.2.0 首次引入
+ * @param int $id 必需;分类ID;默认：0
+ * @param int $args 必需;自定义参数;默认：空
  * @return array 数据列表不带分页
  */
-function apiTermIdArgs($id, $params){
+function apiTermIdArgs($id=0, $params=[]){
     $term = apiTerm(categoryId($id), $params);
     return $term['item'];
 }
 
 /**
  * 按系统分类信息获取API数据列表
- * @param array $term 分类信息
- * @param int $params 自定义参数
+ * @version 1.2.0 首次引入
+ * @param array $term 必需;分类信息;默认：空
+ * @param int $params 必需;自定义参数;默认：空
  * @return array 数据列表带分页
  */
-function apiTerm($term, $params){
+function apiTerm($term=[], $params=[]){
     //检查分类信息
     if( !$term['term_api_tid'] ){
         return null;
     }
+    //API参数
     $arg = array();
-    $arg['t'] = $term['term_api_tid'];
-    $arg['pg'] = DcEmpty($term['term_api_pg'], 1);
-    //分页统一后台设置
-    $arg['limit'] = intval(config('maccms.page_size'));
+    $arg['t']     = $term['term_api_tid'];
+    $arg['pg']    = DcEmpty($term['term_api_pg'], 1);
+    //分页数量（需资源站支持）
+    $arg['limit'] = DcEmpty($term['term_limit'],config('maccms.page_size'));
     //关键字限制
     if($term['term_api_wd']){
         $arg['wd'] = $term['term_api_wd'];
@@ -72,31 +78,19 @@ function apiTerm($term, $params){
     if($term['term_api_h']){
         $arg['h'] = $term['term_api_h'];
     }
-    //指定分类附加参数
-    if($term['term_api_params']){
-        $api_params = config('maccms.api_params');
-        config('maccms.api_params', $term['term_api_params']);
-    }
-    //自定义参数
-    if($params){
-        $arg = array_merge($arg, $params);
-    }
     //读取远程数据
-    $list = apiItem($arg, $term['term_api_url'], $term['term_api_type']);
-    //还原默认附加参数
-    config('maccms.api_params', $api_params);
-    return $list;
+    return apiItem( DcArrayArgs($params,$arg) );
 }
 
 /*-------------------远程API接口参数调用-------------------------------*/
-
 /**
  * 按关键字调用最新一页 xml/json只能搜索片名
- * @param string $wd 搜索关键字
- * @param int $limit 分页大小（需资源站支持）
- * @param int $pg 当前分页
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
+ * @version 1.0.0 首次引入
+ * @param string $wd 必需;搜索关键字;默认：空
+ * @param int $limit 必需;分页大小（需资源站支持）;默认：20
+ * @param int $pg 必需;当前分页;;默认：1
+ * @param string $api 可选;API入口地址,不带参数;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
 function apiSearch($wd='', $limit=20, $pg=1, $api=''){
     if(!$wd){
@@ -108,10 +102,11 @@ function apiSearch($wd='', $limit=20, $pg=1, $api=''){
 
 /**
  * 按最新时间调用最新一页
- * @param int $limit 分页大小（需资源站支持）
- * @param int $pg 当前分页
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
+ * @version 1.0.0 首次引入
+ * @param int $limit 必需;分页大小（需资源站支持）;默认：20
+ * @param int $pg 必需;当前分页;;默认：1
+ * @param string $api 可选;API入口地址,不带参数;;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
 function apiNew($limit=20, $pg=1, $api=''){
     $item = apiItem(['limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
@@ -120,11 +115,12 @@ function apiNew($limit=20, $pg=1, $api=''){
 
 /**
  * 按更新时间段调用最新数据
- * @param int $hour 更新时间小时
- * @param int $limit 分页大小（需资源站支持）
- * @param int $pg 当前分页
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
+ * @version 1.0.0 首次引入
+ * @param int $hour 必需;更新时间小时;默认：24
+ * @param int $limit 必需;分页大小（需资源站支持）;默认：20
+ * @param int $pg 必需;当前分页;默认：1
+ * @param string $api 可选;API入口地址,不带参数;;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
 function apiHour($hour=24, $limit=20, $pg=1, $api=''){
     $item = apiItem(['h'=>$hour, 'limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
@@ -133,25 +129,27 @@ function apiHour($hour=24, $limit=20, $pg=1, $api=''){
 }
 
 /**
- * 按远程分类调用最新一页
- * @param int $typeId 分类ID
- * @param int $limit 分页大小（需资源站支持）
- * @param int $pg 当前分页
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
+ * 按资源站分类调用最新一页
+ * @version 1.0.0 首次引入
+ * @param int $typeId 必需;分类ID;默认：0
+ * @param int $limit 必需;分页大小（需资源站支持）;默认：20
+ * @param int $pg 必需;当前分页;默认：1
+ * @param string $api 可选;API入口地址,不带参数;;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
-function apiType($typeId, $limit=20, $pg=1, $api=''){
+function apiType($typeId=0, $limit=20, $pg=1, $api=''){
     $item = apiItem(['t'=>$typeId, 'limit'=>$limit, 'pg'=>$pg, 'order'=>'addtime', 'sort'=>'desc'], $api);
     return $item['item'];
 }
 
 /**
- * 按字段直接调用远程API数据(需要API接口支持)
- * @param string field 字段名称
- * @param string value 字段值
- * @param array params 其它参数
- * @param string $api API入口地址 不带参数
- * @return array|false 读取失败时返回false
+ * 按资源站字段直接调用远程API数据(需要API接口支持)
+ * @version 1.0.0 首次引入
+ * @param string field 必需;字段名称;默认：wd
+ * @param string value 必需;字段值;默认：空
+ * @param array params 可选;其它API参数;默认：空
+ * @param string $api 可选;API入口地址,不带参数;;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
 function apiField($field='wd', $value='', $params=[], $api=''){
     if( !$value ){
@@ -175,6 +173,7 @@ function apiField($field='wd', $value='', $params=[], $api=''){
     //返回方式
     $returnType = $args['return'];
     unset($args['return']);
+    //
     $item = apiItem($args, $api);
     if($returnType == 'item'){
         return $item['item'];
@@ -183,13 +182,14 @@ function apiField($field='wd', $value='', $params=[], $api=''){
 }
 
 /**
- * 调用API远程多个详情数据
- * @param array $args APIURL参数
- * @param string $api API入品地址 不带参数
- * @param string $apiType API类型 可选json|xml|feifeicms
- * @return array|false 读取失败时返回false
+ * 调用API资源站多个数据
+ * @version 1.0.0 首次引入
+ * @param array $args 必需;APIURL参数;默认：空
+ * @param string $apiUrl 必需;API入口地址,不带参数;默认：空
+ * @param string $apiType 必需;API类型，可选json|xml|feifeicms;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
-function apiItem($args=[], $api='', $apiType=''){
+function apiItem($args=[], $apiUrl='', $apiType=''){
     //分类过滤
     if($args['t'] && config('maccms.filter_tid')){
         if(in_array($args['t'], explode(',', config('maccms.filter_tid')) )){
@@ -198,7 +198,7 @@ function apiItem($args=[], $api='', $apiType=''){
     }
     //默认参数
     $params = [
-        'ac'    => 'list',
+        'ac'    => 'list',//list|detail
         'pg'    => 1,
         'h'     => '',
         't'     => '',
@@ -222,20 +222,24 @@ function apiItem($args=[], $api='', $apiType=''){
     if($args){
         $args = array_merge($params, $args);
     }
-    if(empty($api)){
-        $api = config('maccms.api_url');
+    if(empty($apiUrl)){
+        $apiUrl = config('maccms.api_url');
     }
-    return controller('maccms/Client', 'event')->item($args, $api, $apiType);
+    //过滤无效参数
+    $args = DcArrayEmpty($args);
+    //加载API接口
+    return model('maccms/Client')->item($args, $apiUrl, $apiType);
 }
 
 /**
- * 调用API远程单个数据
- * @param int id 视频id
- * @param string $api API入口地址 不带参数
- * @param string $apiType API类型 可选json|xml|feifeicms
- * @return array|false 读取失败时返回false
+ * 调用API资源站单个数据
+ * @version 1.0.0 首次引入
+ * @param int id 必需;视频id;默认：0
+ * @param string $apiUrl 必需;API入口地址,不带参数;默认：空
+ * @param string $apiType 必需;API类型，可选json|xml|feifeicms;默认：空
+ * @return mixed array|false(读取失败时返回false)
  */
-function apiDetail($id, $api='', $apiType=''){
+function apiDetail($id=0, $apiUrl='', $apiType=''){
     //详情ID过滤
     if($id && config('maccms.filter_ids')){
         if( in_array($id, explode(',', config('maccms.filter_ids') ) ) ){
@@ -243,228 +247,197 @@ function apiDetail($id, $api='', $apiType=''){
         }
     }
     //默认参数
-    if(empty($api)){
-        $api = config('maccms.api_url');
+    if(empty($apiUrl)){
+        $apiUrl = config('maccms.api_url');
     }
     //获取数据
-    return controller('maccms/Client', 'event')->detail(['ids'=>$id], $api, $apiType);
+    return model('maccms/Client')->detail(['ids'=>$id], $apiUrl, $apiType);
 }
 
 /*-------------------MacCms常用函数-------------------------------*/
 
 /**
- * 获取网站导航列表
- * @param $metaKey key值
- * @param $metaValue value值
- * @return obj|null
+ * 获取网站导航菜单列表
+ * @version 1.5.1 优化
+ * @version 1.4.0 优化
+ * @version 1.2.0 首次引入
+  * @param array $args 必需;查询条件数组格式 {
+ *     @type bool $cache 可选;是否缓存;默认：true
+ *     @type int $limit 可选;分页大小;默认：0
+ *     @type string $sort 可选;排序字段名;默认：term_id
+ *     @type string $order 可选;排序方式(asc|desc);默认：asc
+ *     @type string $status 可选;显示状态（normal|hidden|public|private）;默认：空
+ *     @type string $action 可选;操作名（sitebar|navbar|navs|ico）;默认：空
+ *     @type array $where 可选;自定义高级查询条件;默认：空
+ * }
+ * @return mixed obj|null
  */
-function navItem($params=[]){
-    $args = array();
-    $args['field'] = 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order';
-    $args['sort']  = 'op_order';
-    $args['order'] = 'asc';
-    $args['tree']  = true;
-    $args['where']['op_status'] = ['eq', 'normal'];
-    //$args['where']['op_module'] = ['eq', 'maccms'];
-    $args['where']['op_controll'] = ['eq', 'header'];
-    //$args['cache'] = false;
-    //$args['fetchSql'] = true;
-    //$args['limit'] = 0;
-    //$args['page'] = 0;
-    if($params){
-        $args = array_merge($args, $params);
-    }
-    //重置树型结构为2级菜单
-    if( $args['tree'] ){
-        $args['tree']  = false;
-        $list = \daicuo\Nav::all($args);
-        if($list){
-             return list_to_tree($list, 'op_id', 'nav_parent');
-        }
-        return $list;
-    }
-    //默认数据级结构
-    return \daicuo\Nav::all($args);
+function navItem($args=[]){
+    return model('common/Navs','loglic')->select($args);
 }
 
 /**
- * 获取网站所有分类列表
- * @param $metaKey key值
- * @param $metaValue value值
- * @return obj|null
+ * 获取影视分类列表
+ * @version 1.4.0 优化
+ * @version 1.0.0 首次引入
+ * @param array $args 必需;查询条件数组格式 {
+ *     @type bool $cache 可选;是否缓存;默认：true
+ *     @type int $limit 可选;分页大小;默认：0
+ *     @type string $sort 可选;排序字段名;默认：op_order
+ *     @type string $order 可选;排序方式(asc|desc);默认：asc
+ *     @type string $status 可选;显示状态（normal|hidden）;默认：空
+ *     @type string $module 可选;模型名称;默认：空
+ *     @type string $result 可选;返回结果(array|tree|obj);默认：array
+ *     @type array $where 可选;自定义高级查询条件;默认：空
+ * }
+ * @return mixed obj|null
  */
-function categoryItem($params=[]){
-    $args = array();
-    $args['field'] = '*';
-    $args['sort'] = 'term.term_order desc,';
-    $args['order'] = 'term.term_id desc';
-    $args['with'] = ['termMeta'];
-    $args['where']['term_much_type'] = ['eq', 'category'];
-    $args['where']['term_module'] = ['eq', 'maccms'];
-    $args['where']['term_status'] = ['eq', 'normal'];
-    //$args['cache'] = false;
-    //$args['fetchSql'] = true;
-    //$args['limit'] = 0;
-    //$args['page'] = 1;
-    //$list = \daicuo\Term::tree($args);
-    if($params){
-        $args = array_merge($args, $params);
-    }
-    $list = \daicuo\Term::all($args);
-    if(is_null($list)){
-        return null;
-    }
-    $list = $list->toArray();
-    foreach($list as $key=>$value){
-        if($value['term_meta']){
-            $list[$key] = DcManyToData($value, 'term_meta');
-        }
-    }
-    return $list;
+function categoryItem($args=[]){
+    return model('common/Term','loglic')->select( DcArrayArgs($args,[
+        'cache'   => true,
+        'controll'=> 'category',
+        'module'  => 'maccms',
+        'status'  => 'normal',
+        'sort'    => 'term_order',
+        'order'   => 'desc',
+        'result'  => 'array',
+    ]) );
 }
 
 /**
- * 通过id条件查询单条分类
- * @param $id 分类ID值
- * @return obj|null
+ * 按分类ID快速获取一条分类信息
+ * @version 1.4.0 优化
+ * @version 1.2.0 首次引入
+ * @param int $value 必需;Id值;默认：空
+ * @param bool $cache 必需;是否缓存;默认：true
+ * @param string $status 必需;状态(normal|hidden|private|public|空);默认：normal
+ * @return mixed array|null
  */
-function categoryId($id){
-    return \daicuo\Term::get_id($id);
+function categoryId($value=0, $cache=true, $status='normal'){
+    return \daicuo\Term::get_by('term_id', $value, $cache, 'category', $status);
 }
 
 /**
- * 通过slug条件查询单条分类
- * @param $slug 别名值
- * @return obj|null
+ * 按分类别名快速获取一条分类信息
+ * @version 1.4.0 优化
+ * @version 1.2.0 首次引入
+ * @param int $value 必需;分类别名值;默认：空
+ * @param bool $cache 必需;是否缓存;默认：true
+ * @param string $status 必需;状态();默认：true
+ * @return mixed array|null
  */
-function categorySlug($slug){
-    $where = array();
-    $where['term_slug'] = ['eq', $slug];
-    $data = \daicuo\Term::get($where, 'term_much,term_meta');
-    if(!is_null($data)){
-        $data = $data->toArray();
-        $data_meta = DcManyToData($data, 'term_meta');
-        unset($data['term_meta']);
-        return array_merge($data, $data_meta);
-    }
-    return null;
+function categorySlug($value='', $cache=true, $status='normal'){
+    $args = [
+        'module'   => 'maccms',
+        'controll' => 'category',
+        'cache'    => $cache,
+        'status'   => $status,
+        'slug'     => $value,
+    ];
+    return model('common/Term','loglic')->get($args);
 }
 
 /**
- * 通过meta条件查询单条
- * @param $metaKey key值
- * @param $metaValue value值
- * @param $operation 运算规则
- * @return obj|null
+ * 通过分类的meta条件查询单条分类信息
+ * @version 1.4.6 优化
+ * @version 1.2.0 首次引入
+ * @param string $metaKey 必需;key值;默认：空
+ * @param string $metaValue 必需;value值;默认：空
+ * @param string $operation 可选;运算规则(eq|like|neq);默认：eq
+ * @return mixed obj|null
  */
- function categoryMeta($metaKey, $metaValue, $operation='eq'){
-    $where = array();
-    //$where['term_much_type'] = ['eq','category'];
-    $where['term_meta_key'] = [$operation, $metaKey];
-    $where['term_meta_value'] = [$operation, $metaValue];
-    $join = array();
-    $join[0] = ['term','*'];
-    $join[1] = ['term_much','*','term_much.term_id=term.term_id'];
-    $join[2] = ['term_meta','term_meta_id','term_meta.term_id=term.term_id'];
-    //return \daicuo\Term::get($where, 'termMeta', true, $join);
-    $data = DcDbFind('common/Term', [
-        'cache' => false,
-        'where' => $where,
-        'view'  => $join,
-        'with'  => 'termMeta',
-        'sort'  => 'term_order desc,term_id',
-        'order' => 'desc',
-        //'fetchSql' => true,
+function categoryMeta($metaKey='', $metaValue='', $operation='eq'){
+    return model('common/Term','loglic')->get([
+        'cache'      => true,
+        'meta_key'   => [$operation, $metaKey],
+        'meta_value' => [$operation,$metaValue],
+        'with'       => 'term_meta',
+        'view'       => [
+            ['term', '*'],
+            ['term_meta', NULL, 'term_meta.term_id=term.term_id']
+        ],
     ]);
-    if(!is_null($data)){
-        $data = $data->toArray();
-        $data_meta = DcManyToData($data, 'term_meta');
-        unset($data['term_meta']);
-        return array_merge($data, $data_meta);
-    }
-    return $data;
 }
 
 /**
- * 通过远程分类ID查询绑定的本地分类信息
- * @param $id 分类ID值
- * @return obj|null
- */
-function categoryTypeId($typeId){
-    $terms = categoryItem();
-    $types = list_search($terms,['term_api_tid'=>$typeId]);
-    if( count($types)== 0 ){
-        return null;
-    }
-    if( count($types)> 1 ){
-        $typesUrl = list_search($types, ['term_api_url'=>config('maccms.api_url')]);
-        if($typesUrl){
-            return $typesUrl[0];
-        }
-    }
-    return $types[0];
-}
-
-/**
- * 生成本地分类链接
+ * 生成栏目分类站内链接
+ * @version 1.4.5 优化
+ * @version 1.2.0 首次引入
  * @param int $termId 系统分类ID
  * @param string $termSlug 系统分类别名
+ * @param int $pageNumber 页码
  * @return string 网址链接
  */
-function categoryUrl($termId=0, $termSlug=''){
-    if($termSlug){
-        return DcUrl('maccms/category/'.DcHtml($termSlug), ['page'=>1], ''); 
+function categoryUrl($termId=0, $termSlug='', $pageNumber=0){
+    //配置规则
+    $route  = config('maccms.rewrite_category');
+    //伪静态链接参数
+    $args = [];
+    //拼音/ID
+    if( preg_match('/:slug|<slug/i',$route) ){
+        $args['slug'] = $termSlug;
+    }else{
+        $args['id'] = $termId;
     }
-    return DcUrl('maccms/category/index', ['id'=>$termId,'page'=>1], '');
+    //分页路径
+    if($pageNumber){
+        $args['pageNumber'] = $pageNumber;
+    }
+    //生成链接
+    return DcUrl('maccms/category/index', $args);
 }
 
 /**
- * 生成播放地址链接
- * @param array $args 链接参数
- * @param int $termId 系统分类ID
+ * 生成播放地址站内链接
+ * @version 1.4.6 优化
+ * @version 1.2.0 首次引入
+ * @param array $args 必需;链接参数;默认：空
+ * @param array $term 可选;系统分类[term_id|term_slug];默认：空
  * @return string 网址链接
  */
-function playUrl($args, $term=[]){
-    $jump = [];
-    $jump['from'] = $args['from'];
-    $jump['tid'] = $args['tid'];//远程分类ID
-    $jump['id'] = $args['id'];
-    $jump['ep'] = $args['ep'];
-    //本地分类参数
-    if($term['term_slug']){
-        unset($jump['tid']);
-        return DcUrl('maccms/play/'.$term['term_slug'], $jump, '');
+function playUrl($args=[], $term=[]){
+    //伪静态配置
+    $route = config('maccms.rewrite_play');
+    //分类参数
+    if( preg_match('/:termSlug|<termSlug/i',$route) ){
+        //将远程分类ID转换为本地SLUG
+        if(!$term['term_slug']){
+            $term['term_slug'] = typeId2termSlug($args['tid']);
+        }
+        //分类别名参数
+        $args['termSlug'] = $term['term_slug'];
     }
-    if($term['term_id']){
-        return DcUrl('maccms/play/index', array_merge($jump, ['tid'=>$term['term_id']]), '');
+    if( preg_match('/:termId|<termId/i',$route) ){
+        $args['termId'] = intval($term['term_id']);
     }
-    //将远程分类ID转为本地分类别名
-    if($term_slug = typeId2termSlug($args['tid'])){
-        unset($jump['tid']);
-        return DcUrl('maccms/play/'.$term_slug, $jump, '');
-    }
-    //按远程分类加载播放页
-    return DcUrl('maccms/play/type', $jump, '');
+    //播放链接
+    unset($args['tid']);
+    return DcUrl('maccms/play/index', $args);
+    /*$args = [];
+    $args['tid'] = $args['tid'];//远程分类ID
+    $args['id'] = $args['id'];
+    $args['ep'] = $args['ep'];
+    $args['from'] = $args['from'];*/
 }
 
 /**
- * 生成图床链接
- * @param string $image_url 图片链接
+ * 生成图床站内链接
+ * @version 1.4.6 优化
+ * @version 1.2.0 首次引入
+ * @param string $image_url 必需;图片链接;默认：空
  * @return string 网址链接
  */
-function imageUrl($image_url){
-    if(config('maccms.upload_referer')){
-        return config('maccms.upload_referer').urlencode($image_url);
-    }
-    return $image_url;
+function imageUrl($image_url=''){
+    return DcUrlAttachment($image_url);
 }
 
 /**
  * CPS渠道转换
+ * @version 1.2.0 首次引入
  * @param string $name 广告标识
  * @return string 网址链接
  */
-function posterParse($name){
+function posterParse($name=''){
     $string = config($name);
     if(config('common.site_id')){
         return str_replace('{SITEID}', config('common.site_id'), $string);
@@ -474,6 +447,7 @@ function posterParse($name){
 
 /**
  * 生成随机颜色
+ * @version 1.2.0 首次引入
  * @param int $rand 随机数
  * @return string 颜色伪类
  */
@@ -497,8 +471,9 @@ function colorRand($rand=6){
 
 /**
  * 生成随机图标
+ * @version 1.2.0 首次引入
  * @param int $rand 随机数
- * @return ico 伪类
+ * @return string ico伪类
  */
 function faIcoRand($rand=19){
     $rand = rand(0, $rand);
@@ -527,11 +502,13 @@ function faIcoRand($rand=19){
 
 /**
  * 将远程APIID转为本地绑定的分类ID
- * @param int $typeId 远程分类ID
+ * @version 1.4.6 优化
+ * @version 1.2.0 首次引入
+ * @param int $typeId 必需;远程分类ID;默认：0
  * @return int 本地对应ID,无对应时返回0
  */
-function typeId2termId($typeId){
-    if( $term = categoryTypeId($typeId) ){
+function typeId2termId($typeId=0){
+    if( $term = categoryMeta('term_api_tid',$typeId) ){
         return $term['term_id'];
     }
     return 0;
@@ -539,78 +516,89 @@ function typeId2termId($typeId){
 
 /**
  * 将远程APIID转为本地绑定的分类别名
- * @param int $typeId 远程分类ID
+ * @version 1.4.6 优化
+ * @version 1.2.0 首次引入
+ * @param int $typeId 必需;远程分类ID;默认：0
  * @return int 本地对应ID,无对应时返回0
  */
-function typeId2termSlug($typeId){
-    if( $term = categoryTypeId($typeId) ){
+function typeId2termSlug($typeId=0){
+    if(!$typeId){
+        return uniqid();
+    }
+    if( $term = categoryMeta('term_api_tid',$typeId) ){
         return $term['term_slug'];
     }
-    return '';
+    return uniqid();
 }
 
-/** 
- * 将对象转换为多维数组 
- * 
- **/  
-function objectToArray($d) {  
-    if (is_object($d)) {  
-        // Gets the properties of the given object  
-        // with get_object_vars function  
-        $d = get_object_vars($d);  
-    }  
-  
-    if (is_array($d)) {  
-        /* 
-        * Return array converted to object 
-        * Using __FUNCTION__ (Magic constant) 
-        * for recursive call 
-        */  
-        return array_map(__FUNCTION__, $d);  
-    }  
-    else {  
-        // Return array  
-        return $d;  
-    }  
-}  
-   
-/** 
- * 将多维数组转换为对象 
- * 
- **/  
-function arrayToObject($d) {  
-    if (is_array($d)) {  
-        return (object) array_map(__FUNCTION__, $d);
-    } else {  
-        return $d;
-    }  
+/**
+ * 过滤连续空白
+ * @version 1.4.6 首次引入
+ * @param string $str 待过滤的字符串
+ * @return string 处理后的字符串
+ */
+function maccmsTrim($str=''){
+    $str = str_replace("　",' ',str_replace("&nbsp;",' ',trim($str)));
+    $str = preg_replace('#\s+#', ' ', $str);
+    return $str;
+}
+
+/**
+ * 根据对日期或时间进行格式化
+ * @version 1.4.6 首次引入
+ * @param string $format 必需;规定时间戳的格式;空
+ * @param mixed $timestamp 可选;规定时间戳;空
+ * @return string 格式化后的时间
+ */
+function maccmsDate($format='Y-m-d', $timestamp='')
+{
+    if(!is_numeric($timestamp)){
+        $timestamp = strtotime($timestamp);
+    }
+    return date($format, $timestamp);
 }
 
 /**
  * 检测一个UTF-8字符串里是否包含繁体中文
- * @param string $str
- * @return bool
+ * @version 1.3.0 首次引入
+ * @param string $str 必需;待检测字符;默认：空
+ * @return bool true|false
  */
-function maccmsIsBig($str) {
+function maccmsIsBig($str='') {
     return iconv('UTF-8', 'GB2312', $str) === false ? true : false;
 }
 
-//简转繁
-function maccmss2t($str){
+/**
+ * 简体转繁体
+ * @version 1.3.0 首次引入
+ * @param string $str 必需;待转换字符;默认：空
+ * @return string 转换后的字符
+ */
+function maccmss2t($str=''){
     $url = 'http://api.daicuo.cc/jianfan/?token='.maccmsToken().'&type=s2t&text='.urlencode($str);
 	$json = json_decode(DcCurl('windows',10,$url), true);
 	return $json['data'];
 }
 
-//繁转简
-function maccmst2s($str){
+/**
+ * 繁体转简体
+ * @version 1.3.0 首次引入
+ * @param string $str 必需;待转换字符;默认：空
+ * @return string 转换后的字符
+ */
+function maccmst2s($str=''){
 	$url = 'http://api.daicuo.cc/jianfan/?token='.maccmsToken().'&type=t2s&text='.urlencode($str);
 	$json = json_decode(DcCurl('windows',10,$url), true);
 	return $json['data'];
 }
 
-//关键字搜索转换、将繁体字转为简体后搜索
-function maccmsSearch($str){
+/**
+ * 关键字搜索转换、将繁体字转为简体后搜索
+ * @version 1.3.0 首次引入
+ * @param string $str 必需;待转换字符;默认：空
+ * @return string 转换后的字符
+ */
+function maccmsSearch($str=''){
     if( config('maccms.api_search') == 't2s' ){
         //存在繁体字就转为简体
         if(maccmsIsBig($str)){
@@ -624,12 +612,14 @@ function maccmsSearch($str){
             return $strs2t;
         }
     }
-    
     // 原样返回
 	return $str;
 }
 
-//返回MacCms默认TOKEN
+/**
+ * 返回MacCms默认TOKEN
+ * @return string token值
+ */
 function maccmsToken(){
     return DcEmpty(config("common.site_token"),'af3d62d522b656bc02f0ce26010deaea');
 }

@@ -1,22 +1,19 @@
 body{
-	padding-top:66px;
+	padding-top: 66px;
 	background-color: #29262d;
 	color: #6c757d;
-}
-:hover.bg-play{
-    background: rgba(0,0,0,0.1) url(images/play.png) center no-repeat;
 }
 .navbar-nav > li:hover .dropdown-menu {
     display: block;
 }
 .embed-responsive-16by9{
-	max-height:540px;
+	max-height: 540px;
 }
 .pager{
-	list-style:none;
+	list-style: none;
 }
 .pagination{
-	font-size:1.1rem;
+	font-size: 1.1rem;
 }
 .pagination .page-item{
 	margin:auto 0.35rem;
@@ -24,7 +21,7 @@ body{
 .pagination .page-item .page-link{
 	color: #eee;
 	border-color: #333;
-	background-color:#333;
+	background-color: #333;
 	border-radius: .25rem;
 }
 .pagination .page-item .page-link:hover{
@@ -47,14 +44,21 @@ body{
 }
 .pagination .page-item:last-child .page-link {
 }
+
+:hover.bg-play{
+    background: rgba(0,0,0,0.1) url(images/play.png) center no-repeat;
+}
+.h7{
+    font-size: 0.9rem;
+}
 img.h-row{
-	height:135px !important;
+	height: 135px !important;
 }
 img.h-auto{
-	height:135px !important;
+	height: 135px !important;
 }
 .h-slide{
-	height:190px;
+	height: 190px;
 }
 /*ipad pro*/
 @media (min-width: 767.98px) {
@@ -68,9 +72,9 @@ img.h-auto{
     	max-width: 20%;
 	}
 	img.h-row{
-		height:200px !important;
+		height: 200px !important;
 	}	
 	img.h-auto{
-		height:250px !important;
+		height: 250px !important;
 	}
 }

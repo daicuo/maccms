@@ -1,14 +1,4 @@
 <?php
-// +----------------------------------------------------------------------
-// | DaiCuo框架[基于ThinkPHP5.0开发]
-// +----------------------------------------------------------------------
-// | Copyright (c) 2019-2020 http://www.daicuo.net
-// +----------------------------------------------------------------------
-// | DaiCuo承诺基础框架永久免费开源，您可用于学习和商用，但必须保留软件版权信息。
-// +----------------------------------------------------------------------
-// | Author: 老谭 <271513820@qq.com>
-// +----------------------------------------------------------------------
-
 namespace app\common\controller;
 
 use think\Controller;
@@ -38,7 +28,7 @@ class Base extends Controller
     /**
      * 继承初始化方法
      */
-    public function _initialize()
+    protected function _initialize()
     {
         header("Content-type:text/html;charset=utf-8");
         $this->site['user'] = \daicuo\User::get_current_user();
@@ -57,13 +47,13 @@ class Base extends Controller
         \think\Hook::listen('hook_base_init', $this->site);
     }
     
-    
     /**
      * 权限验证方法 默认都需要登录 都需要鉴权 白名单除外
      * @author 老谭 <271513820@qq.com>
      * @return mixed
      */
-    public function _authCheck(){
+    protected function _authCheck()
+    {
         //认证开关
         if( false == $this->auth['check'] ){
             return true;
@@ -88,19 +78,20 @@ class Base extends Controller
             }
             // 不需要鉴权的白名单里没有此规则需验证是否有对应权限关系
             if( !in_array($this->auth['rule'], $this->auth['none_right']) ){
-                if ( false == \daicuo\Auth::check($this->auth['rule'], $this->site['user']['user_capabilities']) ) {
+                if ( false == \daicuo\Auth::check($this->auth['rule'], $this->site['user']['user_capabilities'], $this->site['user']['user_caps']) ) {
                     $this->error( DcError(lang('user_capabilities_error')), $this->auth['error_right']);
                 }
             }
         }
     }
-		
+
     /**
      * 空操作
      * @author 老谭 <271513820@qq.com>
      * @return mixed
      */
-    public function _empty($name){
+    public function _empty($name)
+    {
         return abort(404, 'action none');
     }
 }

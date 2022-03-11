@@ -16,34 +16,43 @@ class Common
     //应用初始化
     public function appInit(&$params)
     {
-        //加载缓存配置
-        if( !\think\Env::get('cache.type') ){
-            DcLoadConfig('./datas/config/cache.php');
+        //加载缓存文件配置
+        if(!\think\Env::get('cache.type')){
+            \daicuo\Cache::appInt();
         }
-        //加载路由配置
-        action('common/Route/appInt','','event');
-        //Route::rule('new/:id','home/News/read');
+        
+        //加载路由动态配置cache(route_all)
+        \daicuo\Route::appInt();
     }
     
     //应用开始
     public function appBegin(&$params)
     {
-        //加载框架动态配置
-        action('common/Op/appBegin','','event');
+        //所有设为自动加载的配置（公共模块）cache(config_common)
+        \daicuo\Op::config('common');
+        
         //主域名与移动端域名切换
-        action('common/Request/appBegin','','event');
-        //注册框架动态钩子
-        action('common/Hook/appBegin','','event');
+        \daicuo\Request::appBegin();
+        
+        //是否开启调试模式显示错误信息
+        if(config('common.app_debug')=='on'){
+            config('show_error_msg',true);
+        }
     }
     
     //模块初始化
     public function moduleInit(&$params)
     {
         //获取当前模块名
-        $module = request()->module();
-        //加载框架所有应用插件信息配置函数等
-        action('common/Apply/moduleInit', $module, 'event');
-        //后台|API应用验证
+        $module = $params->module();//request()->module()
+        
+        //加载框架所有插件的初始配置与动态配置
+        \daicuo\Apply::moduleInit($module);
+        
+        //加载框架所有动态语言(数据库里面的语言包)
+        \daicuo\Lang::menuInit();
+        
+        //应用验证（admin|API）
         if( !in_array($module, ['admin','api']) ){
             //插件安装验证
             $applys = config('common.site_applys');
@@ -57,7 +66,7 @@ class Common
             unset($applys);
             //网站开关验证
             if(config('common.site_status') == 'off'){
-                halt(DcHtml(DcEmpty(config('common.site_close'), lang('close'))));
+                halt(DcEmpty(config('common.site_close'), lang('close')));
             }
             //多模板主题路径
             config('template.view_path', DcViewPath($module, request()->isMobile()));

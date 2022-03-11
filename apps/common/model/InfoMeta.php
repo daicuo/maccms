@@ -29,5 +29,4 @@ class InfoMeta extends Model
 	public function info(){
 		return $this->belongsTo('Info', 'info_id');
 	}
-	
 }

@@ -1,21 +1,14 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 class Apply extends Admin
 {
-    // 应用官网
-	public function jump()
-    {
-		$service = new \daicuo\Service();
-        $this->redirect($service->apiUrl().'/home/?'.http_build_query($this->query),302);
-	}
-    
     // 在线升级
     public function upgrade()
     {
-        $apply = controller('common/Apply','event');
+        $apply = new \daicuo\Apply();
         if( !$apply->upgradeOnline($this->query['module']) ){
             $error = explode('%',$apply->getError());
             $this->error(lang($error[0]).$error[2],$error[1]);
@@ -24,15 +17,22 @@ class Apply extends Admin
     }
     
     // 在线安装
-	public function install()
+    public function install()
     {
-        $event = controller('common/Apply','event');
-        if( !$event->installOnline($this->query) ){
-            $error = explode('%',$event->getError());
+        $apply = new \daicuo\Apply();
+        if( !$apply->installOnline($this->query['module']) ){
+            $error = explode('%',$apply->getError());
             $this->error(lang($error[0]).$error[2],$error[1]);
-		}
+		    }
         $this->success(lang('success'));
-	}
+    }
+    
+    // 浏览器打开应用官网
+    public function jump()
+    {
+        $service = new \daicuo\Service();
+        $this->redirect($service->apiUrl().'/home/?'.http_build_query($this->query),302);
+    }
     
     // 浏览器下载
     public function down()
@@ -44,78 +44,71 @@ class Apply extends Admin
     // 禁用插件
     public function disable()
     {
-        $event = controller('common/Apply','event');
-        if(!$event->updateStatus(input('get.module/s'),'disable')){
-			$this->error( lang($event->getError()) );
-		}
+        $apply = new \daicuo\Apply();
+        if(!$apply->updateStatus(input('get.module/s'),'disable')){
+          $this->error( lang($apply->getError()) );
+        }
         $this->success(lang('success'),'apply/index');
     }
     
     // 启用插件
     public function enable()
     {
-        $event = controller('common/Apply','event');
-        if(!$event->updateStatus(input('get.module/s'),'enable')){
-			$this->error( lang($event->getError()) );
-		}
+        $apply = new \daicuo\Apply();
+        if(!$apply->updateStatus(input('get.module/s'),'enable')){
+          $this->error( lang($apply->getError()) );
+        }
         $this->success(lang('success'),'apply/index');
     }
     
     // 卸载插件
     public function remove()
     {
-        $event = controller('common/Apply','event');
-        if(!$event->uninstall(input('get.module/s'))){
-			$this->error( lang($event->getError()) );
-		}
+        $apply = new \daicuo\Apply();
+        if(!$apply->remove(input('get.module/s'))){
+          $this->error( lang($apply->getError()) );
+        }
         $this->success(lang('success'),'apply/index');
     }
     
-    // 应用打包
-	public function create()
-    {
-		return $this->fetch();
-	}
-    
-    // 应用打包保存
+    // 应用手动安装
     public function save()
     {
-        $status = \daicuo\Op::write( input('post.') );
-        if( !$status ){
-            $this->error(lang('fail'));
+        $apply = new \daicuo\Apply();
+        if( !$apply->install(input('get.module/s'),'install') ){
+            $error = explode('%',$apply->getError());
+            $this->error(lang($error[0]).$error[2],$error[1]);
         }
         $this->success(lang('success'));
     }
     
-    // 删除应用
+    // 应用手动删除
     public function delete()
     {
-        $event = controller('common/Apply','event');
-        if( !$event->uninstall(input('get.module/s'), true) ){
-			$this->error( lang($event->getError()) );
-		}
+        $apply = new \daicuo\Apply();
+        if( !$apply->uninstall(input('get.module/s')) ){
+          $this->error( lang($apply->getError()) );
+        }
         $this->success(lang('success'),'apply/index');
     }
     
-    // 本地手动安装
-	public function update()
+    // 应用手动升级
+    public function update()
     {
-        $event = controller('common/Apply','event');
-        if( !$event->install( input('get.module/s') ) ){
-            $error = explode('%',$event->getError());
+        $apply = new \daicuo\Apply();
+        if( !$apply->install(input('get.module/s'), 'upgrade') ){
+            $error = explode('%',$apply->getError());
             $this->error(lang($error[0]).$error[2],$error[1]);
-		}
+        }
         $this->success(lang('success'));
-	}
+    }
     
     //本地应用列表
-	public function index()
+    public function index()
     {
-        $event = controller('common/Apply','event');
-        $service = new \daicuo\Service();
-		$this->assign('applys', $event->appsInfo());
-        $this->assign('api_url', $service->apiUrl());
-		return $this->fetch();
-	}
-	
+        \daicuo\Apply::appsCheck();//同步安装记录
+        $this->assign('applys',  \daicuo\Apply::appsInfo());
+        $this->assign('api_url', \daicuo\Service::apiUrl());
+        return $this->fetch();
+    }
 }

@@ -5,27 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="format-detection" content="telephone=no"/>{block name="header_meta"}
 <title>DaiCuo</title>{/block}<!-- fonts -->
-<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.css">
+<link href="https://lib.baomitu.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <!-- bootsrtap -->
-<link rel="stylesheet" type="text/css" href="//lib.baomitu.com/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+<link href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" rel="stylesheet">
 <!-- base.css -->
-<link rel="stylesheet" type="text/css" href="{$domain}{$path_root}public/css/base.css?{:config('daicuo.version')}">
+<link href="{:DcUrlCss($domain, $path_root.'public/css/base.css')}" rel="stylesheet">
 <!-- theme.css -->
-<link rel="stylesheet" type="text/css" href="{$domain}{$path_root}{$path_view}theme.css?{:config('daicuo.version')}">
+<link href="{:DcUrlCss($domain, $path_root.$path_view.'theme.css')}" rel="stylesheet">
 <!-- jquery -->
-<script type="text/javascript" src="//lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://lib.baomitu.com/jquery/3.3.1/jquery.min.js"></script>
 <!-- bootsrtap -->
-<script type="text/javascript" src="//lib.baomitu.com/twitter-bootstrap/4.6.0/js/bootstrap.bundle.min.js"></script>
-<!-- headerMore -->{block name="header_more"}{/block}
+<script src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.bundle.min.js"></script>
 <!-- base.js-->
-<script type="text/javascript" src="{$domain}{$path_root}public/js/base.js?{:config('daicuo.version')}" data-id="daicuo" data-file="{$file}" data-root="{$path_root}" data-view="{$path_view}" data-upload="{$path_upload}" data-module="{$module}" data-controll="{$controll}" data-action="{$action}" data-page="{$page}" data-user-id="{$user.user_id|default=0}" data-lang="{:config('default_lang')}"></script>
+<script src="{:DcUrlJs($domain, $path_root.'public/js/base.js')}" data-id="daicuo" data-file="{$file}" data-root="{$path_root}" data-view="{$path_view}" data-upload="{$path_upload}" data-module="{$module}" data-controll="{$controll}" data-action="{$action}" data-page="{$page}" data-user-id="{$user.user_id|default=0}" data-lang="{:config('default_lang')}"></script>{block name="header_more"}{/block}
 <!-- theme.js -->
-<script type="text/javascript" src="{$domain}{$path_root}{$path_view}theme.js?{:config('daicuo.version')}"></script>
+<script src="{:DcUrlJs($domain, $path_root.$path_view.'theme.js')}"></script>
+{:config('common.header_tongji')}
 </head>
 <body>
 <!-- -->
-<div class="modal fade dc-modal" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document"></div>
+<div class="modal fade dc-modal">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"></div>
 </div>
 <!-- -->
 <header role="header">

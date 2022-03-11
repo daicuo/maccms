@@ -1,13 +1,9 @@
 <?php
 namespace app\maccms\event;
 
-use think\Controller;
+use app\common\controller\Addon;
 
-/*
-** MacCms管理后台首页
-*/
-
-class Admin extends Controller
+class Admin extends Addon
 {
 	
 	public function _initialize()
@@ -18,72 +14,118 @@ class Admin extends Controller
     //管理首页
 	public function index()
     {
-        $themes = array();
-        foreach( glob_basename('apps/maccms/theme/') as $value){
-            $themes[$value] = $value;
+        $themes = DcThemeOption('maccms');
+        
+        $items = [
+            'theme' => [
+                'type'   =>'select', 
+                'value'  => config('maccms.theme'), 
+                'option' => $themes,
+            ],
+            'theme_wap' => [
+                'type'   => 'select',
+                'value'  => config('maccms.theme_wap'),
+                'option' => $themes,
+            ],
+            'site_title' => [
+                'type'  => 'text', 
+                'value' => config('maccms.site_title'),
+            ],
+            'site_keywords' => [
+                'type'  => 'text', 
+                'value' => config('maccms.site_keywords'),
+            ],
+            'site_description' => [
+                'type'  => 'text',
+                'value' => config('maccms.site_description'),
+            ],
+            'limit_index' => [
+                'type'  => 'number',
+                'value' => intval(config('maccms.limit_index')),
+            ],
+            'limit_categorys' => [
+                'type'  => 'number',
+                'value' => intval(config('maccms.limit_categorys')),
+            ],
+            'html_hr2'   => [
+                'type'  => 'html',
+                'value' => '<hr>'
+            ],
+            'rewrite_index' => [
+                'type'        => 'text', 
+                'value'       => config('maccms.rewrite_index'),
+                'placeholder' => '',
+                'tips'        => 'maccms$',
+            ],
+            'rewrite_play' => [
+                'type'        => 'text',
+                'value'       => config('maccms.rewrite_play'),
+                'placeholder' => '',
+                'tips'        => '[:from] [:id] [:ep] [:termId] [:termSlug]',
+            ],
+            'rewrite_category' => [
+                'type'        => 'text', 
+                'value'       => config('maccms.rewrite_category'),
+                'placeholder' => '',
+                'tips'        => '[:id] [:slug] [:pageNumber]',
+            ],
+        ];
+        foreach($items as $key=>$value){
+            $items[$key]['title']       = lang('mac_'.$key);
+            if(!isset($value['placeholder'])){
+                $items[$key]['placeholder'] = lang('mac_'.$key.'_placeholder');
+            }
         }
-        $this->assign('themes', $themes);
+        //
+        $this->assign('items', DcFormItems($items));
         return $this->fetch('maccms@admin/index');
 	}
     
-    //过滤配置
-	public function filter()
-    {
-        return $this->fetch('maccms@admin/filter');
-	}
-    
-    //首页轮播
-	public function slite()
-    {
-        return $this->fetch('maccms@admin/slite');
-	}
-
-    //链接管理
-	public function link()
-    {
-        return $this->fetch('maccms@admin/link');
-	}
-    
-    //广告配置
-	public function poster()
-    {
-        return $this->fetch('maccms@admin/poster');
-	}
-    
-    //广告配置
-	public function posterwap()
-    {
-        return $this->fetch('maccms@admin/posterwap');
-	}
-    
-    //微信平台
-	public function weixin()
-    {
-        return $this->fetch('maccms@admin/weixin');
-	}
-    
-    //保存配置
+     //保存配置
     public function update()
     {
-        $status = \daicuo\Op::write(
-            input('post.'),
-            input('module/s','maccms'), 
-            input('controll/s'),
-            input('action/s'),
-            input('order/d',0),
-            input('autoload/s','yes')
-        );
+        $post = input('post.');
+        
+        $status = \daicuo\Op::write($post,'maccms', 'config', 'system', 0, 'yes');
 		if( !$status ){
 		    $this->error(lang('fail'));
         }
+        
+        $this->rewriteRoute($post);
+        
         $this->success(lang('success'));
 	}
     
-    //手动执行升级脚本
-    public function upgrade()
+    //配置伪静态
+    private function rewriteRoute($post)
     {
-        controller('maccms/Sql','event')->upgrade();
-        
-        $this->success(lang('success'), 'store/index');
-	}
+        //批量删除路由伪静态
+        \daicuo\Op::delete_all([
+            'op_name'     => ['eq','site_route'],
+            'op_module'   => ['eq','maccms'],
+        ]);
+        //批量添加路由伪静态
+        $result = \daicuo\Route::save_all([
+            [
+                'rule'        => $post['rewrite_index'],
+                'address'     => 'maccms/index/index',
+                'method'      => '*',
+                'op_module'   => 'maccms',
+            ],
+            [
+                'rule'        => $post['rewrite_play'],
+                'address'     => 'maccms/play/index',
+                'method'      => '*',
+                'op_module'   => 'maccms',
+            ],
+            [
+                'rule'        => $post['rewrite_category'],
+                'address'     => 'maccms/category/index',
+                'method'      => '*',
+                'op_module'   => 'maccms',
+            ],
+        ]);
+        //清理全局缓存
+        DcCache('route_all', null);
+    }
 }

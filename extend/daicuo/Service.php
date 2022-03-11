@@ -1,24 +1,23 @@
 <?php
 namespace daicuo;
 
-use think\Lang;
-
 class Service
 {
-    private $error = '';
+    private static $error = '';
 
     // 下载路径
-    private $path = './datas/';
+    private static $path = './datas/';
     
     // 服务端URL
-    private $api_url = 'http://hao.daicuo.cc/1.4';
+    private static $api_url = 'http://hao.daicuo.cc/1.7';
     
     /**
      * 架构函数
      * @param string $path 临时目录路径
      */
-    public function __construct($path = './datas/temp/') {
-        $this->path = $path;
+    public function __construct($path = './datas/temp/') 
+    {
+        self::$path = $path;
     }
     
     /**
@@ -30,28 +29,29 @@ class Service
     {
         // 应用名称
         if( !$args['module'] ){
-            $this->error = 'daicuo_module_empty';
+            self::$error = 'daicuo_module_empty';
             return false;
         }
         
         //ApiKey
         if( !config('common.site_token')|| (config('common.site_token')=='6fc79c072a4500b749b5b11b9f969c8c') ){
-            $this->error = 'daicuo_token_empty';
+            self::$error = 'daicuo_token_empty';
             return false;
         }
         
         //临时文件保存名称
-        $saveFile = $this->path.time().'.zip';
+        $saveFile = self::$path.time().'.zip';
         
         //开始下载
         $http = new \net\Http();
         $header = ['DAICUO:1','TOKEN:'.config('common.site_token')];
-        $status = $http->downLoad($this->api_url.'/apply/?'.http_build_query($args), $saveFile, '', $header);
+        $args['daicuoVersion'] = config('daicuo.version');
+        $status = $http->downLoad(self::$api_url.'/apply/?'.http_build_query($args), $saveFile, '', $header);
         
         //检测是否下载成功
         if(!$status){
         
-            $this->error = $http->getError();
+            self::$error = '<a class="text-purple" href="../union/index" target="_blank">'.$http->getError().'</a>';
             
             return false;
         }
@@ -61,7 +61,7 @@ class Service
         
             @unlink($saveFile);
             
-            $this->error = 'apply_download_failed';
+            self::$error = 'apply_download_failed';
             
             return false;
         }
@@ -78,7 +78,8 @@ class Service
     {
         $query['event'] = 'browser';
         $query['token'] = config('common.site_token');
-        return $this->api_url.'/apply/?'.http_build_query($query);
+        $query['daicuoVersion'] = config('daicuo.version');
+        return self::$api_url.'/apply/?'.http_build_query($query);
     }
     
     /**
@@ -88,7 +89,8 @@ class Service
      */
     public function apiData($query)
     {
-        return json_decode(DcCurl('auto', 10, $this->api_url.'/store/?'.http_build_query($query)),true);
+        $query['daicuoVersion'] = config('daicuo.version');
+        return json_decode(DcCurl('auto', 10, self::$api_url.'/store/?'.http_build_query($query)),true);
     }
     
     /**
@@ -98,7 +100,8 @@ class Service
      */
     public function apiUpgrade($query)
     {
-        return json_decode(DcCurl('auto', 10, $this->api_url.'/version/?'.http_build_query($query)),true);
+        $query['daicuoVersion'] = config('daicuo.version');
+        return json_decode(DcCurl('auto', 10, self::$api_url.'/version/?'.http_build_query($query)),true);
     }
     
     /**
@@ -107,7 +110,7 @@ class Service
      */
     public function apiUrl()
     {
-        return $this->api_url;
+        return self::$api_url;
     }
     
     /**
@@ -116,6 +119,6 @@ class Service
      */
     public function getError()
     {
-        return $this->error;
+        return self::$error;
     }
 }

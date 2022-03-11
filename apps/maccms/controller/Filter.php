@@ -5,25 +5,32 @@ use app\common\controller\Front;
 
 class Filter extends Front
 {
-
 	public function _initialize()
     {
 		parent::_initialize();
 	}
     
     //最近更新
-	public function lately()
+	public function index()
     {
-        $list = apiItem(['limit'=>intval(config('maccms.page_size')), 'pg'=>$this->query['page'], 'order'=>'addtime', 'sort'=>'desc']);
-        $this->assign($this->query);
+        $list = apiItem([
+            'limit' => intval(config('maccms.page_size')),
+            'pg'    => $this->site['page'],
+            'order' => 'addtime',
+            'sort'  => 'desc',
+        ]);
         $this->assign($list['page']);
         $this->assign('type', $list['type']);
         $this->assign('item', $list['item']);
         if($this->request->isAjax()){
             return $this->fetch('ajax');
         }
-        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
-			DcUrl('maccms/filter/lately',['page'=>'[PAGE]'],'')));
+        $this->assign('pages',DcPage(
+            $list['page']['current_page'], 
+            $list['page']['per_page'], 
+            $list['page']['total'],
+			DcUrl('maccms/filter/index',['pageNumber'=>'[PAGE]'])
+        ));
 		return $this->fetch();
 	}
     
@@ -36,40 +43,40 @@ class Filter extends Front
     //主演页
     public function actor()
     {
-        return $this->_field('actor',input('get.id/s','刘德华'));
+        return $this->_field('actor',input('get.wd/s','刘德华'));
     }
     
     //导演页
     public function director()
     {
-        return $this->_field('director',input('get.id/s','王晶'));
+        return $this->_field('director',input('get.wd/s','王晶'));
     }
     
     //地区页
     public function area(){
-        return $this->_field('area',input('get.id/s','内地'));
+        return $this->_field('area',input('get.wd/s','内地'));
     }
     
     //年代页
     public function year()
     {
-        return $this->_field('year',input('get.id/s','2020'));
+        return $this->_field('year',input('get.wd/s','2022'));
     }
     
     //语言页
     public function language()
     {
-        return $this->_field('language',input('get.id/s','国语'));
+        return $this->_field('language',input('get.wd/s','国语'));
     }
     
     //按字段获取
-    private function _field($field, $value)
+    private function _field($field='index', $value='')
     {
         $value = DcHtml(urldecode($value));
-        //接口参数
+        //API参数
         $args = [];
         $args['limit'] = intval(config('maccms.page_size'));
-        $args['pg'] = $this->query['page'];
+        $args['pg']   = $this->site['page'];
         $args[$field] = $value;
         //调用数据
         $list = apiItem($args);
@@ -80,14 +87,18 @@ class Filter extends Front
         $this->assign('item', $list['item']);
         //AJAX模板
         if($this->request->isAjax()){
-            if($this->query['page'] > $list['page']['last_page']){
+            if($this->site['page'] > $list['page']['last_page']){
                 return null;
             }
             return $this->fetch('ajax');
         }
         //普通模板
-        $this->assign('pages',DcPage($list['page']['current_page'], $list['page']['per_page'], $list['page']['total'],
-			DcUrl('maccms/filter/'.$field,['id'=>$value,'page'=>'[PAGE]'],'')));
+        $this->assign('pages',DcPage(
+            $list['page']['current_page'], 
+            $list['page']['per_page'], 
+            $list['page']['total'],
+			DcUrl('maccms/filter/'.$field,['wd'=>$value,'pageNumber'=>'[PAGE]'])
+        ));
 		return $this->fetch();
     }
 }

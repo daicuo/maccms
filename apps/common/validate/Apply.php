@@ -6,16 +6,16 @@ use think\Validate;
 class Apply extends Validate
 {
 	
-	protected $rule = [
-		'module'  =>  'alpha',
-	];
-	
-	protected $message = [
-		'module.alpha' => '{%alpha_module}',
-	];
-	
-	protected $scene = [
-    
-	];
+    protected $rule = [
+        'module'  =>  'alpha',
+    ];
+
+    protected $message = [
+        'module.alpha' => '{%alpha_module}',
+    ];
+
+    protected $scene = [
+
+    ];
 
 }

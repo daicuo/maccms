@@ -1,57 +1,43 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 class Cache extends Admin
 {
 	//保存缓存配置
 	public function update()
     {
-        $config = array();
-        $config['type'] = input('post.cache_type/s','File');
-        $config['prefix'] = input('post.cache_prefix/s');
-        $config['path'] = input('post.cache_path/s');
-        $config['db'] = input('post.cache_db/s');
-        $config['host'] = input('post.cache_host/s');
-        $config['port'] = input('post.cache_port/s');
-        $config['expire'] = input('post.cache_expire/d',0);
-        $config['expire_detail'] = input('post.cache_expire_detail/d','');
-        $config['expire_item'] = input('post.cache_expire_item/d','');
-        //
-		if($config['type'] == 'Sqlite3'){
-			if(!class_exists('sqlite3')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}elseif($config['type'] == 'Memcache'){
-			if(!class_exists('memcache')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}elseif($config['type'] == 'Memcached'){
-			if(!class_exists('memcached')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}elseif($config['type'] == 'Redis'){
-			if(!class_exists('redis')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}elseif($config['type'] == 'Wincache'){
-			if(!class_exists('wincache_ucache_info')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}elseif($config['type'] == 'Xcache'){
-			if(!class_exists('xcache_info')){
-				$this->error(lang('unSupport').$config['type']);
-			}
-		}
-        //将配置写入文件
-        $file = new \files\File();
-        $result = $file->write_array('./datas/config/cache.php', ['cache'=>$config]);
-        if($result){
+        $options = array();
+        $options['type']          = input('post.cache_type/s','File');
+        $options['prefix']        = input('post.cache_prefix/s');
+        $options['path']          = input('post.cache_path/s');
+        $options['db']            = input('post.cache_db/s');
+        $options['host']          = input('post.cache_host/s');
+        $options['port']          = input('post.cache_port/s');
+        $options['expire']        = input('post.cache_expire/d',0);
+        $options['expire_detail'] = input('post.cache_expire_detail/d','');
+        $options['expire_item']   = input('post.cache_expire_item/d','');
+        //验证缓存服务是否支持
+        if( \think\Cache::connect($options) ){
+            //将配置写入数据库
+            if( write_array('./datas/config/cache.php',$options) ){
+                $this->success(lang('success'));
+            }else{
+                $this->error(lang('cache_error_write'));
+            }
+            //返回结果
             $this->success(lang('success'));
-        }else{
-            $this->error(lang('fail'));
         }
+         //连接失败
+        $this->error(lang('unSupport').$option['type']);
 	}
     
+    //缓存配置
+    public function index()
+    {
+        $this->assign('fields', DcFormItems(model('admin/Cache','loglic')->fields()));
+        
+		return $this->fetch();
+    }
 }

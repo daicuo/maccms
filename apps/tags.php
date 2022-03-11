@@ -16,29 +16,5 @@ return [
     // 表单验证
     'form_validate'  => [
         'app\\common\\behavior\\Common',
-    ],
-    // 配置数据验证
-    'op_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
-    // 钩子数据验证
-    'hook_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
-    // 路由数据验证
-    'route_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
-    // 导航数据验证
-    'nav_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
-    // 队列数据验证
-    'term_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
-    // 内容数据验证
-    'info_data_validate'  => [
-        'app\\common\\behavior\\Common',
-    ],
+    ]
 ];

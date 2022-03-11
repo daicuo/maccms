@@ -3,8 +3,8 @@ namespace app\common\model;
 
 use app\maccms\model\Api;
 
-class Xml extends Api{
-
+class Xml extends Api
+{
     //字段转换字典
     protected $fields = [
         'vod_id'    => 'a',
@@ -13,7 +13,8 @@ class Xml extends Api{
     ];
     
     //列表数据xml接口
-	public function item($api, $args){
+	public function item($api='', $args=[])
+    {
         //API参数 搜索时只能走list接口
         $url = array();
         $url['ac']  = 'list';//videolist|list
@@ -78,7 +79,8 @@ class Xml extends Api{
     }
     
     //详情页xml接口
-    public function detail($api, $args){
+    public function detail($api='', $args=[])
+    {
         //API参数
         $url = array();
         $url['ac']  = 'videolist';//videolist|list
@@ -109,6 +111,7 @@ class Xml extends Api{
 			}
             //其它字段对象转数组后由字典转换获取
             $xml = json_decode(json_encode($value), true);
+            //拼装数据列表
             $item[$key] = $this->detail_data( array_merge($xml, ['from'=>$from]) );
             $key++;
         }
@@ -133,7 +136,8 @@ class Xml extends Api{
     }
     
     //分类字典转化xml
-    public function item_data($data){
+    public function item_data($data=[])
+    {
         $item = array();
         $key = 0;
         foreach($data->class->ty as $list){
@@ -145,7 +149,8 @@ class Xml extends Api{
     }
     
     //详情字典转换xml
-    public function detail_data($data){
+    public function detail_data($data=[])
+    {
         if(!$data){
             return null;
         }
@@ -174,13 +179,16 @@ class Xml extends Api{
         ];
         //字段转化
         $data = $this->data_fields($data);
-        $data['vod_year']     = $this->data_explode($data['vod_year']);
-        $data['vod_area']     = $this->data_explode($data['vod_area']);
-        $data['vod_language'] = $this->data_explode($data['vod_language']);
-        $data['vod_actor']    = $this->data_explode($data['vod_actor']);
-        $data['vod_director'] = $this->data_explode($data['vod_director']);
-        $data['play_list']    = $this->play_list($data['vod_play'], $data['play_list']);
-        $data['play_last']    = $this->play_last($data['type_id'], $data['vod_id'], $data['play_list']);
+        //字段处理
+        $data['vod_year']       = $this->data_explode($data['vod_year']);
+        $data['vod_area']       = $this->data_explode($data['vod_area']);
+        $data['vod_language']   = $this->data_explode($data['vod_language']);
+        $data['vod_actor']      = $this->data_explode($data['vod_actor']);
+        $data['vod_director']   = $this->data_explode($data['vod_director']);
+        $data['vod_content']    = maccmsTrim(strip_tags($data['vod_content'],'<p>,<br>'));
+        $data['episode_status'] = implode($data['episode_status']);
+        $data['play_list']      = $this->play_list($data['vod_play'], $data['play_list']);
+        $data['play_last']      = $this->play_last($data['type_id'], $data['vod_id'], $data['play_list']);
         return $data;
     }
     

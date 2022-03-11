@@ -6,10 +6,10 @@ use think\Controller;
 class Hook extends Controller
 {
 
-    // 后台首页
+    // 后台首页欢迎界面
     public function adminIndexHeader(&$params, $extra)
     {
-        echo(widget('admin/Common/welcome'));
+        widget('admin/Common/welcome');
     }
     
     // 用户登录前

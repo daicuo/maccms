@@ -21,41 +21,41 @@ class User
     /**
      * 检测与设置暴力破解的IP是否应锁定(检测是否因指定时间内错误数过多超出设置值而应锁定IP 主要用于暴力登录与暴力token)
      * @param bool $isSet 是否记录此次出错操作
-     * @return array
+     * @return bool $bool true|false
      */
-    protected static function is_lock($isSet=false)
+    public static function is_lock($isSet=false)
     {
-         // 检测开关 时长不设置或为0则不检测
-         if(!config('common.user_max_expire') ){
+        // 检测开关 时长不设置或为0则不检测
+        if(!config('common.user_max_expire') ){
+            return false;
+        }
+        // 白名单IP用户
+        if(config('common.user_force_white')){
+           if( in_array(request()->ip(), explode(',',config('common.user_force_white')) ) ){
              return false;
-         }
-         // 白名单IP用户
-         if(config('common.user_force_white')){
-             if( in_array(request()->ip(), explode(',',config('common.user_force_white')) ) ){
-                 return false;
-             }
-         }
-         // 定义参数
-         $cache_name  = md5('lock'.request()->ip());//UID_IP
-         $cache_value = intval(cache($cache_name));//从缓存获取已记录的出错次数
-         $max_expire  = intval(config('common.user_max_expire'));//检测时长
-         $max_error = intval(config('common.user_max_error'));//最大错误次数
-         // 是否增加出错次数+1
-         if($isSet){
-             return cache($cache_name, $cache_value+1, $max_expire);
-         }
-         // 检测是否超出最大错误阀值
-         if($cache_value > $max_error){
-             return true;
-         }
-         return false;
+           }
+        }
+        // 定义参数
+        $cache_name  = md5('lock'.request()->ip());//UID_IP
+        $cache_value = intval(cache($cache_name));//从缓存获取已记录的出错次数
+        $max_expire  = intval(config('common.user_max_expire'));//检测时长
+        $max_error   = intval(config('common.user_max_error'));//最大错误次数
+        // 是否增加出错次数+1
+        if($isSet){
+            return cache($cache_name, $cache_value+1, $max_expire);
+        }
+        // 检测是否超出最大错误阀值
+        if($cache_value > $max_error){
+            return true;
+        }
+        return false;
     }
     
     /**
      * Token信息
      * @return array
      */
-    public static function token_login($user_name, $user_pass)
+    public static function token_login($user_name='', $user_pass='', $user_expire=30)
     {
         if(!$user_name || !$user_pass){
             self::$error = lang('mustIn');
@@ -80,7 +80,7 @@ class User
             return false;
         }
         //更新TOKEN
-        if( !$result = self::token_update($user['user_id']) ){
+        if( !$result = self::token_update($user['user_id'],$user_expire) ){
             return false;
         }
         //返回登录结果
@@ -130,6 +130,7 @@ class User
             self::$error = lang('user_locked');
             return false;
         }
+        //查询TOKEN
         $user = self::get_user_by('user_token', $user_token);
         if(!$user){
             self::is_lock(true);//记录错误次数
@@ -157,6 +158,19 @@ class User
     }
     
     /**
+     * 生成TOKEN过期时长
+     * @version 1.6.9
+     * @param string $user_expire 过期时间多少天后
+     * @return string $string linux时间戳
+     */
+    public static function token_expire($user_expire=30)
+    {
+        $user_expire = DcEmpty($user_expire,30);
+        
+        return strtotime("+$user_expire days");
+    }
+    
+    /**
      * 删除Token
      * @param int $$user_id 用户ID
      * @return bool
@@ -172,9 +186,9 @@ class User
     }
     
     /**
-     * 修改Token
+     * 通过用户ID修改Token与过期时间
      * @param int $user 用户信息数组
-     * @param string $user_expire 延迟时长
+     * @param string $user_expire 延迟过期时长
      * @param string $user_token 用户旧的token
      * @return false|array 失败时返回false
      */
@@ -186,34 +200,94 @@ class User
         }else{
             $data['user_token'] = $user_token;
         }
-        $data['user_expire'] = strtotime("+$user_expire days");
-        /*
-        foreach($user as $key=>$value){
-            if( in_array($key, config('custom_fields.user_meta')) ){
-                $data[$key] = $value;
-            }
-        }*/
-        $result = self::update_user_by('user_id', $user_id, $data);//可自动更新验证查询缓存
+        $data['user_expire'] = self::token_expire($user_expire);
+        //可自动更新验证查询缓存
+        $result = self::update_user_by('user_id', $user_id, $data);
         if( is_null($result) ){
             self::$error = lang('user_update_error');
             return false;
         }
         return $data;
     }
+    
+    /**
+     * 通过Token值延迟过期时间
+     * @param string $user_token 用户TOKEN值
+     * @param int $user_expire 待增加时长天数
+     * @return array $array TOKEN值与新的过期时间
+     */
+    public static function token_refresh($user_token='',$user_expire=30)
+    {
+        if(!$user_token || !$user_expire){
+            self::$error = lang('mustIn');
+            return false;
+        }
+        //更新数据
+        $data = [];
+        $data['user_expire'] = self::token_expire($user_expire);
+        //可自动更新验证查询缓存
+        $result = self::update_user_by('user_token', $user_token, $data);
+        if( is_null($result) ){
+            self::$error = lang('user_update_error');
+            return false;
+        }
+        $data['user_token'] = $user_token;
+        return $data;
+    }
+    
+    /**
+     * 用户注册
+     * @return array
+     */
+    public static function register($data=[])
+    {
+        //注册信息
+        $post = array();
+        $post['user_name']         = $data['user_name'];
+        $post['user_mobile']       = $data['user_mobile'];
+        $post['user_email']        = $data['user_email'];
+        $post['user_pass']         = $data['user_pass'];
+        $post['user_pass_confirm'] = $data['user_pass_confirm'];
+        $post['user_nice_name']    = uniqid();
+        $post['user_slug']         = '';
+        $post['user_create_time']  = '';
+        $post['user_update_time']  = '';
+        $post['user_token']        = self::token_create(0);
+        $post['user_expire']       = self::token_expire(config('common.token_expire'));
+        $post['user_capabilities'] = ['subscriber'];
+        
+        //预留钩子
+        \think\Hook::listen('user_register_before', $post);
+        
+        //写入数据
+        $userId = self::save($post);
+        
+        //返回注册用户信息
+        $user = self::set_current_user($userId);
+        
+        // 预留钩子
+        \think\Hook::listen('user_register_after', $user);
+        
+        // 返回结果
+        return $user;
+    }
 
     /**
      * 用户登录
      * @return bool
      */
-    public static function login()
+    public static function login($post=[])
     {
         // 是否IP已锁定
         if( self::is_lock() ){
             self::$error = lang('user_locked');
             return false;
         }
-        // 接收表单
-        $post = input('post.');
+        // 是否接收表单
+        if(!$post){
+            self::$error = lang('empty');
+            return false;
+        }
         //预留钩子
         \think\Hook::listen('user_login_before', $post);
         // 查询字段
@@ -225,19 +299,19 @@ class User
             $field = 'user_name';
         }
         // 查询数据库
-        $data = self::get_user_by($field, input('user_name/s'), false);
+        $data = self::get_user_by($field, $post['user_name'], false);
         if(!$data){
+            self::$error = lang('user_name_error');
             self::is_lock(true);//记录出错次数
-            config('daicuo.error', lang('user_name_error'));
             return false;
         }
-        if(md5(input('user_pass/s')) != $data['user_pass']){
+        if(md5($post['user_pass']) != $data['user_pass']){
+            self::$error = lang('user_pass_error');
             self::is_lock(true);//记录出错次数
-            config('daicuo.error', lang('user_pass_error'));
             return false;
         }
         if('normal' != $data['user_status']){
-            config('daicuo.error', lang('user_status_error'));
+            self::$error = lang('user_status_error');
             return false;
         }
         // 重置当前用户
@@ -249,13 +323,13 @@ class User
             $cookie_expire = 0;
         }
         if( self::set_auth_cookie($data['user_id'],$cookie_expire) == false ){
-            config('daicuo.error', lang('cookie').lang('unSupport'));
+            self::$error = lang('cookie').lang('unSupport');
             return false;
         }
         // 预留钩子
         \think\Hook::listen('user_login_after', $data);
         // 返回结果
-        return true;
+        return $data;
     }
     
     /**
@@ -272,7 +346,7 @@ class User
      * 判断当前用户是否登录
      * @return bool
      */
-    public function is_logged_in()
+    public static function is_logged_in()
     {
         if(self::validate_auth_cookie() > 0){
             return true;
@@ -309,14 +383,13 @@ class User
         if($user_id > 0){
             //是否已经有当前用户信息
             $user = self::$currentUser;
-            if( !empty($user) ){
-                if($user_id == $user['user_id'] ){
-                    return $user;
-                }
+            if($user_id == $user['user_id'] ){
+                return $user;
             }
             //数据库查询有效用户ID
             $user = self::get_user_by('user_id', $user_id, false);
             if($user){
+                $user['user_caps'] = explode(chr(10),$user['user_caps']);
                 self::$currentUser = $user;
                 return $user;
             }
@@ -439,6 +512,8 @@ class User
         session('user_secert', null);
     }
     
+    /********************************************************************************************/
+    
     /**
      * 批量增加用户
      * @param array $list 写入数据（二维数组） 
@@ -452,45 +527,76 @@ class User
         }
         //缓存标识清理
         DcCacheTag('common/User/Item', 'clear');
+        //缓回结果
         return $status;
     }
     
     /**
+     * 按userId快速删除一条用户数据
+     * @param int $id 必需;ID值;默认：空
+     * @return bool $bool true|false
+     */
+    public static function delete_id($id='')
+    {
+        return self::delete_user_by('user_id',$id);
+    }
+    
+    /**
+     * 按userId快速删除多条用户数据
+     * @param mixed $ids 必需;ID值,多个用逗号分隔(int|string|array);默认：空
+     * @return array $array 多条删除记录结果
+     */
+    public static function delete_ids($ids='')
+    {
+        $result = [];
+        if( is_string($ids) ){
+            $ids = explode(',',$ids);
+        }
+        foreach($ids as $key=>$value){
+            array_push($result, self::delete_user_by('user_id',$value));
+        }
+        return $result;
+    }
+    
+    /**
      * 按模块名删除整个模块的用户
-     * @param array module 模块名
-     * @return array 影响数据
+     * @param array $module 模块名
+     * @return array $array 影响数据的条数
      */
     public static function delete_module($module)
     {
         if($module){
            return self::delete_all(['user_module'=>['eq', $module]]); 
         }
-        return 0;
+        return null;
     }
     
     /**
      * 按字段删除一个用户
      * @param string $field 字段条件
      * @param string $value 字段值
-     * @return string 返回操作记录数(0|1,1)
+     * @return bool $bool true|false
      */
     public static function delete_user_by($field, $value)
     {
-        $value = trim( $value );
-        if ( ! $value ) {
-            return '0';
+        $value = trim($value);
+        if ( !$value) {
+            return false;
         }
         if( !in_array($field, ['user_id','user_name','user_email','user_mobile','user_token']) ){
-            return '0';
+            return false;
         }
         if('user_id' == $field){
             if($value < 1){
-                return '0';
+                return false;
             }
         }
         $where = array();
         $where[$field] = ['eq', $value];
-        return self::delete($where);
+        if( self::delete($where,'user_meta') ){
+            return true;
+        }
+        return false;
     }
     
     /**
@@ -503,16 +609,25 @@ class User
         $status = ['user'=>0,'user_meta'=>0];
         $user_id = db('user')->where($where)->column('user_id');
         if($user_id){
-            //预留钩子user_delete_all_before
-            \think\Hook::listen('user_delete_all_before', $user_id);
+            //先删除meta
             $status['user_meta'] = db('userMeta')->where(['user_id'=>['in',$user_id]])->delete();
+            //后删除基础
             $status['user'] = db('user')->where(['user_id'=>['in',$user_id]])->delete();
-            //预留钩子user_delete_all_after
-            \think\Hook::listen('user_delete_all_after', $user_id, $status);
             //缓存标识清理
             DcCacheTag('common/User/Item', 'clear');
         }
         return $status;
+    }
+    
+    /**
+     * 按userId快速修改一条用户数据
+     * @param int $id 必需;ID值;默认：空
+     * @param array $idata 必需;待更新的数据;默认：空
+     * @return obj|null 不为空时返回obj
+     */
+    public static function update_id($id='', $data)
+    {
+        return self::update_user_by('user_id', $id, $data);
     }
     
     /**
@@ -542,6 +657,17 @@ class User
     }
     
     /**
+     * 通过ID获取用户信息
+     * @param string $value 字段值 
+     * @param bool $cache 是否开启缓存功能 由后台统一配置
+     * @return mixed $mixed array|null
+     */
+    public static function get_id($value, $cache=true)
+    {
+        return self::get_user_by('user_id', $value, $cache);
+    }
+    
+    /**
      * 通过字段获取用户信息
      * @param string $field 字段条件 
      * @param string $value 字段值
@@ -550,7 +676,7 @@ class User
      */
     public static function get_user_by($field, $value, $cache=true)
     {
-        $value = trim( $value );
+        $value = trim($value);
         if ( !$value ) {
             self::$error = lang('mustIn');
             return null;
@@ -559,47 +685,66 @@ class User
             self::$error = lang('mustIn');
             return null;
         }
-        $where = array();
-        $where[$field] = ['eq', $value];
-        $data = self::get($where, 'user_meta', $cache);
-        if(!is_null($data)){
-            $data = $data->toArray();
-            $data_meta = DcManyToData($data, 'user_meta');//将user_meta的信息全并一起返回
-            unset($data['user_meta']);
-            return array_merge($data, $data_meta);
+        //获取数据
+        $data = self::get([
+            'cache' => $cache,
+            'field' => '*',
+            'where' => [$field=>['eq',$value]],
+            'with'  => 'user_meta',
+            'view'  => [],
+        ]);
+        //获取器修改
+        $data = self::meta_attr($data);
+        //返回结果
+        if(is_null($data)){
+            self::$error = lang('empty');
+            return null;
         }
-        self::$error = lang('empty');
-        return null;
+        return $data;
     }
     
     /**
-     * 新增一个用户的meta自定义附加信息
+     * 按用户ID新增一条自定义META
      * @param int $user_id 用户ID
      * @param string $user_meta_key 自定义KEY
      * @param string $user_meta_value 自定义value 支持数组
-     * @return obj|null 不为空时返回obj
+     * @return int 影响数
      */
     public static function save_user_meta($user_id, $user_meta_key, $user_meta_value)
     {
+        if(!$user_id || !$user_meta_key || !$user_meta_value){
+            return null;
+        }
         $data = [];
         $data['user_id'] = $user_id;
         $data['user_meta_key'] = $user_meta_key;
         $data['user_meta_value'] = $user_meta_value;
-        return DcDbSave('common/userMeta', $data);
+        return DcCacheResult(dbInsert('common/userMeta', $data), 'user_id_'.$user_id, 'tag');
     }
     
     /**
-     * 删除一个用户的meta自定义附加信息
-     * @param int $where 删除条件
+     * 按用户ID与metaKey删除自定义META(支持多条)
+     * @param int $user_id 用户ID
+     * @param string $user_meta_key 自定义KEY
      * @return int 影响数
      */
-    public static function delete_user_meta($where)
+    public static function delete_user_meta($user_id, $user_meta_key)
     {
-        return DcDbDelete('common/userMeta', $where);
+        if(!$user_id){
+            return 0;
+        }
+        $where = array();
+        
+        $where['user_id'] = ['eq', $user_id];
+        
+        if($user_meta_key){
+            $where['user_meta_key'] = ['eq', $user_meta_key];
+        }
+        return DcCacheResult(dbDelete('common/userMeta',$where), 'user_id_'.$user_id, 'tag');
     }
     
     /**
-     * 修改一个用户的meta自定义附加信息 自动清理缓存
+     * 按用户ID与metaKey修改一条自定义META
      * @param int $user_id 用户ID
      * @param string $user_meta_key 自定义KEY
      * @param string $user_meta_value 自定义value 支持数组
@@ -607,52 +752,49 @@ class User
      */
     public static function update_user_meta($user_id, $user_meta_key, $user_meta_value)
     {
+        if(!$user_id || !$user_meta_key || !$user_meta_value){
+            return null;
+        }
         $where = array();
         $where['user_id'] = ['eq', $user_id];
         $where['user_meta_key'] = ['eq', $user_meta_key];
-        return DcDbUpdate('common/userMeta', $where, ['user_meta_value'=>$user_meta_value]);
+        return DcCacheResult(dbUpdate('common/userMeta', $where, ['user_meta_value'=>$user_meta_value]), 'user_id_'.$user_id, 'tag');
     }
     
     /**
-     * 获取一个用户的meta自定义附加信息
+     * 按用户ID与metaKey获取一条META自定义附加信息
      * @param int $user_id 用户ID
      * @param string $user_meta_key 自定义KEY
-     * @param bool $cache 是否开启缓存功能 由后台统一配置
      * @param string $single 关系表达式
      * @return array|null 不为空时返回修改后的数据
      */
-    public static function get_user_meta($user_id, $user_meta_key, $cache=true, $single='eq')
+    public static function get_user_meta($user_id, $user_meta_key, $single='eq')
     {
+        if(!$user_id || !$user_meta_key){
+            return null;
+        }
         $where = array();
         $where['user_id'] = ['eq',$user_id];
         $where['user_meta_key'] = [$single, $user_meta_key];
-        $args = [
-            'cache'     => $cache,
-            'where'     => $where,
-            'fetchSql'  => false,
-        ];
-        $data = DcDbFind('common/userMeta', $args);
-        if(!is_null($data)){
-            return $data->user_meta_value;
-            //return $data->toArray();
-        }
-        return null;
-    }
-    
-    //获取所有的用户信息（可筛选）
-    public static function get_users_metas($args)
-    {
-    
+        return dbFindValue('common/userMeta', $where, 'user_meta_value');
     }
     
     /**
-     * 统计每个角色及网站全部用户数量
-     * @param string $strategy
-     * @return array 返回每个角色的用户数量，以及所有用户的总数
+     * 按用户ID获取所有META自定义附加信息
+     * @param int $user_id 用户ID
+     * @return array|null 不为空时返回修改后的数据
      */
-    public static function count_users($strategy = 'time')
+    public static function select_user_meta($user_id)
     {
-    
+        if(!$user_id){
+            return null;
+        }
+        $result = [];
+        $list = DcArrayResult( dbSelect('common/userMeta',['user_id'=>['eq',$user_id]]) );
+        foreach($list as $key=>$value){
+            $result[$value['user_meta_key']] = $value['user_meta_value'];
+        }
+        return $result;
     }
     
     /**
@@ -663,29 +805,14 @@ class User
      */
     public static function save($data, $relation='user_meta')
     {
+        //删除主键
+        unset($data['user_id']);
         //数据验证及格式化数据
         if(!$data = self::data_post($data)){
             return null;
 		}
-        //钩子传参定义
-        $params = array();
-        $params['data'] = $data;
-        $params['relation'] = $relation;
-        $params['result'] = false;
-        unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('user_save_before', $params);
-        //添加数据
-        if( false == $params['result'] ){
-            $params['result'] = DcDbSave('common/User', $params['data'], $params['relation']);
-            if(!$params['result']){
-                self::$error = lang('user_create_error');
-            }
-        }
-        //预埋钩子
-        \think\Hook::listen('user_save_after', $params);
         //返回结果
-        return $params['result'];
+        return DcDbSave('common/User', $data, $relation);
     }
     
     /**
@@ -696,25 +823,7 @@ class User
      */
     public static function delete($where, $relation='user_meta')
     {
-        //钩子传参定义
-        $params = array();
-        $params['where'] = $where;
-        $params['relation'] = $relation;
-        $params['result'] = 0;
-        unset($where);unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('user_delete_before', $params);
-        //删除数据
-        if( 0 == $params['result'] ){
-            $params['result'] = DcDbDelete('common/User', $params['where'], $params['relation']);
-            if(!$params['result']){
-                self::$error = lang('user_delete_error');
-            }
-        }
-        //预埋钩子
-        \think\Hook::listen('user_delete_after', $params);
-        //返回结果
-        return implode(',', $params['result']);
+        return DcDbDelete('common/User', $where, $relation);
     }
     
     /**
@@ -736,61 +845,32 @@ class User
         if(!$data = self::data_post($data)){
             return null;
 		}
-        //钩子传参定义
-        $params = array();
-        $params['where'] = $where;
-        $params['data'] = $data;
-        $params['relation'] = $relation;
-        unset($where);unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('user_update_before', $params);
-        //修改数据
-        if( false == $params['result'] ){
-            $params['result'] = DcDbUpdate('common/User', $params['where'], $params['data'], $params['relation']);
-            if(!$params['result']){
-                self::$error = lang('user_update_error');
-            }
-        }
-        //预埋钩子
-        \think\Hook::listen('user_update_after', $params);
         //返回结果
-        return $params['result'];
+        return DcDbUpdate('common/User', $where, $data, $relation);
     }
     
     /**
      * 按条件查询一个用户
-     * @param array $where 查询条件（一维数组）
-     * @param bool $cache 是否开启缓存功能由后台统一配置
-     * @param string|array $with 关联预载入表 
+     * @param array $args 查询条件（一维数组）
      * @return obj|null 不为空时返回obj
      */
-    public static function get($where, $with='user_meta', $cache=true, $view='')
+    public static function get($args)
     {
-        //钩子传参定义
-        $params = array();
-        $params['result'] = false;
-        $params['args'] = [
-            'cache'     => $cache,
-            'where'     => $where,
-            'with'      => $with,
-            'view'      => $view,
-            'fetchSql'  => false,
-        ];
-        //释放变量
-        unset($where);unset($relation);unset($cache);unset($view);
-        //预埋钩子
-        \think\Hook::listen('user_get_before', $params);
-        //数据库查询
-        if( false == $params['result'] ){
-            $params['result'] = DcDbFind('common/User', $params['args']);
-            if(!$params['result']){
-                self::$error = lang('user_get_error');
-            }
+        //格式验证
+        if(!is_array($args)){
+            return null;
         }
-        //预埋钩子
-        \think\Hook::listen('user_get_after', $params);
+        //初始参数
+        $args = DcArrayArgs($args, [
+            'cache'     => true,
+            'field'     => '*',
+            'fetchSql'  => false,
+            'where'     => '',
+            'with'      => 'user_meta',
+            'view'      => [],
+        ]);
         //返回结果
-        return $params['result'];
+        return DcDbFind('common/User', $args);
     }
     
     //获取所有的用户信息（可筛选）
@@ -800,37 +880,102 @@ class User
         if(!is_array($args)){
             return null;
         }
-        //钩子传参定义
-        $params = array();
-        $params['result'] = false;
-        $params['args'] = array_merge([
+        //初始参数
+        $args = DcArrayArgs($args, [
             'cache'     => true,
-            'field'     => '*',//term.*,termMuch.term_much_id as ids
+            'field'     => '*',
             'fetchSql'  => false,
-            'sort'      => 'term_id',
-            'order'     => 'asc',
+            'sort'      => 'user_id',
+            'order'     => 'desc',
             'paginate'  => '',
             'where'     => '',
-            'with'      => 'userMeta',
-            'view'      => '',
-        ], $args);unset($args);//旧参数
-        //查询分类数据前的钩子
-        \think\Hook::listen('user_all_before', $params);
-        //数据库查询
-        if( false == $params['result'] ){
-            $params['result'] = DcDbSelect('common/User', $params['args']);
-            if(!$params['result']){
-                self::$error = lang('user_all_error');
-            }
-        }
-        //查询数据后的钩子
-        \think\Hook::listen('user_all_after', $params);
+            'with'      => '',
+            'join'      => [],
+            'view'      => [
+                //['user', '*'],
+                //['user_meta', 'user_meta_id', 'user_meta.user_id=user.term_id']
+            ],
+        ]);
         //返回结果
-        return $params['result'];
+        return DcDbSelect('common/User', $args);
     }
     
     /**
-     * 转换post数据
+     * 获取器、整体修改返回的数据类型
+     * @param obj $list 必需;数据库查询结果
+     * @param string $type 必需;返回类型(array|tree|level|obj);默认：空
+     * @return mixed $mixed obj|array|null
+     */
+    public static function result($list, $type='array')
+    {
+        if($type == 'array'){
+            return self::meta_attr_list($list);
+        }
+        return $list;
+    }
+    
+    /**
+     * 获取器、格式化数据列表为数组
+     * @param mixed $data 二维数组或OBJ数据集(array|obj)
+     * @return array $array 格式化后的数据
+     */
+    public static function meta_attr_list($data)
+    {
+        if( is_null($data) ){
+            return null;
+        }
+        //数据结果
+        if( is_object($data) ){
+            $data = $data->toArray();
+        }
+        //是否分页
+        if(isset($data['total'])){
+            foreach($data['data'] as $key=>$value){
+                $data['data'][$key] = self::meta_attr($value);
+            }
+        }else{
+            foreach($data as $key=>$value){
+                $data[$key] = self::meta_attr($value);
+            }
+        }
+        return $data;
+    }
+    
+    /**
+     * 获取器、格式化扩展表数据
+     * @param mixed $data 一维数组或OBJ数据集(array|obj)
+     * @return mixed $mixed 格式化后的数据(array|null)
+     */
+    public static function meta_attr($data)
+    {
+        
+        if( is_null($data) ){
+            return null;
+        }
+        
+        if(is_string($data)){
+            return $data;
+        }
+        
+        if( is_object($data) ){
+            $data = $data->toArray();
+        }
+        
+        //整理数据
+        $data = array_merge($data, DcManyToData($data, 'user_meta'));
+        //删除旧数据
+        unset($data['user_meta']);
+        
+        //删除关联的原始数据
+        unset($data['user_meta_id']);
+        unset($data['user_meta_key']);
+        unset($data['user_meta_value']);
+        //返回数据
+        return $data;
+    }
+    
+    /**
+     * 修改器、转换post数据
      * @param array $data 表单数据
      * @return array 关联写入数据格式
      */

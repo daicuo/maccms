@@ -1,18 +1,8 @@
 <?php
 namespace daicuo;
 
-class Term 
+class Term
 {
-
-    /**
-     * 架构函数
-     * @param array $config
-    public function __construct($config)
-    {
-        //self::$config = array_merge(self::$config, $config);
-    }
-    */
-    
     // 错误信息
     protected static $error = 'error';
     
@@ -28,9 +18,9 @@ class Term
     /**
      * 批量增加队列
      * @param array $list 写入数据（二维数组） 
-     * @return null|obj 添加成功返回自增ID数据集
+     * @return mixed 添加成功返回自增ID数据集
      */
-    public static function save_all($list)
+    public static function save_all($list=[])
     {
         //关联新增只有循环操作
         foreach($list as $key=>$data){
@@ -38,69 +28,88 @@ class Term
         }
         //缓存标识清理
         DcCacheTag('common/Term/Item', 'clear');
+        //返回结果
         return $status;
     }
     
     /**
      * 按termId删除一个队列
-     * @param string $value 字段值
-     * @return string 返回操作记录数(0|1,1)
+     * @param int $termId ID值
+     * @return bool true|false
      */
-    public static function delete_id($value)
+    public static function delete_id($termId='')
     {
-        $value = trim( $value );
-        if ( ! $value ) {
-            return '0';
+        $value = trim($termId);
+        if($termId < 1){
+            return false;
         }
-        if($value < 1){
-            return '0';
-        }
-        if( self::childrens($value) ){
-            return '0';
+        if( self::childrens($termId) ){
+            return false;
         }
         $where = array();
-        $where['term_id'] = ['eq', $value];
-        return self::delete($where);
+        $where['term_id'] = ['eq', $termId];
+        if( self::delete($where,'term_meta,term_map') ){
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * 按termId删除一个队列
+     * @param mixed $ids 必需;ID值,多个用逗号分隔;默认：空
+     * @return array 多条删除记录
+     */
+    public static function delete_ids($ids='')
+    {
+        $result = [];
+        if( is_string($ids) ){
+            $ids = explode(',',$ids);
+        }
+        foreach($ids as $key=>$value){
+            array_push($result, self::delete_id($value));
+        }
+        return $result;
     }
     
     /**
      * 按模块名删除整个模块的分类
-     * @param array module 模块名
-     * @return array 影响数据
+     * @param string $module 模块名
+     * @return array 影响条数
      */
-    public static function delete_module($module)
+    public static function delete_module($module='')
     {
         if($module){
            return self::delete_all(['term_module'=>['eq',$module]]); 
         }
-        return 0;
+        return ['term'=>0,'term_meta'=>0,'term_map'=>0];
     }
     
     /**
      * 批量删除分类数据
      * @param array $where 查询条件
-     * @return array 影响数据的条数
+     * @return array 影响条数
      */
-    public static function delete_all($where)
+    public static function delete_all($where=[])
     {
-        $status = ['term'=>0,'term_much'=>0,'term_meta'=>0,'term_map'=>0];
-        $term_id = db('term')->where($where)->column('term_id');
+        $status = ['term'=>0,'term_meta'=>0,'term_map'=>0];
+        //sqlite最大参数只能1000
+        if(config('database.type') == 'sqlite'){
+            $limit = 950;
+        }else{
+            $limit = 0;
+        }
+        //先获取ID值
+        $term_id = db('term')->where($where)->limit($limit)->column('term_id');
         if($term_id){
-            $term_much_id = db('termMuch')->where(['term_id'=>['in',$term_id]])->column('term_much_id');
-            //定义钩子参数
-            $hookParams = ['term_id'=>$term_id, 'term_much_id'=>$term_much_id];
-            //预留钩子term_delete_all_before
-            \think\Hook::listen('term_delete_all_before', $hookParams);
-            if($term_much_id){
-                $status['term_map'] = db('termMap')->where(['term_much_id'=>['in',$term_much_id]])->delete();
-            }
+                
+            $status['term_map'] = db('termMap')->where(['term_id'=>['in',$term_id]])->delete();
+            
             $status['term_meta'] = db('termMeta')->where(['term_id'=>['in',$term_id]])->delete();
-            $status['term_much'] = db('termMuch')->where(['term_id'=>['in',$term_id]])->delete();
+            
             $status['term'] = db('term')->where(['term_id'=>['in',$term_id]])->delete();
+            
             //缓存标识清理
             DcCacheTag('common/Term/Item', 'clear');
-            //预留钩子term_delete_all_after
-            \think\Hook::listen('term_delete_all_after', $hookParams, $status);
         }
         return $status;
     }
@@ -109,98 +118,103 @@ class Term
      * 按termId修改一个队列
      * @param string $value 字段值
      * @param array $data 写入数据（一维数组） 
-     * @return obj|null 不为空时返回obj
+     * @return mixed obj|null
      */
-    public static function update_id($value, $data)
+    public static function update_id($id, $data)
     {
-        if ( ! $value ) {
-            return null;
-        }
-        if($value < 1){
+        if($id < 1){
             return null;
         }
         $where = array();
-        $where['term_id'] = ['eq', $value];
-        return self::update($where, $data);
+        $where['term_id'] = ['eq', $id];
+        return self::update($where, $data, 'term_meta');
     }
     
     /**
      * 通过termId获取队列信息
      * @param string $value 字段值 
      * @param bool $cache 是否开启缓存功能 由后台统一配置
-     * @return array|null 不为空时返回修改后的数据
+     * @return mixed array|null
      */
     public static function get_id($value, $cache=true)
     {
+        return self::get_by('term_id', $value, $cache);
+    }
+    
+    /**
+     * 通过字段获取队列信息
+     * @param string $field 字段条件 
+     * @param string $value 字段值
+     * @param bool $cache 是否开启缓存功能 由后台统一配置
+     * @param string $controll 控制器名
+     * @param string $status 数据状态(normal|hidden)
+     * @return array|null 不为空时返回修改后的数据
+     */
+    public static function get_by($field='term_id', $value='', $cache=true, $controll='', $status='')
+    {
+        $value = trim($value);
         if ( !$value ) {
+            self::$error = lang('mustIn');
             return null;
         }
-        $where = array();
-        $where['term_id'] = ['eq', $value];
-        $data = self::get($where, 'term_much,term_meta', $cache);
-        if(!is_null($data)){
-            $data = $data->toArray();
-            $data_meta = DcManyToData($data, 'term_meta');
-            unset($data['term_meta']);
-            return array_merge($data, $data_meta);
+        if( !in_array($field, ['term_id','term_name','term_slug']) ){
+            self::$error = lang('mustIn');
+            return null;
         }
-        return null;
+        //基本条件
+        $where = [];
+        $where[$field] = ['eq',$value];
+        //附加条件
+        if($controll){
+            $where['term_controll'] = ['eq', $controll];
+        }
+        if($status){
+            $where['term_status'] = ['eq', $status];
+        }
+        //获取数据
+        $data = self::get([
+            'cache' => $cache,
+            'field' => '*',
+            'where' => $where,
+            'with'  => 'term_meta',
+        ]);
+        //获取器修改
+        $data = self::meta_attr($data);
+        //返回结果
+        if(is_null($data)){
+            self::$error = lang('empty');
+            return null;
+        }
+        return $data;
     }
     
     /**
      * 创建一个新队列
      * @param array $data 写入数据（一维数组） 
      * @param string|array $relation 关联表 
-     * @return null|obj 成功时返回obj
+     * @return mixed null|obj
      */
-    public static function save($data, $relation='term_much,term_meta')
+    public static function save($data, $relation='term_meta')
     {
+        //删除主键
+        unset($data['term_id']);
         //数据验证及格式化数据
         if(!$data = self::data_post($data)){
             return null;
 		}
-        //钩子传参定义
-        $params = array();
-        $params['data'] = $data;
-        $params['relation'] = $relation;
-        $params['result'] = false;
-        unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('term_save_before', $params);
-        //添加数据
-        if( false == $params['result'] ){
-            $params['result'] = DcDbSave('common/Term', $params['data'], $params['relation']);
-        }
-        //预埋钩子
-        \think\Hook::listen('term_save_after', $params);
         //返回结果
-        return $params['result'];
+        return DcDbSave('common/Term', $data, $relation);
     }
     
     /**
      * 按条件关联删除一个队列
-     * @param array $where 删除条件
-     * @param string|array $relation 关联表 
-     * @return string 返回操作记录数(0|1,1)
+     * @param array $where 必需;删除条件;默认：空
+     * @param mixed $relation 可选;关联表string|array;默认：term_meta
+     * @return mixed null|obj
      */
-    public static function delete($where, $relation='term_much,term_meta')
+    public static function delete($where=[], $relation='term_meta,term_map')
     {
-        //钩子传参定义
-        $params = array();
-        $params['where'] = $where;
-        $params['relation'] = $relation;
-        $params['result'] = 0;
-        unset($where);unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('term_delete_before', $params);
-        //删除数据
-        if( 0 == $params['result'] ){
-            $params['result'] = DcDbDelete('common/Term', $params['where'], $params['relation']);
-        }
-        //预埋钩子
-        \think\Hook::listen('term_delete_after', $params);
-        //返回结果
-        return implode(',', $params['result']);
+        return DcDbDelete('common/Term', $where, $relation);
     }
     
     /**
@@ -208,76 +222,46 @@ class Term
      * @param array $where 修改条件
      * @param array $data 写入数据（一维数组） 
      * @param string|array $relation 关联表
-     * @return null|obj 成功时返回obj
+     * @return mixed null|obj
      */
-    public static function update($where, $data, $relation='term_much,term_meta')
+    public static function update($where, $data, $relation='term_meta')
     {
-        //类型不可修改去掉此字段
-        unset($data['term_much_type']);
         //数据验证及格式化数据
         if(!$data = self::data_post($data)){
             return null;
 		}
-        //钩子传参定义
-        $params = array();
-        $params['where'] = $where;
-        $params['data'] = $data;
-        $params['relation'] = $relation;
-        unset($where);unset($data);unset($relation);
-        //预埋钩子
-        \think\Hook::listen('term_update_before', $params);
-        //修改数据
-        if( false == $params['result'] ){
-            $params['result'] = DcDbUpdate('common/Term', $params['where'], $params['data'], $params['relation']);
-        }
-        //预埋钩子
-        \think\Hook::listen('term_update_after', $params);
         //返回结果
-        return $params['result'];
+        return DcDbUpdate('common/Term', $where, $data, $relation);
     }
     
     /**
      * 按条件查询一个队列
-     * @param array $where 查询条件（一维数组）
-     * @param string|array $relation 关联查询表
-     * @param bool $cache 是否开启缓存功能 由后台统一配置
-     * @return obj|null 成功时返回obj
+     * @param array $args 查询参数
+     * @return mixed obj|null
      */
-    public static function get($where, $with='term_much,term_meta', $cache=true , $view='')
+    public static function get($args)
     {
-        /*$view = [
-            ['term', '*'],
-            ['term_much', '*', 'term_much.term_id=term.term_id'],
-            ['term_meta', 'term_meta_id', 'term_meta.term_id=term.term_id']
-        ];*/
-        //钩子传参定义
-        $params = array();
-        $params['result'] = false;
-        $params['args'] = [
-            'cache'     => $cache,
-            'where'     => $where,
-            'with'      => $with,
-            'view'      => $view,
-            'fetchSql'  => false,
-        ];
-        //释放变量
-        unset($where);unset($relation);unset($cache);unset($view);
-        //预埋钩子
-        \think\Hook::listen('term_get_before', $params);
-        //查询数据
-        if( false == $params['result'] ){
-            $params['result'] = DcDbFind('common/Term', $params['args']);
+        //格式验证
+        if(!is_array($args)){
+            return null;
         }
-        //预埋钩子
-        \think\Hook::listen('term_get_after', $params);
+        //初始参数
+        $args = DcArrayArgs($args, [
+            'cache'     => true,
+            'field'     => '',
+            'fetchSql'  => false,
+            'where'     => '',
+            'with'      => 'term_meta',
+            'view'      => '',
+        ]);
         //返回结果
-        return $params['result'];
+        return DcDbFind('common/Term', $args);
     }
     
     /**
      * 按条件查询多个队列
      * @param array $args 查询条件（一维数组）
-     * @return obj|null 成功时返回obj
+     * @return mixed obj|null
      */
     public static function all($args)
     {
@@ -285,88 +269,23 @@ class Term
         if(!is_array($args)){
             return null;
         }
-        //钩子传参定义
-        $params = array();
-        $params['result'] = false;
-        $params['args'] = array_merge([
+        //初始参数
+        $args = DcArrayArgs($args, [
             'cache'     => true,
-            'field'     => '*',//term.*,termMuch.term_much_id as ids
+            'field'     => '*',
             'fetchSql'  => false,
             'sort'      => 'term_id',
             'order'     => 'desc',
             'paginate'  => '',
             'where'     => '',
-            //'with'      => ['termMuch','termMeta'],
+            'with'      => '',
             'view'      => [
-                ['term', '*'],
-                ['term_much', '*', 'term_much.term_id=term.term_id'],
+                //['term', 'term_id,term_name,term_slug,term_module,term_status,term_order'],
                 //['term_meta', 'term_meta_id', 'term_meta.term_id=term.term_id']
             ],
-        ], $args);unset($args);//旧参数
-        //查询分类数据前的钩子
-        \think\Hook::listen('term_all_before', $params);
-        //数据库查询
-        if( false == $params['result'] ){
-            $params['result'] = DcDbSelect('common/Term', $params['args']);
-        }
-        //查询数据后的钩子
-        \think\Hook::listen('term_all_after', $params);
+        ]);
         //返回结果
-        return $params['result'];
-    }
-    
-    /**
-     * 按条件一次性获取所有队列/后续做无限递归处理
-     * @param array $args 查询条件（一维数组）
-     * @return mixed null|array
-     */
-    public static function all_pad($args)
-    {
-        //默认参数
-        $default = [
-            //'limit'   => 100,
-            //'cache'   => false,
-            'type'      => 'category',
-            'sort'      => 'term.term_id',//term_much_parent desc,
-            'order'     => 'desc',
-        ];
-        //合并参数
-        if( $args ){
-            $args = array_merge($default, $args);
-        }else{
-            $args = $default;
-        }
-        //固定参数
-        $args['paginate'] = false;
-        $args['where']['term_much_type'] = ['eq', $args['type']];
-        if($args['searchText']){
-            $args['where']['term_name|term_slug'] = ['like','%'.$args['searchText'].'%'];
-        }else{
-            if($args['ids']){
-                $args['where']['term_ids'] = ['in', $args['ids']];
-            }
-            if($args['module']){
-                $args['where']['term_module'] = ['eq', $args['module']];
-            }
-            if($args['name']){
-                $args['where']['term_name'] = ['like','%'.$args['name'].'%'];
-            }
-            if($args['slug']){
-                $args['where']['term_slug'] = ['like','%'.$args['slug'].'%'];
-            }
-        }
-        unset($args['type']);
-        unset($args['ids']);
-        unset($args['name']);
-        unset($args['slug']);
-        unset($args['module']);
-        unset($args['searchText']);
-        //调用数据
-        $list = self::all($args);
-        if(is_null($list)){
-            return null;
-        }
-        return $list->toArray();
+        return DcDbSelect('common/Term', $args);
     }
     
     /**
@@ -374,16 +293,27 @@ class Term
      * @param array $args 查询条件（参数请参考手册）
      * @return mixed null|array
      */
-    public static function tree($args)
+    public static function tree($args=[])
     {
-        $terms = self::all_pad($args);
-        if($terms){
-            $terms = list_to_tree($terms, 'term_id', 'term_much_parent');
-            $terms = tree_to_level($terms, 'term_name');
-            //是否分页显示处理后的数据
-            if( $args['paginate'] ){
-                return self::tree_to_page($terms, $args['paginate']);
-            }
+        $args = DcArrayArgs($args,[
+            'cache'      => true,
+            'limit'      => 0,
+            'sort'       => 'term_id',
+            'order'      => 'desc',
+            'controll'   => 'category',
+            'result'     => 'level',
+        ]);
+        
+        //查询时强制不分页，处理后再手动分页
+        $page = $args['paginate'];
+        unset($args['paginate']);
+        
+        //查询数据
+        $terms = model('common/Term','loglic')->select($args);
+        
+        //是否分页显示处理后的数据
+        if( $terms && $page ){
+            return self::tree_to_page($terms, $page);
         }
         return $terms;
     }
@@ -394,7 +324,7 @@ class Term
      * @param array $paginate 分页参数
      * @return array 符合TP分页数据格式的数据
      */
-    public static function tree_to_page($terms, $paginate)
+    public static function tree_to_page($terms=[], $paginate=[])
     {
         $page = array();
         $page['total'] = count($terms);
@@ -415,17 +345,33 @@ class Term
     /**
      * 快速生成select标签Option属性的对应关系 id=>name
      * @param array $args 查询条件（一维数组）
-     * @return mixed null|array;
+     * @return mixed null|array
      */
-    public static function option($args)
+    public static function option($args=[])
     {
-        $terms = self::tree($args);
+        $args = DcArrayArgs($args,[
+            'cache'      => false,
+            'result'     => 'level',//返回树状层级结构
+            'controll'   => 'category',//队列类型
+            'limit'      => 0,
+            'page'       => 0,
+            'status'     => 'normal',
+            'sort'       => 'term_parent asc,term_order',
+            'order'      => 'desc',
+            'isSelect'   => false,
+            'fieldKey'   => 'term_id',
+            'fieldValue' => 'term_name',
+        ]);
+        //空值过滤
+        $args = DcArrayEmpty($args);
+        //拼装数据
         $array = array();
-        $array[0] = ' ';
-        foreach($terms as $key=>$value){
-            $array[$value['term_id']] = $value['term_name'];
+        if($args['isSelect']){
+            $array[0] = ' ';
         }
-        unset($terms);
+        foreach(model('common/Term','loglic')->select($args) as $key=>$value){
+            $array[$value[$args['fieldKey']]] = $value[$args['fieldValue']];
+        }
         return $array;
     }
     
@@ -433,30 +379,38 @@ class Term
      * 快速生成字段与其它字段对应关系
      * @param string $field_key 用做KEY的字段
      * @param string $field_value 用做value的字段
-     * @param string $term_type 分类法规则
-     * @return mixed null|array;
+     * @param string $controll 分类法规则
+     * @param bool $tree 是否树形
+     * @param bool $level 是否将树形还原成层级
+     * @return mixed null|array
      */
-    public static function fields($field_key='term_id', $field_value='term_slug', $term_type='category')
+    public static function fields($field_key='term_id', $field_value='term_slug', $controll='category', $tree=false, $level=false)
     {
-        $terms = self::all_pad(['type'=>$term_type]);
-        $array = array();
-        foreach($terms as $key=>$value){
-            $array[$value[$field_key]] = $value[$field_value];
-        }
-        unset($terms);
-        return $array;
+        return self::option([
+            'cache' => false,
+            'sort'  => 'term_order',
+            'order' => 'desc',
+            'tree'  => $tree,
+            'level' => $level,
+            'controll' => $controll,
+        ]);
     }
     
     /**
      * 通过队列ID获取该队列的所有子集
      * @param int $term_id 队列ID
-     * @param string $term_type 分类法规则
+     * @param string $term_controll 分类法规则
      * @return mixed array|null
      */
-    public static function childrens($term_id, $term_type='category')
+    public static function childrens($term_id='',$term_controll='category',$term_module='',$term_action='')
     {
-        if( $terms = self::all_pad(['type'=>$term_type]) ){
-            return get_childs($terms, $term_id);
+        $args = [];
+        $args['cache']    = true;
+        $args['controll'] = $term_controll;
+        $args['model']    = $term_module;
+        $args['action']   = $term_action;
+        if( $terms = model('common/Term','loglic')->select(DcArrayEmpty($args)) ){
+            return get_childs($terms, $term_id, 'term_id');
         }
         return null;
     }
@@ -464,36 +418,115 @@ class Term
     /**
      * 通过队列的父ID获取该队列的所有父级
      * @param int $term_pid 分类父ID
-     * @param string $term_type 分类法规则
+     * @param string $term_controll 分类法规则
      * @return mixed array|null
      */
-    public static function parents($term_pid, $term_type='category')
+    public static function parents($term_pid='', $term_controll='category',$term_module='',$term_action='')
     {
-        if( $terms = self::all_pad(['type'=>$term_type]) ){
-            return get_parents($terms, $term_pid);
+        $args = [];
+        $args['cache']    = true;
+        $args['controll'] = $term_controll;
+        $args['model']    = $term_module;
+        $args['action']   = $term_action;
+        if( $terms = model('common/Term','loglic')->select(DcArrayEmpty($args)) ){
+            return get_parents($terms, $term_pid, 'term_id');
         }
         return null;
     }
     
     /**
      * 获取队列层级ID对应关系
-     * @param string $term_type 分类法规则
+     * @param string $term_controll 分类法规则
      * @return mixed null|array
      */
-    public static function hierarchy($term_type='category')
+    public static function hierarchy($term_controll='category')
     {
-        $terms = self::all_pad(['type'=>$term_type]);
+        $terms = model('common/Term','loglic')->select(['cache'=>true,'controll'=>$term_controll]);
         $children = array();
         foreach ( $terms as $key => $value ) {
-            if ( $value['term_much_parent'] > 0 ) {
-                $children[ $value['term_much_parent'] ][] = $value['term_id'];
+            if ( $value['term_parent'] > 0 ) {
+                $children[ $value['term_parent'] ][] = $value['term_id'];
             }
         }
         return $children;
     }
     
     /**
-     * 转换post数据
+     * 获取器、整体修改返回的数据类型
+     * @param obj $list 必需;数据库查询结果
+     * @param string $type 必需;返回类型(array|tree|level|obj);默认：空
+     * @return mixed obj|array|null
+     */
+    public static function result($list, $type='array')
+    {
+        
+        //自定义字段格式化
+        if(in_array($type,['array','tree','level'])){
+            $list = self::meta_attr_list($list);
+        }
+        //树形结构
+        if($type == 'tree'){
+            return list_to_tree($list, 'term_id', 'term_parent');
+        }
+        //还原层级
+        if($type == 'level'){
+            return tree_to_level(list_to_tree($list, 'term_id', 'term_parent'), 'term_name');
+        }
+        return $list;
+    }
+    
+    /**
+     * 获取器、格式化数据列表为数组
+     * @param mixed $data 二维数组或OBJ数据集(array|obj)
+     * @return array 格式化后的数据
+     */
+    public static function meta_attr_list($data)
+    {
+        if( is_null($data) ){
+            return null;
+        }
+        //数据结果
+        if( is_object($data) ){
+            $data = $data->toArray();
+        }
+        //是否分页
+        if(isset($data['total'])){
+            foreach($data['data'] as $key=>$value){
+                $data['data'][$key] = self::meta_attr($value);
+            }
+        }else{
+            foreach($data as $key=>$value){
+                $data[$key] = self::meta_attr($value);
+            } 
+        }
+        return $data;
+    }
+    
+    /**
+     * 获取器、格式化扩展表数据
+     * @param mixed $data 一维数组或OBJ数据集(array|obj)
+     * @return mixed 格式化后的数据(array|null)
+     */
+    public static function meta_attr($data)
+    {
+        if( is_null($data) ){
+            return null;
+        }
+        if(is_string($data)){
+            return $data;
+        }
+        if( is_object($data) ){
+            $data = $data->toArray();
+        }
+        $data = array_merge($data, DcManyToData($data, 'term_meta'));
+        
+        unset($data['term_meta']);
+        
+        return $data;
+    }
+    
+    /**
+     * 修改器、转换post数据
      * @param array $data 表单数据
      * @return array 关联写入数据格式
      */
@@ -512,11 +545,7 @@ class Term
         }
         unset($validate);
         // 数据整理成关联写入的格式
-        //$data = DcDataToOne($data, 'term_much_type,term_much_info,term_much_parent,term_much_count,term_id', 'term_much');
-        //$data = DcDataToMany($data, 'term_tpl', 'term_meta');
-        $data = DcDataToOne($data, DcConfig('custom_fields.term_much'), 'term_much');
         $data = DcDataToMany($data, DcConfig('custom_fields.term_meta'), 'term_meta');
         return $data;
-    }
-    
+    } 
 }

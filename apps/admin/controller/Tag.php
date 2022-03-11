@@ -1,19 +1,63 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
 class Tag extends Admin
 {
+    //定义表单字段列表
+    protected function fields($data=[])
+    {
+        return model('admin/Tag','loglic')->fields($data);
+    }
+    
+    //定义表单初始数据
+    protected function formData()
+    {
+        if( $id = input('id/d',0) ){
+            return model('common/Term','loglic')->getId($id, false);
+		}
+        return [];
+    }
+
+    //定义表格数据（JSON）
+    protected function ajaxJson()
+    {
+        //查询参数
+        $args = array();
+        $args['cache']      = false;
+        $args['controll']   = 'tag';
+        $args['limit']      = DcEmpty($this->query['pageSize'],50);
+        $args['page']       = DcEmpty($this->query['pageNumber'],1);
+        $args['sort']       = DcEmpty($this->query['sortName'],'term_id');
+        $args['order']      = DcEmpty($this->query['sortOrder'],'desc');
+        //基础字段条件
+        $args['search']     = $this->query['searchText'];
+        $args['status']     = $this->query['term_status'];
+        $args['module']     = $this->query['term_module'];
+        $args['action']     = $this->query['term_action'];
+        $args['parent']     = DcEmpty($this->query['term_parent'],'');
+        //扩展字段条件
+        $args['meta_query'] = DcMetaQuery(model('common/Term','loglic')->metaList($args['module'],$args['controll']), $this->query);
+        //自定义字段排序
+        if( !in_array($args['sort'],model('common/Attr','loglic')->termSort()) ){
+            $args['meta_key'] = $args['sort'];
+            $args['sort']     = 'meta_value_num';
+        }
+        //数据查询
+        $list = model('common/Term','loglic')->select(DcArrayEmpty($args));
+        //数据返回
+        return DcEmpty($list,['total'=>0,'data'=>[]]);
+    }
+    
 	//添加(数据库)
 	public function save()
     {
-        config('common.validate_name', 'common/Term');
-        config('common.validate_scene', 'save');
-        $term_id = \daicuo\Term::save(input('post.'));
-		if($term_id < 1){
+        $id = model('common/Tag','loglic')->write(input('post.'));
+		if($id < 1){
 			$this->error(\daicuo\Term::getError());
 		}
+        
 		$this->success(lang('success'));
 	}
     
@@ -22,74 +66,50 @@ class Tag extends Admin
     {
 		$ids = input('id/a');
 		if(!$ids){
-			$this->error(lang('mustIn'));
+			$this->error(lang('errorIds'));
 		}
-        foreach($ids as $id){
-            \daicuo\Term::delete_id($id);
-        }
+        
+        model('common/Term','loglic')->deleteIds($ids);
+
         $this->success(lang('success'));
-	}
-    
-    //修改（表单）
-	public function edit()
-    {
-		$term_id = input('id/d',0);
-		if(!$term_id){
-			$this->error(lang('mustIn'));
-		}
-		//查询数据
-        //config('cache.expire_detail', -1);
-        $data = \daicuo\Term::get_id($term_id, false);
-        if( is_null($data) ){
-            $this->error(lang('empty'));
-        }
-		$this->assign('data', $data);
-		return $this->fetch();
 	}
     
     //修改（数据库）
 	public function update()
     {
 		$data = input('post.');
-        if($data['term_id']){
-            config('common.validate_name', 'common/Term');
-            config('common.validate_scene', 'update');
-            $info = \daicuo\Term::update_id($data['term_id'], $data);
-            if(is_null($info)){
-                $this->error(\daicuo\Term::getError());
-            }
+        if(!$data['term_id']){
+            $this->error(lang('errorIds'));
+        }
+        
+        $info = model('common/Tag','loglic')->write($data);
+        if(is_null($info)){
+            $this->error(\daicuo\Term::getError());
         }
         $this->success(lang('success'));
 	}
     
-	public function index()
+    //快速修改状态
+    public function status()
     {
-        if($this->request->isAjax()){
-            $args = array();
-            $args['cache'] = false;
-            $args['sort'] = input('get.sortName/s','term_id');
-            $args['sort'] = str_replace('term_id', 'term.term_id', $args['sort']);
-            $args['order'] = input('get.sortOrder/s','desc');
-            $args['where']['term_much_type'] = ['eq', 'tag'];
-            //$args['with'] = ['termMeta'];
-            //$args['fetchSql'] = true;
-            $args['paginate'] = [
-                'list_rows' => input('pageSize/d',10),
-                'page' => input('pageNumber/d',1),
-            ];
-            if($this->query['op_module']){
-                $args['where']['term_module'] = ['eq', DcHtml($this->query['op_module'])];
-            }
-            if($this->query['searchText']){
-                $args['where']['term_name|term_slug'] = ['like','%'.DcHtml($this->query['searchText']).'%'];
-            }
-            $list = \daicuo\Term::all($args);
-            if( is_null($list) ){
-                return json(['total'=>0,'data'=>'']);
-            }
-            return json($list->toArray());
-		}
-        $this->assign('query', $this->query);
-		return $this->fetch();
-	}
+        if( !$ids = input('post.id/a') ){
+            $this->error(lang('errorIds'));
+        }
+        
+        $result = model('common/Term','loglic')->status($ids,input('request.value/s', 'hidden'));
+        
+        $this->success(lang('success'));
+    }
+    
+    //预览
+    public function preview()
+    {
+        if(!$info= model('common/Term','loglic')->getId(input('id/d',0), false)){
+            $this->error(lang('empty'));
+        }
+        //去掉后台入口文件
+        $url = str_replace($this->request->baseFile(), '', model('common/Term','loglic')->url($info));
+        //跳转至前台
+        $this->redirect($url,302);
+    }
 }

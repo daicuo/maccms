@@ -29,7 +29,7 @@ class Op extends Model{
     //获取器增加不存在的字段
     public function getOpStatusTextAttr($value, $data)
     {
-        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden')];
+        $status = ['normal'=>lang('normal'),'hidden'=>lang('hidden'),'private'=>lang('private'),'public'=>lang('public')];
         return $status[$data['op_status']];
     }
     

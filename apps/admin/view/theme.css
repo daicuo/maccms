@@ -122,6 +122,20 @@ body {
 }
 .pagination .page-item:last-child .page-link {
 }
+/*下拉框*/
+.dropdown-menu{
+    min-width: 6rem;
+    padding: .5rem 0;
+    margin: .125rem 0 0;
+    font-size: 0.9rem;
+    color: #212529;
+}
+.dropdown-menu .dropdown-item {
+    padding: .25rem 1.5rem;
+}
+.dropdown-menu .dropdown-item.active, .dropdown-menu .dropdown-item:active {
+    background-color: #563d7c;
+}
 /*模态框表单*/
 .dc-modal form input{
     font-size:1.1em;
@@ -143,4 +157,8 @@ body {
 }
 .fa-sync:before {
     content: "\f021";
+}
+/*bootstrap-tagsinput*/
+.bootstrap-tagsinput{
+    width: 100% !important;
 }

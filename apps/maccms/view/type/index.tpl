@@ -21,3 +21,4 @@
     </form>
   </div>
 </div>
+<script>$('#api_type').val("{$type}");</script>

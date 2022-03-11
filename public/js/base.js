@@ -2,12 +2,10 @@
 window.daicuo = {
     // 后台扩展对像
     admin: {},
-    // 插件扩展对像
-    fn: {},
     // 语言包扩展对像
     lang: {},
     // 配置扩展对像.根据自定义HTML属性动态配置变量
-    config: function() {
+    config: function(){
         "use strict";
         var obj = {};
         $.each($('script[data-id="daicuo"]').get(0).attributes, function() {
@@ -18,9 +16,9 @@ window.daicuo = {
             }
         });
         return obj;
-    } (),
+    }(),
     //按默认配置初始化组件合集
-    init: function() {
+    init: function(options){
         "use strict";
         window.daicuo.ajax.init();
         window.daicuo.captcha.init();
@@ -32,6 +30,8 @@ window.daicuo = {
         window.daicuo.media.init();
         window.daicuo.page.init();
         //window.daicuo.sortable.init();
+        //window.daicuo.table.init();
+        window.daicuo.tags.init();
         window.daicuo.upload.init();
     }
 };
@@ -195,15 +195,23 @@ window.daicuo.ajax = {
 window.daicuo.bootstrap = {
     // 对话框BASE
     dialog: function($html, $title) {
-        $title = $title|| daicuo.lang.modalTitle;
-        $('.dc-modal .modal-dialog').removeClass('modal-lg').html('<div class="modal-content"><div class="modal-header pt-2 pb-1"><h6 class="my-0 py-0">' + $title + '</h6><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button></div><div class="modal-body"><h5 class="text-center py-3 text-dark">' + $html + '</h5></div></div>');
+        $title = $title || daicuo.lang.modalTitle;
+        $('.dc-modal .modal-dialog').removeClass('modal-lg modal-xl').html('<div class="modal-content"><div class="modal-header pt-2 pb-1"><h6 class="my-0 py-0">' + $title + '</h6><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="text-primary">&times;</span></button></div><div class="modal-body"><h5 class="text-center py-3 text-dark">' + $html + '</h5></div></div>');
         $('.dc-modal').modal('show');
-        //$('.dc-modal .modal-dialog').toggleClass('modal-dialog-centered',true);
     },
     // 对话框表单
     dialogForm: function($html) {
         $('.dc-modal .modal-dialog').html($html);
         $('.dc-modal').modal('show');
+        window.daicuo.upload.init();
+        window.daicuo.json.init();
+        window.daicuo.tags.init();
+    },
+    // 预览图片
+    preview: function($html, $title){
+        $('.dc-preview').remove();
+        $('.dc-modal').after('<div class="modal fade dc-preview"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body">' + $html + '</div></div></div></div>');
+        $('.dc-preview').modal('show');
     }
 };
 
@@ -226,7 +234,7 @@ window.daicuo.browser = {
     // 是否支持画图
     'canvas': function() {
         return !! document.createElement('canvas').getContext;
-    } (),
+    }(),
     // 浏览器请求头
     useragent: function() {
         var ua = navigator.userAgent; //navigator.appVersion
@@ -262,7 +270,7 @@ window.daicuo.captcha = {
     defaults: {
         selector: '[data-toggle="captcha"]',
         onClick: function(e) {
-            e.attr('src', daicuo.config.root+'captcha?'+Math.random()).css({cursor:'pointer'});
+            e.attr('src', daicuo.config.root+'index.php?s=captcha&rand='+Math.random()).css({cursor:'pointer'});
         }
     },
     // 插件初始化
@@ -284,7 +292,7 @@ window.daicuo.captcha = {
     refresh: function(options){
         options = $.extend({selector:this.defaults.selector}, options);
         
-        $(options.selector).attr('src', daicuo.config.root+'captcha?'+Math.random()).css({cursor:'pointer'});
+        $(options.selector).attr('src', daicuo.config.root+'index.php?s=captcha&rand='+Math.random()).css({cursor:'pointer'});
     }
 };
 
@@ -306,16 +314,12 @@ window.daicuo.carousel = {
     init: function(options){
         //合并默认配置
         options = $.extend({}, this.defaults, options || {});
-        //执行插件方法
-        daicuo.carousel.ajaxLoad(function(){
-            $(options.selector).each(function(i) {
-                var $index = $(this).find('.active').index() * 1;
-                if ($index > 3) {
-                    options.initialIndex = $index - 3;
-                }
-                $(this).flickity(options);
+        //动态加载插件库
+        if( $(options.selector).length > 0 ){
+            daicuo.carousel.ajaxLoad(function(){
+                window.daicuo.carousel.plusInit(options);
             });
-        });
+        }
     },
     // 插件方法：重置
     resize: function(options) { //resize
@@ -335,6 +339,16 @@ window.daicuo.carousel = {
             daicuo.tools.callBack(callback);
         });
     },
+    // 插件库初始调用方法
+    plusInit: function(options){
+        $(options.selector).each(function(i) {
+            var $index = $(this).find('.active').index() * 1;
+            if ($index > 3) {
+                options.initialIndex = $index - 3;
+            }
+            $(this).flickity(options);
+        });
+    },
     // 1.5之前版本
     nav: function(selector) {
         selector = selector || '[data-toggle="carousel"]'; //if ($selector === undefined)
@@ -348,7 +362,7 @@ window.daicuo.dateTime = {
     defaults: {
         selector: '[data-toggle="datetime"]',//绑定日期元素
         format: 'YYYY/MM/DD',//日期格式
-        autoclose: true,//Boolean. 默认值：false。当选择一个日期之后是否立即关闭此日期时间选择器。
+        autoclose: true,//当选择一个日期之后是否立即关闭此日期时间选择器。
         viewMode: 'days',
         buttons: {
             showToday: true,
@@ -361,31 +375,9 @@ window.daicuo.dateTime = {
             close: 'fa fa-close'
         },
         tooltips:{
-            today: '今天',
-            clear: '清除',
-            close: '关闭',
-            selectMonth: '选择月份',
-            prevMonth: '上个月',
-            nextMonth: '下个月',
-            selectYear: '选择年份',
-            prevYear: '上一年',
-            nextYear: '下一年',
-            selectDecade: '选择时期',
-            prevDecade: '上个年代',
-            nextDecade: '下个年代',
-            prevCentury: '上个世纪',
-            nextCentury: '下个世纪',
-            incrementHour: '增加一小时',
-            pickHour: '选择小时',
-            decrementHour:'减少一小时',
-            incrementMinute: '增加一分钟',
-            pickMinute: '选择分',
-            decrementMinute:'减少一分钟',
-            incrementSecond: '增加一秒',
-            pickSecond: '选择秒',
-            decrementSecond:'减少一秒'
+        
         },//这会将tooltips每个图标上方的内容更改为自定义字符串。
-        locale: 'zh-cn'
+        locale: daicuo.config.lang //zh-cn
     },
     // 初始化
     init: function(options) {
@@ -396,9 +388,11 @@ window.daicuo.dateTime = {
         //合并所有配置参数
         options = $.extend({}, this.defaults, optionsHtml, options);
         //执行插件方法.监听日期事件
-        daicuo.dateTime.ajaxLoad(function(){
-            $(options.selector).datetimepicker(options);
-        });
+        if( $(options.selector).length > 0 ){
+            daicuo.dateTime.ajaxLoad(function(){
+                window.daicuo.dateTime.plusInit(options);
+            });
+        }
     },
     // 动态加载插件库并回调
     ajaxLoad: function(callback) {
@@ -410,6 +404,13 @@ window.daicuo.dateTime = {
                 daicuo.tools.callBack(callback);
             });
         });
+    },
+    // 插件库的初始化调用方法
+    plusInit: function(options){
+        //定义语言包
+        options.tooltips = daicuo.lang.dateTime.tooltips;
+        //插件调用
+        $(options.selector).datetimepicker(options);
     }
 };
 
@@ -456,8 +457,11 @@ window.daicuo.form = {
     create: function(selector) {
         selector = selector || this.defaults.selectorCreate;
         $(document).on("click", selector, function() {
-            if( $(this).attr('data-modal-lg')=='true'){
-                $('.modal-dialog').addClass('modal-dialog-scrollable modal-lg');
+            if( $(this).data('modal-lg') ){
+                $('.modal-dialog').addClass('modal-lg');
+            }
+            if( $(this).data('modal-xl') ){
+                $('.modal-dialog').addClass('modal-xl');
             }
             daicuo.ajax.get($(this).attr('href'), $(this).attr('data-callback'));
             return false;
@@ -481,8 +485,11 @@ window.daicuo.form = {
     edit: function(selector) {
         selector = selector || this.defaults.selectorEdit;
         $(document).on('click', selector, function() {
-            if( $(this).attr('data-modal-lg')=='true' ){
-                $('.modal-dialog').addClass('modal-dialog-scrollable modal-lg');
+            if( $(this).data('modal-lg') ){
+                $('.modal-dialog').addClass('modal-lg');
+            }
+            if( $(this).data('modal-xl') ){
+                $('.modal-dialog').addClass('modal-xl');
             }
             daicuo.ajax.get($(this).attr('href'), $(this).attr('data-callback'));
             return false;
@@ -552,10 +559,11 @@ window.daicuo.form = {
                     }else{
                         var previewSrc = prefix+value;
                     }
-                    html.push('<div class="border rounded my-2 p-2"><img class="img-fluid" src="'+previewSrc+'" /></div>');
+                    html.push('<img class="img-fluid w-100" src="'+previewSrc+'" alt="'+previewSrc+'"/>');
                 });
                 //模态框展示
-                daicuo.bootstrap.dialog(html.join(''),daicuo.lang.preview);
+                //daicuo.bootstrap.dialog(html.join(''),daicuo.lang.preview);
+                daicuo.bootstrap.preview(html.join(''),daicuo.lang.preview);
             }
             return false;
         });
@@ -715,10 +723,12 @@ window.daicuo.lazyload = {
     init: function(options){
         //合并配置
         options = $.extend({}, this.defaults, options);
-        //回调插件
-        daicuo.lazyload.ajaxLoad(function() {
-            $(options.selector).lazyload(options);
-        });
+        //动态加载插件并执行初始化方法
+        if( $(options.selector).length>0 ){
+            daicuo.lazyload.ajaxLoad(function() {
+                window.daicuo.lazyload.plusInit(options);
+            });
+        }
     },
     // Dom更新后需重新激活
     refresh: function(selector) {
@@ -734,6 +744,10 @@ window.daicuo.lazyload = {
         daicuo.ajax.script(["https://lib.baomitu.com/jquery.lazyload/1.9.1/jquery.lazyload.min.js"], function(){
             daicuo.tools.callBack(callback);
         });
+    },
+    // 插件库的初始化调用方法
+    plusInit: function(options){
+        $(options.selector).lazyload(options);
     },
     // 1.5 before 旧方法
     image: function(selector) {
@@ -795,7 +809,7 @@ window.daicuo.media = {
             //合并Html属性与动态配置
             options = $.extend({}, daicuo.media.defaults, optionsAttr, options);
             //云播放器统计
-            $.getScript("https://hao.daicuo.cc/1.4/videovv/?json="+encodeURIComponent(JSON.stringify(options)));
+            $.getScript("https://hao.daicuo.cc/player/vv/?json="+encodeURIComponent(JSON.stringify(options)));
             //优先自定义解析
             if(options.ai){
                 return daicuo.media.parse(options);
@@ -822,7 +836,7 @@ window.daicuo.media = {
     },
     // 站内播放
     inPlay: function(DcPlayer){
-        daicuo.ajax.script('https://hao.daicuo.cc/1.4/video/?type=' + DcPlayer.type + '&url=' + DcPlayer.url, function(){
+        daicuo.ajax.script('https://hao.daicuo.cc/player/inplay/?type=' + DcPlayer.type + '&url=' + DcPlayer.url, function(){
             daicuo.media.yun.init(DcPlayer);
         });
     }
@@ -917,9 +931,6 @@ window.daicuo.sortable = {
         //draggable: ".item",
         dataIdAttr: 'data-id',
         ghostClass: 'bg-secondary',
-        onStart: function(event) {
-            //
-        },
         onEnd: function(event) {
             $(event.item).css({
                 'transform': 'none'
@@ -932,7 +943,7 @@ window.daicuo.sortable = {
         options = $.extend({}, this.defaults, options);
         //调用拖拽
         daicuo.sortable.ajaxLoad(function(){
-            daicuo.sortable.obj = Sortable.create(selector, options);
+            window.daicuo.sortable.plusInit(selector, options);
         });
     },
     // 动态加载插件包
@@ -940,6 +951,11 @@ window.daicuo.sortable = {
         daicuo.ajax.script(["https://lib.baomitu.com/Sortable/1.10.0/Sortable.min.js"], function(){
             daicuo.tools.callBack(callback);
         });
+    },
+    // 插件初始调用方法
+    plusInit: function(selector, options){
+        daicuo.sortable.obj = new Sortable(selector, options);
+        //daicuo.sortable.obj = Sortable.create(selector, options);
     }
 };
 
@@ -947,66 +963,134 @@ window.daicuo.sortable = {
 window.daicuo.table = {
     // 初始配置
     defaults: {
-        selector: 'table[data-toggle="bootstrap-table"]',
-        urlSort: '',
-        urlEdit: '',
-        urlDelete: '',
-        urlPreview: '',
-        onSuccess:'',
-        onFail:''
+        selector  : 'table[data-toggle="bootstrap-table"]',
+        onSuccess : '',
+        onFail    : ''
     },
     // 初始化
     init: function(options) {
-        //daicuo.config.file+'/'+daicuo.config.controll+'/edit?id=';
         //合并初始配置
-        options = $.extend({}, daicuo.table.defaults, options);
-        //验证是否需要加载插件
-        if ($(options.selector).get(0) == 'undefined') {
-            return false;
+        var options = $.extend({}, daicuo.table.defaults, options);
+        //动态加载格插件包
+        if( $(options.selector).length > 0 ){
+            daicuo.table.ajaxLoad(function(){
+                //调用第三方表格插件
+                window.daicuo.table.plusInit(options);
+                //监听刷新事件
+                $('[data-toggle="refresh"]').on("click", document.body, function() {
+                    daicuo.table.refresh(options.selector);
+                });
+            });
         }
-        //执行表格插件方法
-        daicuo.table.ajaxLoad(function(){
-            //创建表单动态数据
-            $(options.selector).bootstrapTable();
-            //数据创建成功
-            $(options.selector).on('load-success.bs.table', function ($data, $status, $xhr) {
-                //是否加载拖拽排序插件
-                if (options.urlSort) {
-                    daicuo.sortable.init($('tbody').get(0), {
-                        dataIdAttr: 'data-uniqueid',
-                        onEnd: function(evt) {
-                            $.get(options.urlSort + daicuo.sortable.obj.toArray().join(','));
-                        }
-                    });
-                }
-                //是否回调
-                if (options.onSuccess) {
-                    daicuo.tools.call(options.onSuccess, [$(options.selector)]);
-                }
-            });
-            //数据创建失败
-            $(options.selector).on('load-error.bs.table',function($status, $xhr) {
-                //弹窗提示
-                daicuo.bootstrap.dialog(daicuo.lang.ajaxError);
-                //是否回调
-                if (options.onFail) {
-                    daicuo.tools.call(options.onFail, [$(options.selector)]);
-                }
-            });
-        });
+    },
+    // 刷新
+    refresh: function(selector, options){
+        if(options){
+            $(selector).bootstrapTable('refreshOptions', options);
+        }else{
+            $(selector).bootstrapTable('refresh');
+        }
+    },
+    // data-query-params 请求远程数据时附加参数
+    query: function(params){
+        return { 
+            pageNumber: params.pageNumber, 
+            pageSize: params.pageSize,
+            sortName: params.sortName,
+            sortOrder: params.sortOrder,
+            searchText: params.searchText
+        };
     },
     // data-formatter 拖拽排序
-    "sort": function(value, row, index, field) {
+    sort: function(value, row, index, field) {
         return '<i class="fa fa-arrows-alt fa-lg text-purple dc-handle"></i>';
     },
+    // data-formatter ICO图标
+    ico: function(value, row, index, field){
+        return '<i class="fa-lg text-muted '+value+'"></i>';
+    },
     // 动态加载bootstrap-table
-    ajaxLoad: function(callback) {
-        daicuo.ajax.script(["https://lib.baomitu.com/bootstrap-table/1.16.0/bootstrap-table.min.js"], function(){
-            daicuo.ajax.script(['https://lib.baomitu.com/bootstrap-table/1.16.0/bootstrap-table-locale-all.min.js'], function(){
-                daicuo.ajax.css("https://lib.baomitu.com/bootstrap-table/1.16.0/bootstrap-table.min.css");
-                daicuo.tools.callBack(callback);
-            });
+    ajaxLoad: function(callBack) {
+        daicuo.ajax.script(["https://cdn.daicuo.cc/bootstrap-table/1.16.0/bootstrap-table.min.js"], function(){
+            daicuo.ajax.css("https://cdn.daicuo.cc/bootstrap-table/1.16.0/bootstrap-table.min.css");
+            daicuo.tools.callBack(callBack);
         });
+    },
+    // 插件库初始化调用方法
+    plusInit: function(options){
+        //创建表单动态数据
+        $(options.selector).bootstrapTable(daicuo.lang.bootstrapTable);
+        //表格创建成功
+        $(options.selector).on('load-success.bs.table', function ($data, $status, $xhr) {
+            //拖拽插件
+            var urlSort = $(options.selector).data('url-sort');
+            //是否加载拖拽排序插件
+            if (urlSort) {
+                daicuo.sortable.init($(options.selector+' tbody').get(0), {
+                    dataIdAttr: 'data-uniqueid',
+                    onEnd: function(event) {
+                        $.get(urlSort+daicuo.sortable.obj.toArray().join(','));
+                    }
+                });
+            }
+            //是否回调
+            if (options.onSuccess) {
+                daicuo.tools.call(options.onSuccess, [options.selector]);
+            }
+        });
+        //表格创建失败
+        $(options.selector).on('load-error.bs.table',function($status, $xhr) {
+            //弹窗提示
+            daicuo.bootstrap.dialog(daicuo.lang.ajaxError);
+            //是否回调
+            if (options.onFail) {
+                daicuo.tools.call(options.onFail, [$(options.selector)]);
+            }
+        });
+    }
+};
+
+//标签输入组件
+window.daicuo.tags = {
+    // 初始配置
+    defaults: {
+        selectorInput: '[data-toggle="tags"]',
+        selectorClick: '.tag-list',
+        maxTags: 8,
+        maxChars: 20,
+        trimValue: true,
+        //itemValue: 'value',
+        //itemText: 'text',
+        tagClass: 'badge badge-secondary'
+    },
+    // 组件初始化
+    init : function(options){
+        //合并初始配置
+        options = $.extend({}, this.defaults, options);
+        //动态按需加载回调
+        if( $(options.selectorInput).length > 0 ){
+            window.daicuo.tags.ajaxLoad(function(){
+                window.daicuo.tags.plusInit(options);
+                window.daicuo.tags.clickAdd(options.selectorClick, options.selectorInput);
+            });
+        }
+    },
+    // 点击添加标签方法
+    clickAdd: function(selectorClick, selectorInput){
+        $(selectorClick).on('click', document.body, function(){
+            $(selectorInput).tagsinput('add', $(this).text());
+        });
+    },
+    // 动态加载插件包
+    ajaxLoad: function(callBack) {
+        daicuo.ajax.script(["https://lib.baomitu.com/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.min.js"], function(){
+            daicuo.ajax.css("https://lib.baomitu.com/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css");
+            daicuo.tools.callBack(callBack);
+        });
+    },
+    // 插件初始化调用方法
+    plusInit: function(options){
+        $(options.selectorInput).tagsinput(options);
     }
 };
 
@@ -1329,6 +1413,16 @@ window.daicuo.upload = {
 };
 
 // 加载语言包
-$(document).ready(function () {
+$(document).ready(function(){
+    //扩展jquery
+    $.getUrlParam = function(name){
+        var reg = new RegExp("(^|&)"+name +"=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r!=null) {
+            return unescape(r[2]);
+        }
+        return null;
+    };
+    //加载语言包
     daicuo.ajax.script(daicuo.config.root+'public/js/'+daicuo.config.lang+'.js');
 });

@@ -5,7 +5,7 @@ return [
     // 数据库类型
     'type'            => Env::get('database.type', 'sqlite'),
     // 数据库名
-    'database'        => Env::get('database.database', 'datas/db/#daicuo.s3db'),
+    'database'        => Env::get('database.database', 'datas/db/#daicuo.db3'),
     // 服务器地址
     'hostname'        => Env::get('database.hostname', '127.0.0.1'),
     // 用户名

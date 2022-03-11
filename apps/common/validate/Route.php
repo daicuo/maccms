@@ -1,5 +1,6 @@
 <?php
 namespace app\common\validate;
+
 use think\Validate;
 
 class Route extends Validate
@@ -13,18 +14,14 @@ class Route extends Validate
 	];
 	
 	protected $message = [
-		'rule.require' => '{%route_rule_require}',
-		'address.require' => '{%route_address_require}',
-	];
-	
-	protected $scene = [
-    
+		'rule.require' => '{%rule_require}',
+		'address.require' => '{%address_require}',
 	];
 	
 	protected function checkRule($value, $rule, $data)
     {
 		if(is_numeric($value)){
-			return lang('route_rule_number');
+			return lang('rule_number');
 		}
 		return true;
 	}
@@ -32,7 +29,7 @@ class Route extends Validate
 	protected function checkAddress($value, $rule, $data)
     {
 		if(count(explode('/',$value)) < 3){
-			return lang('route_address_demo');
+			return lang('address_demo');
 		}
 		return true;
 	}
@@ -41,7 +38,7 @@ class Route extends Validate
     {
 		if($value){
             if(!json_decode($value, true)){
-                return lang('route_'.$field.'_json');
+                return lang($field.'_json');
             }
 		}
 		return true;

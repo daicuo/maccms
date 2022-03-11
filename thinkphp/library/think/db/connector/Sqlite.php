@@ -53,7 +53,8 @@ class Sqlite extends Connection
                 $val                = array_change_key_case($val);
                 $info[$val['name']] = [
                     'name'    => $val['name'],
-                    'type'    => $val['type'],
+                    //'type'    => $val['type'],
+                    'type'    => $this->fieldsType($val['type']),
                     'notnull' => 1 === $val['notnull'],
                     'default' => $val['dflt_value'],
                     'primary' => '1' == $val['pk'],
@@ -62,6 +63,18 @@ class Sqlite extends Connection
             }
         }
         return $this->fieldCase($info);
+    }
+    
+    /**
+     * 特殊类型转换为SQLITE常用字段（TP自动绑定时获取的类型）
+     * @param string $type 
+     * @return string
+     */
+    private function fieldsType($type=''){
+        if(preg_match('/(int|double|float|decimal|real|numeric|serial|bit)/is', $type)){
+            return 'TEXT';
+        }
+        return $type;
     }
 
     /**

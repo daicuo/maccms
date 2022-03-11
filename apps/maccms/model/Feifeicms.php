@@ -3,8 +3,8 @@ namespace app\common\model;
 
 use app\maccms\model\Api;
 
-class Feifeicms extends Api{
-
+class Feifeicms extends Api
+{
     //字段转换字典
     protected $fields = [
         'vod_id'    => 'a',
@@ -13,19 +13,19 @@ class Feifeicms extends Api{
     ];
     
     //列表页接口
-	public function item($api, $args)
+	public function item($api='', $args=[])
     {
         return $this->apis($api, $args, 'item');
     }
     
     //详情页接口
-    public function detail($api, $args)
+    public function detail($api='', $args=[])
     {
         return $this->apis($api, $args, 'detail');
     }
     
     //通用采集接口
-    private function apis($api, $args, $action='detail')
+    private function apis($api='', $args=[], $action='detail')
     {
         //API参数
         $url = array();
@@ -86,7 +86,7 @@ class Feifeicms extends Api{
     }
     
     //分类字典转化xml
-    public function item_data($data){
+    public function item_data($data=[]){
         $type = array();
         foreach($data['list'] as $key=>$value){
             $type[$key]['type_id'] = $value['list_id'];
@@ -96,7 +96,7 @@ class Feifeicms extends Api{
     }
     
     //详情字典转换xml
-    public function detail_data($data){
+    public function detail_data($data=[]){
         if(!$data){
             return null;
         }
@@ -130,6 +130,7 @@ class Feifeicms extends Api{
         $data['vod_language'] = $this->data_explode($data['vod_language']);
         $data['vod_actor']    = $this->data_explode($data['vod_actor']);
         $data['vod_director'] = $this->data_explode($data['vod_director']);
+        $data['vod_content']  = maccmsTrim(strip_tags($data['vod_content'],'<p>,<br>'));
         $data['vod_play']     = explode('$$$',$data['vod_play']);
         $data['play_list']    = $this->play_list($data['vod_play'], $data['play_list']);
         $data['play_last']    = $this->play_last($data['type_id'], $data['vod_id'], $data['play_list']);
@@ -137,7 +138,7 @@ class Feifeicms extends Api{
     }
     
     //播放列表
-    private function play_list($vod_play, $vod_url){
+    private function play_list($vod_play=[], $vod_url=''){
         if( empty($vod_url) ){
             return [];
         }
@@ -168,7 +169,8 @@ class Feifeicms extends Api{
 	}
     
     //播放分组
-    private function play_one($playOne){
+    private function play_one($playOne='')
+    {
         $urlItem = explode( chr(13), str_replace(array("\r\n", "\n", "\r"), chr(13), $playOne) );
         $urlOne = array();
         foreach($urlItem as $key=>$value){

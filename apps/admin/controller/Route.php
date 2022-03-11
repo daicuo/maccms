@@ -1,22 +1,53 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\controller\Admin;
+use app\admin\controller\Admin;
 
-/**
- * 路由管理
- */
 class Route extends Admin
 {
+    //定义表单字段列表
+    protected function fields($data=[])
+    {
+        return model('admin/Route','loglic')->fields($data);
+    }
+    
+    //定义表单初始数据
+    protected function formData()
+    {
+        if( $id = input('id/d',0) ){
+            return $this->data = \daicuo\Route::get_id($id, false);
+		}
+        return [];
+    }
+    
+    //定义表格数据（JSON）
+    protected function ajaxJson()
+    {
+        //查询参数
+        $args = array();
+        $args['cache']    = false;
+        $args['field']    = '*';
+        $args['limit']    = 0;
+        $args['page']     = 1;
+        $args['sort']     = input('get.sortName/s','op_id');
+        $args['order']    = input('get.sortOrder/s','desc');
+        $args['search']   = input('searchText/s','');
+        $args['where']    = DcWhereQuery(['op_module','op_controll','op_action','op_status'], 'eq', $this->query);
+        //数据返回
+        return DcEmpty(model('common/Route','loglic')->select($args),[]);
+    }
 	
     //新加一条规则到数据库
 	public function save()
     {
         config('common.validate_name', 'common/Route');
-        $op_id = \daicuo\Route::save(input('post.'));
-		if($op_id < 1){
+        
+        $id = \daicuo\Route::save(input('post.'));
+        
+		if($id < 1){
 			$this->error(\daicuo\Route::getError());
 		}
+        
 		$this->success(lang('success'));
 	}
     
@@ -24,102 +55,54 @@ class Route extends Admin
 	public function delete()
     {
         $ids = input('id/a');
-		if(!$ids){
+		if( !$ids ){
 			$this->error(lang('mustIn'));
 		}
+        
         foreach($ids as $id){
             \daicuo\Route::delete_id($id);
         }
+        
         $this->success(lang('success'));
-	}
-    
-    //修改
-	public function edit()
-    {
-        $id = input('id/d',0);
-		if(!$id){
-			$this->error(lang('mustIn'));
-		}
-		//查询数据
-        $data = \daicuo\Route::get_id($id, false);
-        if( is_null($data) ){
-            $this->error(lang('empty'));
-        }
-		$this->assign('data', $data);
-		return $this->fetch();
 	}
 	
 	//修改一条规则到数据库
 	public function update()
     {
         $data = input('post.');
-        if(!$data['op_id']){
-			$this->error(lang('mustIn'));
-		}
+        
         config('common.validate_name', 'common/Route');
+        
         $info = \daicuo\Route::update_id($data['op_id'], $data);
+        
         if(is_null($info)){
             $this->error(\daicuo\Route::getError());
         }
+    
         $this->success(lang('success'));
 	}
     
-    //路由管理
-	public function index()
+    //排序（拖拽ajax）
+	public function sort()
     {
-        if($this->request->isAjax()){
-            $args = array();
-            $args['cache'] = false;
-            $args['field'] = 'op_id,op_name,op_value,op_module,op_controll,op_action,op_order,op_status';
-            $args['sort']  = input('get.sortName/s','op_id');
-            $args['order'] = input('get.sortOrder/s','desc');
-            //$args['fetchSql'] = true;
-            if( $this->query['op_module'] ){
-                $args['where']['op_module'] = ['eq', DcHtml($this->query['op_module'])];
-            }
-            if( $this->query['searchText'] ){
-                $args['where']['op_value'] = ['like','%'.DcHtml($this->query['searchText'].'%')];
-            }
-            $infos = \daicuo\Route::all($args);
-            foreach($infos as $key=>$value){
-                $infos[$key]['operate'] = base64_encode($value["rule"]);
-            }
-            if($infos){
-                return json($infos);
-            }
-            return json([]);
-		}
-		$this->assign('query', $this->query);
-		return $this->fetch();
+		if( !\daicuo\Op::sort(input('get.id')) ){
+            $this->error(lang('fail'));
+        }
+        
+        DcCache('route_all', NULL);
+        
+        $this->success(lang('success'));
 	}
     
-    //首页快捷设置
-	public function home()
+    //预览
+	public function preview()
     {
-        //定义首页路由
-		$data = array();
-        $data['rule'] = '/';
-        $data['address'] = input('address/s','index/index/index');
-        //查询是否已经设置其它模块为首页
-        $args = array();
-        $args['cache'] = false;
-        $infos = \daicuo\Route::all($args);
-        foreach($infos as $key=>$value){
-            if($value['rule'] == '/'){
-                $data['id'] = $value['op_id'];
-                break;
-            }
-        }
-        //写入数据库
-        if($data['id']){
-            $status = \daicuo\Route::update_id($data['id'],$data);
-        }else{
-            $status = \daicuo\Route::save($data);
-        }
-        if( !$status ){
-			$this->error(lang('fail'));
+		if( !$id = input('id/d',0) ){
+			$this->error(lang('mustIn'));
 		}
-		$this->success(lang('success'));
+        
+        $data = \daicuo\Route::get_id($id, false);
+        
+        $this->redirect(DcUrlAdmin($data['address']), 302);
 	}
-	
 }
